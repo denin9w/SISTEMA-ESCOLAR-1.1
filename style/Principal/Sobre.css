@@ -1,0 +1,34 @@
+div#sobre{
+  display: flex;
+  grid-column: 1 / span 2 ;
+  grid-row: 3 / span 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+#sobre h1{
+  font-family: var(--font-titulos);
+  font-weight: lighter;
+  font-size: clamp(50px, 2.5vw, 30px);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.195);
+  padding: 20px;
+  line-height: 150%;
+  border-radius: 6px;
+  color: var(--texto-inverso);
+  background-image: linear-gradient(to right, var(--btncor),#fd269cb9 );
+}
+#sobre p{
+  font-size: 1.3em;
+  text-align: justify;
+  line-height: 150%;
+  margin: 20px 0px 20px 0px;
+
+}
+#social a{
+  font-size: 2em;
+  color: var(--btncor);
+}
+#social a:hover{
+  color: var(--text);
+}
