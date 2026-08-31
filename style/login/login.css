@@ -1,0 +1,190 @@
+@import url(../principal/style.css);
+@import url(../principal/ficha.css);
+@import url(../login/expansinvo-L.css);
+
+:root{
+
+  --fundo-principal: #f5f5f5;
+  --texto:#222222;
+  --texto-inverso:#ffffff;
+  --titlecor:#003869;
+  --btncor:#fd269c;
+  --destaque:#0077ff;
+  --destaque-inverso:#66bbff;
+  --fundo-card:#ffffff;
+
+  --font-titulos:"Sacramento", cursive, sans-serif;
+  --font-subtitulo:"Teachers", sans-serif;
+  --font-botoes:"Roboto", sans-serif;
+
+}
+
+
+
+section#ficha{
+    grid-template-columns: auto auto auto;
+    grid-template-rows: repeat(6, auto);
+    background: url(../../imagens/fundo.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+    text-align: center;
+   
+
+}
+
+img.boneco{
+    z-index: 1;
+    width: 90px;
+    grid-row: 1 / span 1;
+    grid-column: 1 / 2;
+    padding-left:30px;
+    margin-top: 20px;
+
+}
+img.moeda{
+    width:80px;
+    grid-row: -1 / -2;
+    grid-column: -1 / -2;
+    justify-self: right;
+    padding-right: 30px;
+    margin-bottom: 20px;
+
+}
+
+
+div.text-baner{
+    grid-column: 1 / span 3 ;
+    grid-row: 1 / span 1;
+    height: 100px;
+    margin: 0px;
+    text-align: center;
+    align-content: center;
+    align-self: flex-start;
+    background-color: #043e7092;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.29);
+}
+div.text-baner h1{
+    color: var(--texto-inverso);
+    
+}
+
+
+div.tabs{
+    grid-column: 1 / -1 ;
+    grid-row: 2 / span 1;
+    gap:10px;
+    margin:40px 0px 40px 0px;
+    justify-self: center;
+}
+
+.tab{
+    background-color:transparent;
+    flex:1;
+    font-size:1em;
+    background-color: #043e7092;
+    color:var(--texto-inverso);
+    padding:20px;
+    border-radius:8px;
+    border: none;
+}
+.tab:hover{
+    background-color: var(--destaque-inverso);
+    color: var(--texto);
+}
+
+
+div#login{
+    grid-column: 1 / -1 ;
+    grid-row: 3 / span 1;
+}
+
+
+#loginForm{
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+    align-items: center;
+    padding: 20px 0px 20px 0px;
+    width: 90%;
+    gap: 20px;
+    border-radius: 6px;
+    background-color: #043e7092;
+
+}
+.input-one,
+.input-two{
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+}
+.input-one label,
+.input-two label{
+    margin-bottom: 0px;
+    color: white;
+    font-size: 1.3em;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.157);
+}
+input.input-l{
+    border-radius: 4px;
+    width: 100% ;
+    height: 50px;
+    font-size: 1.5em;
+    background-color:transparent;
+    border:none;
+    box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 3px;
+}
+
+.input-l:hover{
+    outline: none;
+    box-shadow: none;
+    border-bottom: 1px solid white;
+}
+.input-l:focus{
+    outline: none;
+    box-shadow: none;
+    color: white;
+}
+
+.input-b{
+    border-radius: 10px;
+    width: 80% ;
+    padding: 20px;
+    font-size: 1.2em;
+    margin-top: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.21);
+    background-color: #fdfdfdc6;
+  
+    color: black;
+}
+
+
+.input-b:hover{
+    background-color: rgb(251, 251, 251);
+    color: #043e70fe;
+    transition: 0.3s;
+}
+
+
+a.back{
+    grid-column: 1 / -1 ;
+    grid-row: 4 / span 1;
+    text-decoration: none;
+    font-weight: bold;
+    color:var(--texto);
+}
+a.back:hover{
+    color: var(--destaque-inverso);
+}
+
+p.link-cadastro{
+    grid-column: 1 / -1 ;
+    grid-row: 5 / span 1;
+}
+
+
+footer{
+    margin:0px;
+}
+

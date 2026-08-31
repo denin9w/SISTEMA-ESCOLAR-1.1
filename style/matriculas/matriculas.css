@@ -1,0 +1,109 @@
+@import url(../principal/style.css);
+
+
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#dados-container{
+    width: 100%;
+    padding: 35px;
+    background: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+section#dados-aluno{
+    width: 100%;
+    background-color: #043e7092;
+    padding: 10px;
+}
+
+.titulo-dadosaluno h1{
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--text);
+}
+
+.titulo-dadosaluno h2{
+    text-align: center;
+    font-size: 1em;
+    color: var(--texto-inverso);
+}
+
+
+.etapa {
+    display: none;
+}
+
+.etapa.ativa {
+    display: block;
+}
+
+label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    font-size: 16px;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+
+    border-color: #003869;
+}
+
+button {
+    padding: 12px 20px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #003869;
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+button:hover {
+    background: #00558a;
+}
+
+.botoes {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 25px;
+}
+
+
+
+
