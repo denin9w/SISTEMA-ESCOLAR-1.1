@@ -1,109 +1,94 @@
 @import url(../principal/style.css);
+@import url(../principal/style.css);
 
 
-
-*{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-}
-
-body{
+main#dados-container{
     display: flex;
     flex-direction: column;
+    width: 100vw;
+    padding: 1rem;
     justify-content: center;
     align-items: center;
-
 }
-
-#dados-container{
-    width: 100%;
-    padding: 35px;
-    background: white;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+main#dados-container h1{
+    font-size: 2.2rem;
+    text-align: center;
+    color: var(--titlecor);
 }
-
-
-section#dados-aluno{
-    width: 100%;
-    background-color: #043e7092;
+fieldset.dados-aluno{
+    border: 3px dashed var(--destaque);
+    border-radius: 5px;
     padding: 10px;
 }
 
-.titulo-dadosaluno h1{
+
+legend.titulo{
     text-align: center;
-    font-size: 2.5em;
-    color: var(--text);
+    font-size: 1.3rem;
+    padding: 0 10px;
+    color: var(--destaque);
 }
 
-.titulo-dadosaluno h2{
-    text-align: center;
-    font-size: 1em;
-    color: var(--texto-inverso);
+label{
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--texto);
+    font-weight: bold;
+}
+.input-aluno{
+    width: 100%;
+    padding: 0.6rem;
+    color: var(--texto);
+    font-size: 1rem;
 }
 
-
-.etapa {
-    display: none;
-}
-
-.etapa.ativa {
-    display: block;
-}
-
-label {
-    display: block;
-
-    margin-bottom: 8px;
-
+legend{
+    font-size: 1.2rem;
+    color: var(--texto);
     font-weight: bold;
 }
 
-input,
-select {
+.sexo legend{
+    justify-self: start;
+    padding: 0;
+}
+div.sexo{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+div.sexo-m{
+    display: flex;
+    align-items: center;
+}
+div.sexo-f{
+    display: flex;
+    align-items: center;
+}
+label.subtitulo{
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--texto);
+    font-weight: normal;
+}
+
+input[type="radio"]{
+    margin-right: 0.5rem;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+button#btnProximo{
     width: 100%;
-
-    padding: 13px;
-
-    border: 1px solid #ccc;
-    border-radius: 6px;
-
-    font-size: 16px;
-}
-
-input:focus,
-select:focus {
-    outline: none;
-
-    border-color: #003869;
-}
-
-button {
-    padding: 12px 20px;
-
+    padding: 0.8rem;
+    font-size: 1.2rem;
+    color: var(--texto);
+    background-color: var(--destaque);
+    margin-top: 1rem;
     border: none;
-    border-radius: 6px;
-
-    background: #003869;
-    color: white;
-
-    font-size: 16px;
-
+    border-radius: 0.3rem;
     cursor: pointer;
 }
-
-button:hover {
-    background: #00558a;
+button#btnProximo:hover{
+    background-color: var(--destaque-inverso);
+    color: var(--texto-inverso);
 }
-
-.botoes {
-    display: flex;
-
-    justify-content: space-between;
-
-    margin-top: 25px;
-}
-
-
-
-

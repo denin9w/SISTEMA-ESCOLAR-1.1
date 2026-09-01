@@ -14,62 +14,115 @@
         <h1>Centro Educacional Jardin do Éden</h1>
         <h2>Uma escola de Gerações</h2>
     </header>
+    <nav id="MCL">
+        <a href="index.html">Inicio <i class="fa-solid fa-graduation-cap"></i></a>
+        <a href="#">Cadastro <i class="fa-solid fa-user-plus"></i></a>
+        <a href="login.htm">Login <i class="fa-solid fa-key"></i></a>
+    </nav>
+
     <main id="dados-container">
-        <section id="dados-aluno">
-            <div class="input-aluno">
-                <div class="titulo-dadosaluno">
-                    <h1 class="titulo">Matriculas</h1>
-                    <h2 class="titulo">Dados Pessoais do Aluno</h2>
+            <h1 class="titulo">Matriculas</h1>
+        <fieldset class="dados-aluno">
+            <legend class="titulo">Dados Pessoais do Aluno</legend>
+            <form id="formulario">
+
+                <section class="etapa-ativa">
+            
+                    <label for="#iname">Nome:</label>
+                    <input 
+                        class="input-aluno"
+                        id="inome" 
+                        name="nome"      
+                        type="text" 
+                        method="post"
+                        placeholder="Digite o nome completo do aluno"
+                        autocomplete="on"
+                        required
+                    >
+
+                    <label for="#idata">Data de Nascimento:</label>
+                    <input
+                        class="input-aluno"
+                        id="idata"
+                        name="data"
+                        type="date"
+                        required
+                    >
+                        
+                    <fieldset>
+                        <legend>Sexo:</legend>
+                        <div class="sexo">
+                            <div class="sexo-m">
+                                    <input
+                                        id="isexoM"
+                                        name="sexo"
+                                        type="radio"
+                                        checked
+                                    >
+                                    <label class=" subtitulo" for="isexoM">Masculino</label>
+                            </div>
+                            <div class="sexo-f">
+                                <input
+                                    id="isexoF"
+                                    name="sexo"
+                                    type="radio"
+                                >
+                                <label class=" subtitulo" for="isexoF">Feminino</label>
+                            </div>
+                        </div>
+                    </fieldset>
+            
+                   
+
+                </section>
+            </form>
+        </fieldset>
+        <button type="button" id="btnProximo">
+            Próximo
+        </button>
+        
+
+
+            <!-- 
+                
+            <section class="etapa">
+
+
+                <div class="botoes">
+
+                    <button type="button" class="btnVoltar">
+                        Voltar
+                    </button>
+
+                    <button type="button" class="btnProximo">
+                        Próximo
+                    </button>
+
                 </div>
 
-                <form id="formMatricula">
-                    <div class="etapa ativa">
-                        <label for="#iname">Nome:</label>
-                        <input class="cnome" id="inome" name="nome" type="text" required>
-                            
-                        <button type="button" class="proximo">
-                            Próximo
-                        </button>
+            </section>
 
-                    </div>    
-                    
-                    <div class="etapa">
-                        <label for="#isexo">Sexo:</label>
-                        <input class="csexo" id="isexo" name="sexo" type="text" required>
-
-                        <div class="botoes">
-
-                            <button type="button" class="voltar">
-                                Voltar
-                            </button>
-
-                            <button type="button" class="proximo">
-                                Próximo
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="etapa">
-                        <label for="#idata">Data de Nascimento:</label>
-                        <input class="cdata" id="idata" name="data" type="number" required>
-
-                            <div class="botoes">
-
-                        <button type="button" class="voltar">
-                            Voltar
-                        </button>
-
-                        <button type="submit">
-                            Finalizar matrícula
-                        </button>
-
-                    </div>
-                    
 
                     
+            <section class="etapa">
+             
+                <div class="botoes">
+                    <button type="button" class="btnVoltar">
+                        Voltar
+                    </button>
+                    <button type="submit">
+                        Finalizar matrícula
+                    </button>
+                </div>
+                
+            </section>
+            -->
+
+         
+            
+
+
+
                     <!-- <label for="#inacionalidade">Nacionalidade:</label>
                     <input class="cnacionalidade" id="inacionalidade" name="nacionalidade" type="text">
 
@@ -125,11 +178,11 @@
                         <option value="3ano-a">8º Ano A</option>
                     </select>
                                                     -->
-                </form>
-            </div>
+            
+        
 
             
-        </section>
+       
 
          <!--<section id="dados-pai">
             <div class="input-pai">
@@ -149,9 +202,11 @@
             </div>
         </section>
                         -->
-
+    
     </main>
     
+    <footer>
+        <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
     <script src="script.js"></script>
 
 </body>
