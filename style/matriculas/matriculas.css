@@ -2,6 +2,9 @@
 @import url(../principal/style.css);
 
 
+body{
+    background: url(../../imagens/fundo.png)
+}
 main#dados-container{
     display: flex;
     flex-direction: column;
@@ -9,15 +12,17 @@ main#dados-container{
     padding: 1rem;
     justify-content: center;
     align-items: center;
+
 }
+
 main#dados-container h1{
     font-size: 2.2rem;
     text-align: center;
     color: var(--titlecor);
 }
 fieldset.dados-aluno{
-    border: 3px dashed var(--destaque);
-    border-radius: 5px;
+    border: 2px dashed var(--destaque);
+    border-radius: 10px;
     padding: 10px;
 }
 
@@ -28,6 +33,9 @@ legend.titulo{
     padding: 0 10px;
     color: var(--destaque);
 }
+.etapa2 legend{
+    font-size: 1.1rem;
+}
 
 label{
     margin: 0;
@@ -36,6 +44,13 @@ label{
     font-weight: bold;
 }
 .input-aluno{
+    width: 100%;
+    padding: 0.6rem;
+    color: var(--texto);
+    font-size: 1rem;
+}
+
+.input-responsavel{
     width: 100%;
     padding: 0.6rem;
     color: var(--texto);
@@ -77,6 +92,16 @@ input[type="radio"]{
     width: 1.2rem;
     height: 1.2rem;
 }
+
+select{
+    width: 100%;
+    padding: 0.6rem;
+    color: var(--texto);
+    font-size: 1rem;
+}
+
+
+
 button#btnProximo{
     width: 100%;
     padding: 0.8rem;
@@ -94,4 +119,28 @@ button#btnProximo{
 button#btnProximo:hover{
     background-color: var(--btncor);
     color: var(--texto);
+}
+button#btnVoltar{
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.2rem;
+    color: var(--texto-inverso);
+    background-color: var(--destaque-inverso);
+    margin-top: 1rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
+    text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
+
+}
+button#btnVoltar:hover{
+    background-color: var(--btncor);
+    color: var(--texto);
+}
+
+
+
+div.etapa2{
+    display:none;
 }
