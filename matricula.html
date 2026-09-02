@@ -208,44 +208,162 @@
                 <legend class="titulo">Dados Pessoais dos Responsáveis</legend>
                 <form id="formulario">
                     <section class="etapa">
-
+                        
                         <label for="#iname">Nome do Pai:</label>
-                        <input
-                            class="input-responsavel"
-                            id="inome"
-                            name="nome"
-                            type="text"
-                            method="post"
-                            placeholder="Digite o nome completo do aluno"
-                            autocomplete="on"
-                            required
-                        >
-
-                        <label for="#iname">Nome do Mãe:</label>
-
-                        <input
-                            class="input-responsavel"
-                            id="inome"
-                            name="nome"
-                            type="text"
-                            method="post"
-                            placeholder="Digite o nome completo do aluno"
-                            autocomplete="on"
-                            required
-                        >
-
-                        <label for="#iname">Nome do responsavel(Avó ou Avo):</label>
                             <input
-                            class="input-responsavel"
-                            id="inome"
-                            name="nome"
-                            type="text"
-                            method="post"
-                            placeholder="Digite o nome completo do aluno"
-                            autocomplete="on"
-                            required
-                        >
+                                class="input-responsavel"
+                                id="inome"
+                                name="nome"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o nome completo do aluno"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Profissão do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iprofissao-pai"
+                                name="profissao-pai"
+                                type="text"
+                                method="post"
+                                placeholder="Digite a profissão do pai"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Identidade do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iidentidade-pai"
+                                name="identidade-pai"
+                                type="text"
+                                method="post"
+                                placeholder="Digite a identidade do pai"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Cpf do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="icpf-pai"
+                                name="cpf-pai"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o CPF do pai"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">WhatsApp do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iwhatsapp-pai"
+                                name="whatsapp-pai"
+                               type="text"
+                                method="post"
+                                 placeholder="Digite o WhatsApp do pai"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Telefone do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="itelefone-pai"
+                                name="telefone-pai"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o telefone do pai"
+                                autocomplete="on"
+                                required
+                            >
+                       
+                        <label for="#iname">Nome da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="inome-mae"
+                                name="nome-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o nome completo da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Profissão da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iprofissao-mae"
+                                name="profissao-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite a profissão da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Identidade da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iidentidade-mae"
+                                name="identidade-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite a identidade da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Cpf da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="icpf-mae"
+                                name="cpf-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o CPF da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">WhatsApp da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iwhatsapp-mae"
+                                name="whatsapp-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o WhatsApp da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="#iname">Telefone da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="itelefone-mae"
+                                name="telefone-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o telefone da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                      
 
+                        <label for="#iname">Nome do Responsável:</label>
+                        <select name="responsavel" id="iresponsavel">
+                
+                            <option value="pai">Pai</option>
+                            <option value="mãe">Mãe</option>
+                            <option value="outro">Responsável</option>
+                            <option value="outro">
+                                 <input
+                                class="input-responsavel"
+                                id="itelefone-mae"
+                                name="telefone-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o nome apenas se o responsável for diferente do pai ou da mãe"
+                                autocomplete="on"
+                                 required
+                                >
+                            </option>
+                        </select>
+                        
                     </section>
                 </form>
             </fieldset>
