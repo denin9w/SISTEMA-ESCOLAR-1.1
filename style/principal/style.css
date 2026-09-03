@@ -164,8 +164,9 @@ nav#MCL a{
   font-weight: bolder;
   color: var(--texto-inverso);
   text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.392);
-  transition: 0.5s wid;
+  transition: 0.5s width;
 }
+
 nav#MCL a:hover{
   border-radius: 6px;
   color: var(--titlecor);

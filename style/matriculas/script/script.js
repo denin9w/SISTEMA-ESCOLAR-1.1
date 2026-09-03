@@ -13,6 +13,7 @@ function proximo(){
     etapa2.style.display = 'block';
     btnproximo.style.display = 'none';
     btnfinalizar.style.display = 'block';
+    btnvoltar.style.display = 'block';
 }
 
 function voltar(){
