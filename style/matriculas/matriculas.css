@@ -138,8 +138,25 @@ button#btnVoltar:hover{
     background-color: var(--btncor);
     color: var(--texto);
 }
+button#btnFinalizar{
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.2rem;
+    color: var(--texto-inverso);
+    background-color: var(--destaque-inverso);
+    margin-top: 1rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
+    text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
+    display:none;
 
-
+}
+button#btnFinalizar:hover{
+    background-color: var(--btncor);
+    color: var(--texto);
+}
 
 div.etapa2{
     display:none;
