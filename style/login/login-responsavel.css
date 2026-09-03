@@ -1,0 +1,64 @@
+@import url(login.css);
+
+
+div.text-baner h1{
+    font-size: 1.5rem;
+}
+#documentos{
+    grid-column: 1 / -1;
+    grid-row: 2 / span 2 ;
+    margin-top: 20px;
+    justify-self: center;
+    
+}
+
+div.documentos-itens{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+}
+
+
+.opçao-card input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  display: none;
+
+}
+
+.conteudo-card {
+  padding: 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+ 
+}
+.icone {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.conteudo-card:hover {
+  border-color: #bbb;
+  background-color: #f9f9f9;
+}
+.opçao-card input[type="checkbox"]:checked + .conteudo-card {
+  border-color: #007bff;
+  background-color: #e6f2ff;
+  color: #007bff;
+}
+
+.input-b{
+    background-color: var(--destaque);
+    color: var(--texto-inverso);
+}
+.input-b:hover{
+    background-color: var(--btncor);
+    color: var(--texto);
+}

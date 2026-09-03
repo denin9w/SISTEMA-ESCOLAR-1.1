@@ -23,7 +23,7 @@
 
 section#ficha{
     grid-template-columns: auto auto auto;
-    grid-template-rows: repeat(6, auto);
+    grid-template-rows: repeat(5, auto);
     background: url(../../imagens/fundo.png);
     background-size: cover;
     background-repeat: no-repeat;
@@ -164,6 +164,10 @@ input.input-l{
     background-color: rgb(251, 251, 251);
     color: #043e70fe;
     transition: 0.3s;
+}
+.input-b a{
+    text-decoration: none;
+    color: var(--texto);
 }
 
 
