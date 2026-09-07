@@ -1,0 +1,58 @@
+@media screen and (min-width: 790px){
+main#dados-container{
+    display: flex;
+    width: 100vw;
+    padding: 1rem;
+    justify-content: center;
+    align-items: center;
+  
+
+}
+
+section.etapa-ativa{
+    display: flex;
+    flex-wrap: wrap;
+    width: 90vw;
+    gap: 20px;
+   
+}
+
+
+label{
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--texto);
+    font-weight: bold;
+}
+.input-aluno{
+    width: 30%;
+    padding: 0.6rem;
+    color: var(--texto);
+    font-size: 1rem;
+}
+#idata{
+    width: 20%;
+}
+
+
+div.sexo{
+    width: 90vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 100px;
+}
+
+
+.legend{
+    font-size: 0.8rem;
+}
+label.subtitulo{
+    font-size: 0.8rem;
+}
+
+.input-aluno::placeholder{
+    font-size: 0.7rem;
+}
+
+}

@@ -24,6 +24,7 @@ div#sobre{
     background-image: linear-gradient(to right, var(--btncor),#fd269cab );
 }
 
+
 section#skill-container{
     flex-direction: row;
     padding: 10px;

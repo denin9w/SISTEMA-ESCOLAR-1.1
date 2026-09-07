@@ -21,6 +21,7 @@ function voltar(){
     etapa2.style.display= 'none';
     btnproximo.style.display = 'block';
     btnfinalizar.style.display = 'none';
+    btnvoltar.style.display = 'none'
 }
 
 function finalizar(){

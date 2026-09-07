@@ -147,7 +147,7 @@ nav#MCL{
   justify-content: space-evenly;
   grid-column: 1 / span 2;
   grid-row: 2 / span 1;
-  background-color: var(--destaque-inverso);
+  background-color: var(--titlecor);
   box-shadow: 0 5px 6px rgba(0, 0, 0, 0.482);
   position: sticky;
   top: 0;
@@ -161,7 +161,7 @@ nav#MCL a{
   text-decoration: none;
   font-size: clamp(17px, 2vw, 20px);
   white-space: nowrap;
-  font-weight: bolder;
+  font-weight:500;
   color: var(--texto-inverso);
   text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.392);
   transition: 0.5s width;
@@ -169,7 +169,7 @@ nav#MCL a{
 
 nav#MCL a:hover{
   border-radius: 6px;
-  color: var(--titlecor);
+  color: var(--destaque-inverso);
 }
 
 footer{
