@@ -61,7 +61,7 @@ div.text-baner{
     text-align: center;
     align-content: center;
     align-self: flex-start;
-    background-color: #043e7092;
+    background-color:var(--titlecor);
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.29);
 }
 div.text-baner h1{
@@ -82,7 +82,7 @@ div.tabs{
     background-color:transparent;
     flex:1;
     font-size:1em;
-    background-color: #043e7092;
+    background-color:var(--titlecor);
     color:var(--texto-inverso);
     padding:20px;
     border-radius:8px;
@@ -109,7 +109,7 @@ div#login{
     width: 90%;
     gap: 20px;
     border-radius: 6px;
-    background-color: #043e7092;
+    background-color: var(--titlecor);
 
 }
 .input-one,
@@ -150,9 +150,9 @@ input.input-l{
 .input-b{
     border-radius: 10px;
     width: 80% ;
-    padding: 20px;
+    padding: 15px;
     font-size: 1.2em;
-    margin-top: 40px;
+    margin-top: 20px;
     border: 1px solid rgba(0, 0, 0, 0.21);
     background-color: #fdfdfdc6;
   

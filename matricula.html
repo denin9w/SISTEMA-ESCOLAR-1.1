@@ -13,8 +13,10 @@
 
 <body>
     <header>   
-        <h1>Centro Educacional Jardin do Éden</h1>
-        <h2>Uma escola de Gerações</h2>
+        <div class="text-fixo">
+            <h1>Centro Educacional Jardin do Éden</h1>
+            <h2>Uma escola de Gerações</h2>
+        </div>
     </header>
     <nav id="MCL">
         <a href="index.html">Inicio <i class="fa-solid fa-graduation-cap"></i></a>
@@ -28,7 +30,7 @@
         <div class="etapa1">
             <fieldset class="dados-aluno">
                 <legend class="titulo">Dados Pessoais do Aluno</legend>
-                <form id="formulario">
+                <form id="formulario" action="/registro" method="post">
                     <section class="etapa-ativa">
             
                         <label for="#iname">Nome:</label>
@@ -42,7 +44,7 @@
                             autocomplete="on"
                             required
                         >
-                        <label for="#idata">Data de Nascimento:</label>
+                        <label for="idata">Data de Nascimento:</label>
                         <input
                             class="input-aluno"
                             id="idata"
@@ -79,83 +81,109 @@
                             class="input-aluno" 
                             id="inacionalidade" 
                             name="nacionalidade"
-                            type="text">
+                            type="text"
+                            placeholder="Digite a Nacionalidade">
 
-                        <label for="#icdidade">Cidade de nascimento:</label>
+                        <label for="icdidade">Cidade de nascimento:</label>
                         <input 
                             class="input-aluno"
                             id="icdidade"
                             name="cdidade" 
-                            type="text">
-                            
-                        <label for="#iendereço">Endereço:</label>
+                            type="text"
+                            placeholder="Lugar onde a criaça foi registrada"
+                            required>
+
+                        <h3>ENDEREÇO</h3>
+
+                        
+                        <label for="iendereço">Rua:</label>
                         <input 
                             class="input-aluno"
                             id="iendereço" 
                             name="endereço" 
-                            type="text">
+                            type="text"
+                            placeholder="Rua atual"
+                            required>
                         
-                        <label for="#in">N:</label>
-                        <input 
-                            class="input-aluno"
-                            id="in" 
-                            name="n" 
-                            type="number">
-
-                        <label for="#ibairro">Bairro:</label>
+                        <label for="ibairro">Bairro:</label>
                         <input 
                             class="input-aluno"
                             id="ibairro" 
                             name="bairro" 
-                            type="text">
-                        
-                        
+                            type="text"
+                            placeholder="Bairro atual"
+                            required>
                             
-                        <label for="#icidade">Cidade:</label>
+                       
+                        
+                    
+                        <label for="#in">Nº:</label>
+                        <input
+                                class="input-aluno"
+                                id="in"
+                                name="n"
+                                type="number"
+                                placeholder="408"
+                                required>
+                        
+                        <label for="icidade">Cidade:</label>
                         <input 
                             class="input-aluno"
                             id="icidade" 
                             name="cidade" 
-                            type="text">
+                            type="text"
+                            placeholder="Garanhuns..."
+                            required>
 
-                        <label for="#iestado">Estado:</label>
-                        <input 
-                            class="input-aluno"
-                            id="iestado" 
-                            name="estado" 
-                            type="text">
+                        <label for="iestado">UF:</label>
+                        <input
+                                class="input-aluno"
+                                id="iestado"
+                                name="estado"
+                                type="text"
+                                placeholder="SP"
+                                required>
+                    
 
-                        <label for="#icep">CEP:</label>
+                        
+
+                        <label for="icep">CEP:</label>
                         <input 
                             class="input-aluno"
                             id="icep" 
                             name="cep" 
-                            type="number">
+                            type="number"
+                            placeholder="00000.000">
 
-                        <label for="#icpf">CPF:</label>
+                        <label for="icpf">CPF:</label>
                         <input 
                             class="input-aluno"
                             id="icpf" 
                             name="cpf" 
-                            type="number">
+                            type="number"
+                            placeholder="000.000.000.00"
+                            required>
 
-                        <label for="#irg">RG:</label>
+                        <label for="irg">RG:</label>
                         <input 
                             class="input-aluno"
                             id="irg" 
                             name="rg" 
-                            type="number">
+                            type="number"
+                            placeholder="00.000.000.0"
+                            required>
 
 
 
-                        <label for="#iniss">NISS:</label>
+                        <label for="iniss">NISS:</label>
                         <input 
                             class="input-aluno"
                             id="inss" 
                             name="niss" 
-                            type="number">
+                            type="number"
+                            placeholder="000.00000.00-0">
 
-                        <label for="#iturma">Turma:</label>
+                        <label for="iturma">Turma:</label>
                         <select name="turma" id="iturma">
                             <option value="disabled" selected>Selecione uma turma</option>
                             <option value="infantil-I a">Infantil I A</option>
@@ -180,8 +208,8 @@
                             <option value="3ano-a">8º Ano A</option>
                         </select>
         
-
-
+                        <label for="iobs">Observação:</label>
+                        <textarea name="nobs" id="iobs" placeholder="Digete alguma observação sobre o aluno."></textarea>
 
                     </section>
                 </form>
@@ -211,10 +239,10 @@
                 <form id="formulario">
                     <section class="etapa">
                         
-                        <label for="#iname">Nome do Pai:</label>
+                        <label for="inameP">Nome do Pai:</label>
                             <input
                                 class="input-responsavel"
-                                id="inome"
+                                id="inomeP"
                                 name="nome"
                                 type="text"
                                 method="post"
@@ -222,18 +250,17 @@
                                 autocomplete="on"
                                 required
                             >
-                        <label for="#iname">Profissão do Pai:</label>
+                        <label for="iprofissao-pai">Profissão do Pai:</label>
                             <input
                                 class="input-responsavel"
                                 id="iprofissao-pai"
                                 name="profissao-pai"
                                 type="text"
-                                method="post"
                                 placeholder="Digite a profissão do pai"
                                 autocomplete="on"
-                                required
+                               
                             >
-                        <label for="#iname">Identidade do Pai:</label>
+                        <label for="#iidentidade-pai">Identidade do Pai:</label>
                             <input
                                 class="input-responsavel"
                                 id="iidentidade-pai"
@@ -244,7 +271,7 @@
                                 autocomplete="on"
                                 required
                             >
-                        <label for="#iname">Cpf do Pai:</label>
+                        <label for="icpf-pai">Cpf do Pai:</label>
                             <input
                                 class="input-responsavel"
                                 id="icpf-pai"
@@ -255,7 +282,7 @@
                                 autocomplete="on"
                                 required
                             >
-                        <label for="#iname">WhatsApp do Pai:</label>
+                        <label for="iwhatsapp-pai">WhatsApp do Pai:</label>
                             <input
                                 class="input-responsavel"
                                 id="iwhatsapp-pai"
@@ -263,10 +290,9 @@
                                type="text"
                                 method="post"
                                  placeholder="Digite o WhatsApp do pai"
-                                autocomplete="on"
-                                required
+                               
                             >
-                        <label for="#iname">Telefone do Pai:</label>
+                        <label for="itelefone-pai">Telefone do Pai:</label>
                             <input
                                 class="input-responsavel"
                                 id="itelefone-pai"
@@ -274,11 +300,10 @@
                                 type="text"
                                 method="post"
                                 placeholder="Digite o telefone do pai"
-                                autocomplete="on"
-                                required
+                               
                             >
                        
-                        <label for="#iname">Nome da Mãe:</label>
+                        <label for="inome-mae">Nome da Mãe:</label>
                             <input
                                 class="input-responsavel"
                                 id="inome-mae"
@@ -289,7 +314,7 @@
                                 autocomplete="on"
                                 required
                             >
-                        <label for="#iname">Profissão da Mãe:</label>
+                        <label for="iprofissao-mae">Profissão da Mãe:</label>
                             <input
                                 class="input-responsavel"
                                 id="iprofissao-mae"
@@ -297,10 +322,9 @@
                                 type="text"
                                 method="post"
                                 placeholder="Digite a profissão da mãe"
-                                autocomplete="on"
-                                required
+                                
                             >
-                        <label for="#iname">Identidade da Mãe:</label>
+                        <label for="#iidentidade-mae">Identidade da Mãe:</label>
                             <input
                                 class="input-responsavel"
                                 id="iidentidade-mae"
@@ -311,7 +335,7 @@
                                 autocomplete="on"
                                 required
                             >
-                        <label for="#iname">Cpf da Mãe:</label>
+                        <label for="icpf-mae">Cpf da Mãe:</label>
                             <input
                                 class="input-responsavel"
                                 id="icpf-mae"
@@ -322,7 +346,7 @@
                                 autocomplete="on"
                                 required
                             >
-                        <label for="#iname">WhatsApp da Mãe:</label>
+                        <label for="iwhatsapp-mae">WhatsApp da Mãe:</label>
                             <input
                                 class="input-responsavel"
                                 id="iwhatsapp-mae"
@@ -333,7 +357,7 @@
                                 autocomplete="on"
                                 required
                             >
-                        <label for="#iname">Telefone da Mãe:</label>
+                        <label for="itelefone-mae">Telefone da Mãe:</label>
                             <input
                                 class="input-responsavel"
                                 id="itelefone-mae"
@@ -346,25 +370,15 @@
                             >
                       
 
-                        <label for="#iname">Nome do Responsável:</label>
+                        <label for="iresponsavel">Nome do Responsável:</label>
                         <select name="responsavel" id="iresponsavel">
-                
                             <option value="pai">Pai</option>
                             <option value="mãe">Mãe</option>
-                            <option value="outro">Responsável</option>
-                            <option value="outro">
-                                 <input
-                                class="input-responsavel"
-                                id="itelefone-mae"
-                                name="telefone-mae"
-                                type="text"
-                                method="post"
-                                placeholder="Digite o nome apenas se o responsável for diferente do pai ou da mãe"
-                                autocomplete="on"
-                                 required
-                                >
-                            </option>
                         </select>
+
+                        <label for="iresponsavelO">Escolha o Responsavel</label>
+                        <br>
+                        <input type="text" id="iresponsavelO" placeholder="Avó / Avô / Tio ou Tia">
                         
                     </section>
                 </form>

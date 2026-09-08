@@ -1,17 +1,63 @@
 @media screen and (min-width: 600px){
+
+header{
+    height: 120px;
+}
+
+
 .moeda{
     display: block;
     margin: auto;
+    padding: 0;
 }
 
 .boneco{
     display: block;
-    margin: auto;   
+    margin: auto;  
+    padding: 0;
+
 }
+
+
+div.text-baner{
+    height: ;
+   
+}
+div.text-baner h1{
+    color: var(--texto-inverso);
+    font-size: 2.5rem;
+    
+}
+
+
 div#login{
     grid-column: 1 / span 3;
     grid-row: 3 / span 1;
-    width: 600px;
+    width: 400px;
+    height: 219px;
     justify-self: center;
+}
+
+div.tabs{
+    grid-column: 1 / -1 ;
+    grid-row: 2 / span 1;
+    gap:10px;
+    margin:30px 0px 30px 0px;
+    justify-self: center;
+}
+
+
+button.tab{
+    background-color:transparent;
+    flex:1;
+    font-size:0.8rem;
+    background-color:var(--titlecor);
+    color:var(--texto-inverso);
+    padding:14px;
+    border-radius:8px;
+    border: none;
+}
+a.back{
+    margin-top: 10px;
 }
 }
