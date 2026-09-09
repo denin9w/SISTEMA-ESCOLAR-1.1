@@ -1,6 +1,16 @@
-@import url(login.css);
+@media screen and (min-width: 790px){
 
-
+header{
+   position: sticky;
+   top: 0;
+   height:100vh;
+}
+header.text-fixo{
+    display: flex;
+    position: sticky;
+    z-index: 1;
+    top: 0;
+}
 div.text-baner h1{
     font-size: 1.5rem;
 }
@@ -13,8 +23,10 @@ div.text-baner h1{
 }
 
 div.documentos-itens{
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center;
+    align-items: center;
     gap: 20px;
 
 }
@@ -55,10 +67,11 @@ div.documentos-itens{
 }
 
 .input-b{
-    background-color: var(--destaque);
+    background-color: var(--titlecor);
     color: var(--texto-inverso);
 }
 .input-b:hover{
     background-color: var(--btncor)!important;
     color: var(--texto);
+}
 }

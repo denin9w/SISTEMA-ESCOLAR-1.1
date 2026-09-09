@@ -1,6 +1,7 @@
 @import url(../principal/style.css);
 @import url(../principal/sobre.css);
 @import url(../login/expansinvo-L.css);
+@import url(../login/login-responsavelExpansivo.css);
 
 :root{
 
@@ -89,8 +90,8 @@ div.tabs{
     border: none;
 }
 .tab:hover{
-    background-color: var(--destaque-inverso);
-    color: var(--texto);
+    background-color: var(--titlecor);
+    color: var(--texto-inverso);
 }
 
 
@@ -133,7 +134,7 @@ input.input-l{
     font-size: 1.5em;
     background-color:transparent;
     border:none;
-    box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 3px;
+    box-shadow: rgba(243, 242, 242, 0.039) 0px 1px 3px;
 }
 
 .input-l:hover{
@@ -154,15 +155,12 @@ input.input-l{
     font-size: 1.2em;
     margin-top: 20px;
     border: 1px solid rgba(0, 0, 0, 0.21);
-    background-color: #fdfdfdc6;
-  
-    color: black;
+    background-color:var(--fundo-card);
+    color:var(--texto);
 }
 
-
-.input-b:hover{
-    background-color: rgb(251, 251, 251);
-    color: #043e70fe;
+button.input-b:hover{
+    background-color:var(--destaque-inverso);
     transition: 0.3s;
 }
 .input-b a{
@@ -170,6 +168,9 @@ input.input-l{
     color: var(--texto);
 }
 
+.input-b a:hover{
+    color: var(--texto-inverso);
+}
 
 a.back{
     grid-column: 1 / -1 ;
