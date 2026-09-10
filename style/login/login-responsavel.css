@@ -1,20 +1,55 @@
 @import url(../login/login.css);
-@import url(../login/expansinvo-L.css); 
-@import url(../login/login-responsavelExpansivo.css);
-div.text-baner h1{
-    font-size: 1.5rem;
+
+
+
+
+
+
+
+img.boneco{
+    position: absolute;
+    width: 25%;
+    top: 120px;
+    left: -5px;
+  
+
 }
-#documentos{
-    grid-column: 1 / -1;
-    grid-row: 2 / span 2 ;
+
+div.text-banerL{
+  width: 100%;
+}
+
+div.text-banerL h1{
+    background-color: var(--destaque);
+    text-align: center;
+    font-size: 1.9rem;
+    padding: 20px;
+    color: var(--texto-inverso);
+}
+div.text-banerL h2{
+    text-align: center;
+    font-size: 1.4rem;
+    color: var(--texto);
     margin-top: 20px;
-    justify-self: center;
-    
+    padding: 10px;
+}
+
+
+div.documentos{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+
 }
 
 div.documentos-itens{
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+    margin-top: 30px;
     gap: 20px;
 
 }
@@ -54,11 +89,20 @@ div.documentos-itens{
   color: #007bff;
 }
 
-.input-b{
+.input-br{
+    display: block;
+    margin: auto;
+    width: 70%;
+    padding: 20px;
+    border-radius: 15px;
+    border: none;
     background-color: var(--destaque);
     color: var(--texto-inverso);
+    margin-top: 30px;
+    font-size: 1.2rem;
+   
 }
-.input-b:hover{
+.input-br:hover{
     background-color: var(--btncor)!important;
     color: var(--texto);
 }

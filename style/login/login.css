@@ -18,57 +18,38 @@
 
 
 section#ficha{
-    grid-template-columns: auto auto auto;
-    grid-template-rows: repeat(5, auto);
-    background: url(../../imagens/fundo.png);
-    background-size: cover;
-    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
     position: relative;
-    text-align: center;
-   
 
 }
 
 img.boneco{
-    z-index: 1;
-    width: 65px;
-    grid-row: 1 / span 1;
-    grid-column: 1 / 2;
-    padding-left:5px;
-    margin-top: 5px;
+    position: absolute;
+    width: 25%;
+    top: 4px;
+    left: -5px;
+  
 
 }
 img.moeda{
-    width:80px;
-    grid-row: -1 / -2;
-    grid-column: -1 / -2;
-    justify-self: right;
-    padding-right: 30px;
-    margin-bottom: 20px;
+  position: absolute;
+  width: 20%;
+  bottom: 100px;
+  right: -20px;
 
 }
 
-
-div.text-baner{
-    grid-column: 1 / span 3 ;
-    grid-row: 1 / span 1;
-    height: 100px;
-    margin: 0px;
-    text-align: center;
-    align-content: center;
-    align-self: flex-start;
-    background-color:var(--titlecor);
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.29);
-}
-div.text-baner h1{
-    color: var(--texto-inverso);
+div.text-banerL h1{
+    margin-top: 40px;
+    font-size: 2.2rem;
+    color: var(--titlecor);
     
 }
 
 
 div.tabs{
-    grid-column: 1 / -1 ;
-    grid-row: 2 / span 1;
     gap:10px;
     margin:40px 0px 40px 0px;
     justify-self: center;
@@ -77,7 +58,7 @@ div.tabs{
 .tab{
     background-color:transparent;
     flex:1;
-    font-size:1em;
+    font-size:0.9rem;
     background-color:var(--titlecor);
     color:var(--texto-inverso);
     padding:20px;
@@ -88,13 +69,6 @@ div.tabs{
     background-color: var(--titlecor);
     color: var(--texto-inverso);
 }
-
-
-div#login{
-    grid-column: 1 / -1 ;
-    grid-row: 3 / span 1;
-}
-
 
 #loginForm{
     display: flex;
@@ -158,23 +132,17 @@ button.input-b:hover{
     background-color:var(--destaque-inverso);
     transition: 0.3s;
 }
-.input-b a{
-    text-decoration: none;
-    color: var(--texto);
-}
 
-.input-b a:hover{
-    color: var(--texto-inverso);
-}
+
 
 a.back{
-    grid-column: 1 / -1 ;
-    grid-row: 4 / span 1;
+
     text-decoration: none;
     font-weight: bold;
     color:var(--texto);
     font-size: 1.1rem;
-    margin-top: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 a.back:hover{
     color: var(--destaque-inverso);
@@ -182,8 +150,7 @@ a.back:hover{
 
 
 footer{
-    grid-column: 1 / -1 ;
-    grid-row: 5 / span 1;
+    width: 100%;
     margin:0px;
 }
 
