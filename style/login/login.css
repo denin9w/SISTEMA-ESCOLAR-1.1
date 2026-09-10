@@ -1,8 +1,4 @@
 @import url(../principal/style.css);
-@import url(../principal/sobre.css);
-@import url(../login/expansinvo-L.css);
-@import url(../login/login-responsavelExpansivo.css);
-
 :root{
 
   --fundo-principal: #f5f5f5;
@@ -19,7 +15,6 @@
   --font-botoes:"Roboto", sans-serif;
 
 }
-
 
 
 section#ficha{
@@ -185,14 +180,10 @@ a.back:hover{
     color: var(--destaque-inverso);
 }
 
-p.link-cadastro{
-    grid-column: 1 / -1 ;
-    grid-row: 5 / span 1;
-    font-size: 1.1rem;
-}
-
 
 footer{
+    grid-column: 1 / -1 ;
+    grid-row: 5 / span 1;
     margin:0px;
 }
 
