@@ -1,19 +1,22 @@
 @import url(../login/login.css);
 
-
-
-
-
-
-
 img.boneco{
     position: absolute;
-    width: 25%;
-    top: 120px;
+    width: 28%;
+    top: 100px;
     left: -5px;
-  
 
 }
+
+img.moeda{
+    position: absolute;
+    left: 200px;
+    bottom: -34%;
+    width:4rem;
+    border: 1px dashed rebeccapurple;
+
+}
+
 
 div.text-banerL{
   width: 100%;
@@ -35,13 +38,19 @@ div.text-banerL h2{
 }
 
 
-div.documentos{
+div#documentos{
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
+  height: 100vh;
+  background: url(../../imagens/fundo.png);
+  background-size:auto;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 
-
+  border: 1px dashed rebeccapurple;
 }
 
 div.documentos-itens{
@@ -51,6 +60,7 @@ div.documentos-itens{
     flex-wrap: wrap;
     margin-top: 30px;
     gap: 20px;
+    border: 1px dashed rebeccapurple;
 
 }
 
@@ -99,10 +109,29 @@ div.documentos-itens{
     background-color: var(--destaque);
     color: var(--texto-inverso);
     margin-top: 30px;
+
     font-size: 1.2rem;
    
 }
 .input-br:hover{
     background-color: var(--btncor)!important;
     color: var(--texto);
+}
+
+a.back{
+
+    text-decoration: none;
+    font-weight: bold;
+    color:var(--texto);
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+a.back:hover{
+    color: var(--destaque-inverso);
+}
+
+footer{
+    width: 100%;
+    margin:0px;
 }

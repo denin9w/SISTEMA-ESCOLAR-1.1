@@ -21,25 +21,40 @@ section#ficha{
     display: flex;
     flex-direction: column;
     width: 100vw;
+    height: 100vh;
+    justify-content: space-between;
     position: relative;
+    background: url(../../imagens/fundo.png);
+    background-size:auto;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    border: 1px dashed rebeccapurple;
 
+}
+
+
+nav#MCL{
+    width: 100%;
 }
 
 img.boneco{
     position: absolute;
     width: 25%;
-    top: 4px;
+    top: 60px;
     left: -5px;
   
 
 }
 img.moeda{
   position: absolute;
-  width: 20%;
-  bottom: 100px;
-  right: -20px;
-
+  width: 15%;
+  bottom: 60px;
+  right: -2px;
+  padding: 0px;
 }
+
+
+
 
 div.text-banerL h1{
     margin-top: 40px;
@@ -141,9 +156,9 @@ a.back{
     font-weight: bold;
     color:var(--texto);
     font-size: 1.1rem;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 10px;
 }
+
 a.back:hover{
     color: var(--destaque-inverso);
 }
