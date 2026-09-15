@@ -1,5 +1,48 @@
-@media screen and (min-width: 600px){
+@media screen and (min-width: 500px){
 
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    display: grid;
+    width: 100vw;
+    min-height: 100vh;
+    grid-template-columns: 400px auto;
+    align-items: stretch;
+    
+    
+}
+
+header{
+    display: flex;
+    width: 400px;
+    grid-column: 1 / 2;
+    background: url(../../imagens/fundo.png);
+    background-size: cover;
+    border: 1px dashed red;
+}
+
+.text-fixo h1{
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.text-fixo h2{
+    font-size: 1.5rem;
+}
+
+section#ficha{
+    display: flex;
+    width: auto;
+    min-height: 100vh;
+    grid-column: 2 / 3;
+    background: var(--fundo);
+    position: relative;
+    justify-content: space-between;
+}
 
 
 img.boneco{
@@ -7,7 +50,6 @@ img.boneco{
     width: 7rem;
     top: 70px;
     left:0px;
-
 }
 
 img.moeda{
