@@ -1,15 +1,17 @@
-@media screen and (min-width: 760px){
-
+@media screen and (min-width: 764px){
 body{
     display: grid;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     grid-template-columns: 400px auto;
+    grid-template-rows: auto auto;
+  
 }
 
 header{
     width: 400px;
-    height: 100vh;
+    height: 100%;
+    grid-row: 1 / -1;
     grid-column: 1 / 2;
     background: url(../../imagens/fundo.png);
 }
@@ -23,7 +25,8 @@ header{
 section#ficha{
     display: flex;
     width: auto;
-    height: 100vh;
+    height: 100%;
+    grid-row: 1 / -1;
     grid-column: 2 / 3;
     background: var(--fundo);
     position: relative;
@@ -33,15 +36,15 @@ section#ficha{
 
 img.moeda{
     position: absolute;
-    top: 60px;
+    bottom: 60px;
     right: 20px;
-    width:4rem;
+    width:3rem;
 }
 
 img.boneco{
     top: 100px;
     position: absolute;
-    width:6rem;
+    width:5rem;
 
 }
 
@@ -83,5 +86,60 @@ button.tab{
 
 footer p{
     font-size: 0.8rem;
+}
+}
+
+@media (min-width: 764px) and (max-width:887px){
+    img.moeda{
+    position: absolute;
+    right:-1%;
+    bottom:60px;
+    width:5rem;
+}
+}
+
+@media screen and (min-width: 888px) and (max-width:949){
+    img.moeda{
+    position: absolute;
+    right:6%;
+    bottom:70px;
+    width:4rem;
+}
+}
+
+
+
+@media screen and (min-width: 950px) and (max-width:1110) {
+    img.boneco{
+    position: absolute;
+    width: 7rem;
+    top: 110px;
+    left:10%;
+}
+img.moeda{
+    position: absolute;
+    right:6%;
+    bottom:70px;
+    width:5rem;
+}
+}
+
+
+
+
+@media screen and (min-width: 1111px){
+img.boneco{
+
+    position: absolute;
+    width: 7rem;
+    top: 110px;
+    left:10%;
+}
+
+img.moeda{
+    position: absolute;
+    left:80%;
+    bottom:40px;
+    width:5rem;
 }
 }
