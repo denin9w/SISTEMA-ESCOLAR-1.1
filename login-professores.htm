@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="style/login/login-responsavel.css">
-    <link rel="stylesheet" href="style/login/login-responsavelExpansivo.css">
+    <link rel="stylesheet" href="style/login/login-professores.css">
 
     <title> CEJE </title>
 
@@ -13,12 +12,22 @@
 
 <body>
 
-    <header class="text-fixo">
-        <h1>Centro Educacional Jardin do Éden</h1>
-        <h2>Uma escola de Gerações</h2>
-    </header>
+    
+    <section id="header">
+        <header class="text-fixo">
+            <h1>Centro Educacional Jardin do Éden</h1>
+            <h2>Uma escola de Gerações</h2>
+        </header>
+    </section>
+   
 
     <section id="ficha">
+
+        <nav id="MCL">
+            <a href="index.html">Inicio <i class="fa-solid fa-home-cap"></i></a>
+        
+            <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
+        </nav>
 
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
         <img  class="moeda" src="imagens/moeda.png" alt="Moeda">
@@ -30,34 +39,53 @@
         <div id="Boletim">
             <label for="iturma">Turma:</label>
             <select name="turma" id="iturma">
-                <option value="disabled" selected>Selecione uma turma</option>
+                <option value="disabled" selected>Selecione Uma Turma</option>
                 <option value="1ano-a">1º Ano A</option>
                 <option value="1ano-b">1º Ano B</option>
                 <option value="2ano-a">2º Ano A</option>
                 <option value="2ano-b">2º Ano B</option>
                 <option value="3ano-a">3º Ano A</option>
-                <option value="1ano-a">4º Ano A</option>
-                <option value="1ano-b">4º Ano B</option>
-                <option value="2ano-a">5º Ano A</option>
-                <option value="2ano-b">5º Ano B</option>
-                <option value="3ano-a">6º Ano A</option>
-                <option value="1ano-a">7º Ano A</option>
+                <option value="1ano-a">3º Ano B</option>
+                <option value="1ano-b">4º Ano A</option>
+                <option value="2ano-a">4º Ano B</option>
+                <option value="2ano-b">5º Ano A</option>
+                <option value="3ano-a">5º Ano B</option>
+                <option value="1ano-a">6º Ano A</option>
                 <option value="2ano-a">7º Ano A</option>
                 <option value="3ano-a">8º Ano A</option>
-                <option value="3ano-a">8º Ano A</option>
+                <option value="3ano-a">9º Ano A</option>
             </select>
+            
+            <div class="aluno">
+                <input type="text" placeholder="Digite o nome do aluno">
+                <button class="Adicionar">
+                    Adicionar
+                </button>
+
+                <div class="alunos-array">
+                    <ul>
+
+                    </ul>
+                </div>
+
+            </div>
+
 
             <div id="lançar-Notas">
 
-                <div class="MB1" active>
+                <div class="MB1">
+                    <h1>1 Bimestre</h1>
                     <label for="in1">N1</label>
                     <input type="number" name="n1" id="in1" placeholder="N1">
                     <label for="in2">N2</label>
                     <input type="number" name="n2" id="in2" placeholder="N2">
                     <label for="in3">N3</label>
                     <input type="number" name="n3" id="in3" placeholder="N3">
-                    <label for="imb">MB</label>
-                    <input type="number" name="mb" id="imb" placeholder="MB">
+                    <div class="resp">
+                       Media Bimestral:
+
+                    </div>
+                    
                     <button
                     class="input-b" 
                     type="submit">
@@ -66,14 +94,18 @@
                 </div>
                     
                 <div class="MB2">
+                    <h1>2 Bimestre</h1>
+
                     <label for="in1">N1</label>
                     <input type="number" name="n1" id="in1" placeholder="N1">
                     <label for="in2">N2</label>
                     <input type="number" name="n2" id="in2" placeholder="N2">
                     <label for="in3">N3</label>
                     <input type="number" name="n3" id="in3" placeholder="N3">
-                    <label for="imb">MB</label>
-                    <input type="number" name="mb" id="imb" placeholder="MB">
+                    <div class="resp">
+                       Media Bimestral:
+
+                    </div>
                     <button
                     class="input-b" 
                     type="submit">
@@ -82,14 +114,18 @@
                 </div>
 
                 <div class="MB3">
+                    <h1>3 Bimestre</h1>
+
                     <label for="in1">N1</label>
                     <input type="number" name="n1" id="in1" placeholder="N1">
                     <label for="in2">N2</label>
                     <input type="number" name="n2" id="in2" placeholder="N2">
                     <label for="in3">N3</label>
                     <input type="number" name="n3" id="in3" placeholder="N3">
-                    <label for="imb">MB</label>
-                    <input type="number" name="mb" id="imb" placeholder="MB">
+                    <div class="resp">
+                        Media Bimestral:
+
+                    </div>
                     <button
                     class="input-b" 
                     type="submit">
@@ -97,19 +133,27 @@
                     </button>
                 </div>
                 <div class="MB4">
+                    <h1>4 Bimestre</h1>
+
                     <label for="in1">N1</label>
                     <input type="number" name="n1" id="in1" placeholder="N1">
                     <label for="in2">N2</label>
                     <input type="number" name="n2" id="in2" placeholder="N2">
                     <label for="in3">N3</label>
                     <input type="number" name="n3" id="in3" placeholder="N3">
-                    <label for="imb">MB</label>
-                    <input type="number" name="mb" id="imb" placeholder="MB">
+                    <div class="resp">
+                        Media Bimestral:
+                    </div>
                     <button
                     class="input-b" 
                     type="submit">
                     Lançar Nota
                     </button>
+
+                    <div class="resp-Media">
+                    Media Anual:
+
+                    </div>
                 </div>
 
         </div>  
@@ -122,7 +166,7 @@
     <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
     </footer>
 
-<script src="script.js"></script>
+<script src=".//style/login/script/script.js"></script>
 </body>
 
 </html>

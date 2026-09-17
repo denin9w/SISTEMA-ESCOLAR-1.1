@@ -1,0 +1,116 @@
+@import url(../login/login-responsavel.css);
+
+
+
+img.boneco{
+    position:absolute;
+    width: 6rem;
+    top:400px;
+    left:250px;
+
+}
+
+img.moeda{
+    position: absolute;
+    z-index: 1;
+    right: 1px;
+    bottom:50px;
+    width:5rem;
+}
+
+
+
+
+
+div.text-baner h1{
+    text-align: center;
+    font-size: 1.8rem;
+    padding: 0px;
+    margin: 0px;
+}
+#Boletim{
+    display: flex;
+    flex-direction: column;
+    width: 90vw;
+    gap: 20px;
+}
+
+
+#Boletim select{
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    color: var(--titlecor);
+    font-weight: bold;
+
+}
+
+div.aluno{
+    width: 100%;
+}
+.aluno input{
+    width: 70%;
+    font-size: 1rem;
+    border: 1px dashed var(--destaque);
+    border-radius:50px;
+    padding: 10px;
+    background-color: var(--fundo-card);
+}
+
+.aluno button{
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--destaque);
+    color: var(--texto-inverso);
+}
+div#lançar-Notas{
+    display: none;
+}
+
+div#lançar-Notas h1{
+    color: var(--titlecor);
+}
+
+div#lançar-Notas label{
+    display: none;
+    font-size: 0.8rem;
+    color: var(--titlecor);
+}
+div#lançar-Notas input{
+    width: 100%;
+    font-size: 1rem;
+    border: 1px dashed var(--destaque);
+    border-radius:50px;
+    padding: 10px;
+    background-color: var(--fundo-card);
+    margin-bottom: 20px;
+    font-size: 0.7rem;
+
+}
+
+div#lançar-Notas button{
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--destaque);
+    color: var(--texto-inverso);
+    margin-bottom: 20px;
+}
+div.resp{
+    font-size: 1.2rem;
+    color: var(--titlecor);
+    font-weight: bolder;
+}
+div.resp-Media{
+    background-color: var(--destaque);
+    border-radius: 50px;
+    padding: 20px;
+    font-size: 2rem;
+    color: var(--texto-inverso);
+    font-weight: bolder;
+}

@@ -38,13 +38,13 @@ img.moeda{
     position: absolute;
     bottom: 60px;
     right: 20px;
-    width:3rem;
+    width:4rem;
 }
 
 img.boneco{
-    top: 100px;
     position: absolute;
-    width:5rem;
+    top: 100px;
+    width:6rem;
 
 }
 
@@ -94,7 +94,7 @@ footer p{
     position: absolute;
     right:-1%;
     bottom:60px;
-    width:5rem;
+    width:4rem;
 }
 }
 

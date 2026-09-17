@@ -21,7 +21,7 @@ section#ficha{
     display: flex;
     flex-direction: column;
     width: auto;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: space-between;
     position: relative;
     background: url(../../imagens/fundo.png);
@@ -39,7 +39,7 @@ nav#MCL{
 
 img.boneco{
     position: absolute;
-    width: 25%;
+    width: 6rem;
     top: 60px;
     left: -5px;
   
@@ -47,7 +47,7 @@ img.boneco{
 }
 img.moeda{
   position: absolute;
-  width: 15%;
+  width: 4rem;
   bottom: 60px;
   right: -2px;
   padding: 0px;
