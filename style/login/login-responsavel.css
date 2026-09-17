@@ -1,20 +1,45 @@
 @import url(../login/login.css);
 
-img.boneco{
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+
+}
+body{
+  display: grid;
+  grid-template-rows: auto;
+  border: 10px dashed rgb(204, 0, 255);
+}
+
+main#container{
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 100vh;
+  border: 10px dashed yellow;
+}
+
+img.bonecoO{
     position: absolute;
-    width: 6rem;
-    top: 170px;
-    left: -8px;
+    z-index: 2;
+    width: 7rem;
+    top: 180px;
+    left: 8px;
 
 }
 
-img.moeda{
+img.moedaO{
     position: absolute;
-    left: 200px;
-    bottom: -44%;
-    width:4rem;
+    z-index: 2;
+    right: 1px;
+    bottom:20px;
+    width:5rem;
     border: 1px dashed rgb(51, 151, 153);
 
+}
+div.elemento-onput{
+  display: none;
 }
 
 div.text-banerL{
