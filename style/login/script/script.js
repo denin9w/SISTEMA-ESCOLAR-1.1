@@ -4,7 +4,7 @@ let nome_Aluno = document.querySelector("#inome-Aluno")
 let list_Alunos = document.querySelector("#lista-Alunos");
 let elemento_Button = document.querySelector(".Adicionar")
 
-let lançar_Notas = document.querySelector("lançar_Notas");
+let lancar_Notas = document.querySelector("#lancar_Notas");
 
 let Alunos = [];
 elemento_Aluno.style.display = "none";
@@ -45,23 +45,28 @@ function renderTarefas(){
     let linkElement = document.createElement("a");
     linkElement.setAttribute("href", "#");
 
-    linkElement.appendChild(document.createTextNode("Excluir"));
+    linkElement.appendChild(document.createTextNode("Lançar Notas"));
     
-    linkElement.setAttribute("onclick", " deletar(" + posicao + "); return false;");
+    linkElement.onclick = bimestral;
+
+    //let alunoElement = document.createElement("a");
+    //alunoElement.setAttribute("href", "#");
+
+    //alunoElement.appendChild(document.createTextNode("Laçar Notas"));
 
 
+    //linkElement.setAttribute("onclick", " bimestral(" + posicao + "); return false;");
 
-
+    
+   // nome_Aluno.appendChild(alunoElement)
     novoAluno.appendChild(tarefasText);
     novoAluno.appendChild(linkElement);
     ulElement.appendChild(novoAluno);
 
     });
 
-
-
     list_Alunos.appendChild(ulElement); 
-    console.log(Alunos)
+  
 
 }
 
@@ -84,11 +89,10 @@ function adicionarAluno(){
 }
 
 
-
-
-
-
-
+function bimestral (){
+   lancar_Notas.style.display = "block";
+    return false;
+}
 
   
 
