@@ -79,6 +79,7 @@ div.tabs{
     padding:20px;
     border-radius:8px;
     border: none;
+    cursor: pointer;
 }
 .tab:hover{
     background-color: var(--titlecor);
@@ -162,6 +163,16 @@ a.back{
 a.back:hover{
     color: var(--destaque-inverso);
 }
+
+#responsavel, #professor, #gestor{
+    cursor: pointer;
+}
+
+.ativa{
+    background-color: var(--destaque);
+    color: var(--texto-inverso);
+}
+
 
 
 footer{

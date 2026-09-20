@@ -1,127 +1,72 @@
-let elemento_Turma = document.querySelector("#iturma");
-let elemento_Aluno = document.querySelector("#ialuno");
-let nome_Aluno = document.querySelector("#inome-Aluno")
-let list_Alunos = document.querySelector("#lista-Alunos");
-let elemento_Button = document.querySelector(".Adicionar")
+let responsavelElement = document.querySelector("#responsavel");
+let professorElement = document.querySelector("#professor");
+let gestorElement = document.querySelector("#gestor");
 
-let lancar_Notas = document.querySelector("#lancar_Notas");
+let input = document.querySelector("#usuario");
+let input_b = document.querySelector(".input-b");
 
-let Alunos = [];
-elemento_Aluno.style.display = "none";
+// Para onde cada perfil leva — troque os caminhos conforme as suas pastas
+const PAGINAS = {
+    responsavel: "login-responsavel.html",
+    professor: "login-professor.html",
+    gestor: "login-gestor.html",
+};
 
-elemento_Turma.addEventListener("change", selecionarTurma);
-elemento_Button.addEventListener("click", adicionarAluno);
-
-
-function selecionarTurma(){
-
-    if(elemento_Turma.value !== ""){
-        elemento_Aluno.style.display = "block";
-       
-    }else{
-        elemento_Aluno.style.display ="none";
-
-    }
-
-    renderTarefas()
-}
+let tipoSelecionado = "";   // nenhum perfil escolhido ainda
 
 
-function renderTarefas(){
-    list_Alunos.innerHTML = ""
+// Marca a aba clicada e guarda qual perfil foi escolhido
+function selecionar(tipo, elemento){
 
-    let ulElement = document.createElement("ul");
+    tipoSelecionado = tipo;
 
-    if(elemento_Turma.value !==""){
-        let turmaText = document.createTextNode(elemento_Turma.value);
-        ulElement.appendChild(turmaText);
-    }
-
-    Alunos.forEach(function (aluno, posicao){
-
-    let novoAluno = document.createElement("li");
-    let tarefasText = document.createTextNode(aluno);
-    
-    let linkElement = document.createElement("a");
-    linkElement.setAttribute("href", "#");
-
-    linkElement.appendChild(document.createTextNode("Lançar Notas"));
-    
-    linkElement.onclick = bimestral;
-
-    //let alunoElement = document.createElement("a");
-    //alunoElement.setAttribute("href", "#");
-
-    //alunoElement.appendChild(document.createTextNode("Laçar Notas"));
-
-
-    //linkElement.setAttribute("onclick", " bimestral(" + posicao + "); return false;");
-
-    
-   // nome_Aluno.appendChild(alunoElement)
-    novoAluno.appendChild(tarefasText);
-    novoAluno.appendChild(linkElement);
-    ulElement.appendChild(novoAluno);
-
+    [responsavelElement, professorElement, gestorElement].forEach(function (aba){
+        aba.classList.remove("ativa");
     });
 
-    list_Alunos.appendChild(ulElement); 
-  
-
+    elemento.classList.add("ativa");
 }
 
 
+responsavelElement.addEventListener("click", function (){
+    selecionar("responsavel", responsavelElement);
+});
 
-function adicionarAluno(){
+professorElement.addEventListener("click", function (){
+    selecionar("professor", professorElement);
+});
 
-    if(nome_Aluno.value === ""){
-        alert("Digite o Nome do Aluno")
-        return false;
-    }else{
-        let novoAluno = nome_Aluno.value
-        Alunos.push(nome_Aluno.value.trim());
-        nome_Aluno.value = "";
-        nome_Aluno.focus();
+gestorElement.addEventListener("click", function (){
+    selecionar("gestor", gestorElement);
+});
 
-        renderTarefas();
-        
+
+// Clique em Entrar
+function entrar(){
+
+    // 1) precisa ter algo digitado
+    if (input.value.trim() === ""){
+        alert("Digite o usuário");
+        input.focus();
+        return;
     }
+
+    // 2) precisa ter escolhido um perfil
+    if (tipoSelecionado === ""){
+        alert("Escolha: Responsável, Professor ou Gestor");
+        return;
+    }
+
+    // 3) vai para o index do perfil escolhido
+    window.location.href = PAGINAS[tipoSelecionado];
 }
 
-
-function bimestral (){
-   lancar_Notas.style.display = "block";
-    return false;
-}
-
-  
+input_b.addEventListener("click", entrar);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//let buttonAdicionar = document.querySelector(".Adicionar");
-//let lançarNotas = document.querySelector("#lançar-Notas");
-
-
-//buttonAdicionar.onclick = function Adcionar(){
-    //if(lançarNotas.style.display === "none" ){
-       // lançarNotas.style.display = "block";
-   // }else{
-       // lançarNotas.style.display = "none";
-   // }
-  
-//}
+// Apertar Enter no campo também entra
+input.addEventListener("keydown", function (evento){
+    if (evento.key === "Enter"){
+        entrar();
+    }
+});
