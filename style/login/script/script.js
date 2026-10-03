@@ -7,9 +7,9 @@ let input_b = document.querySelector(".input-b");
 
 // Para onde cada perfil leva — troque os caminhos conforme as suas pastas
 const PAGINAS = {
-    responsavel: "login-responsavel.html",
-    professor: "login-professor.html",
-    gestor: "login-gestor.html",
+    responsavel: "loginresponsavel.htm",
+    professor: "login-professores.htm",
+    gestor: "login-gestor.htm",
 };
 
 let tipoSelecionado = "";   // nenhum perfil escolhido ainda
