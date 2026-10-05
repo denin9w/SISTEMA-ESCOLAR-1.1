@@ -77,7 +77,7 @@ div#listaAlunos{
     padding: 10px;
     display:none ;
 }
-div#listaAlunos button{
+div#listaAlunos a{
     width: 100%;
     font-size: clamp(10px, 1.1vw, 22px);
     padding: 10px;
@@ -85,6 +85,7 @@ div#listaAlunos button{
     border: none;
     text-align: start;
     white-space: pre-line;
+    cursor: pointer;
 }
 
 div#idocumentos{
