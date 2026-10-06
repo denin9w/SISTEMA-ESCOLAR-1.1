@@ -1,12 +1,33 @@
 
 const etapa1 = document.querySelector('.etapa1');
 const etapa2 = document.querySelector('.etapa2');
-
 const btnproximo = document.querySelector('#btnProximo');
 const btnvoltar = document.querySelector('#btnVoltar');
 const btnfinalizar = document.querySelector('#btnFinalizar');
 
-const formulario = document.getElementById('formulario');
+const formulario = document.querySelector("#formulario");
+
+
+let matriculaSalva = {};
+
+
+formulario.addEventListener("submit", function(event){
+    event.preventDefault();
+    const dados = new FormData(formulario);
+    const matricula = Object.fromEntries(dados);
+
+    matriculaSalva = matricula
+
+    localStorage.setItem("@matricula", JSON.stringify(matriculaSalva));
+    console.log(matriculaSalva)
+
+
+});
+
+
+
+
+
 
 function proximo(){
     etapa1.style.display = 'none';
@@ -24,6 +45,8 @@ function voltar(){
     btnvoltar.style.display = 'none'
 }
 
-function finalizar(){
-    // Finalize the registration logic here
-}
+
+
+
+  
+

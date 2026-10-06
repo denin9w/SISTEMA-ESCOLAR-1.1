@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/matriculas/matriculas.css">
+    <link rel="stylesheet" href="style/matriculas/expansivoM.css">
+    <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
+
+    <title>CEJE</title>
+
+</head>
+
+<body>
+    <header>   
+        <div class="text-fixo">
+            <h1>Centro Educacional Jardin do Éden</h1>
+            <h2>Uma escola de Gerações</h2>
+        </div>
+    </header>
+    <nav id="MCL">
+        <a href="index.html">Inicio <i class="fa-solid fa-graduation-cap"></i></a>
+      
+        <a href="login.htm">Login <i class="fa-solid fa-key"></i></a>
+    </nav>
+
+
+    
+    <main id="dados-container">
+            <h1 class="titulo">Matriculas</h1>
+    
+        <div class="etapa1">
+            <fieldset class="dados-aluno">
+                <legend class="titulo">Dados Pessoais do Aluno</legend>
+                <form id="formulario" action="/registro" method="post">
+                    <section class="etapa-ativa">
+            
+                        <label for="#inome">Nome:</label>
+                        <input
+                            class="input-aluno"
+                            id="inome"
+                            name="nome"
+                            type="text"
+                            method="post"
+                            placeholder="Digite o nome completo do aluno"
+                            autocomplete="on"
+                            required
+                        >
+                        <label for="idata">Data de Nascimento:</label>
+                        <input
+                            class="input-aluno"
+                            id="idata"
+                            name="data"
+                            type="date"
+                            required
+                        >
+            
+                        <fieldset class="sexo-aluno">
+                            <legend class="legend">Sexo:</legend>
+                            <div class="sexo">
+                                <div class="sexo-m">
+                                        <input
+                                            id="isexoM"
+                                            name="sexo"
+                                            type="radio"
+                                            checked
+                                        >
+                                        <label class=" subtitulo" for="isexoM">Masculino</label>
+                                </div>
+                                <div class="sexo-f">
+                                    <input
+                                        id="isexoF"
+                                        name="sexo"
+                                        type="radio"
+                                    >
+                                    <label class=" subtitulo" for="isexoF">Feminino</label>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                         <label for="#inacionalidade">Nacionalidade:</label>
+                        <input 
+                            class="input-aluno" 
+                            id="inacionalidade" 
+                            name="nacionalidade"
+                            type="text"
+                            placeholder="Digite a Nacionalidade">
+
+                        <label for="icdidade">Cidade de nascimento:</label>
+                        <input 
+                            class="input-aluno"
+                            id="icdidade"
+                            name="cdidade" 
+                            type="text"
+                            placeholder="Lugar onde a criaça foi registrada"
+                            required>
+
+                        <h3>ENDEREÇO</h3>
+
+                        
+                        <label for="iendereço">Rua:</label>
+                        <input 
+                            class="input-aluno"
+                            id="iendereço" 
+                            name="endereço" 
+                            type="text"
+                            placeholder="Rua atual"
+                            required>
+                        
+                        <label for="ibairro">Bairro:</label>
+                        <input 
+                            class="input-aluno"
+                            id="ibairro" 
+                            name="bairro" 
+                            type="text"
+                            placeholder="Bairro atual"
+                            required>
+                            
+                       
+                        
+                    
+                        <label for="#in">Nº:</label>
+                        <input
+                                class="input-aluno"
+                                id="in"
+                                name="n"
+                                type="number"
+                                placeholder="408"
+                                required>
+                        
+                        <label for="icidade">Cidade:</label>
+                        <input 
+                            class="input-aluno"
+                            id="icidade" 
+                            name="cidade" 
+                            type="text"
+                            placeholder="Garanhuns..."
+                            required>
+
+                        <label for="iestado">UF:</label>
+                        <input
+                                class="input-aluno"
+                                id="iestado"
+                                name="estado"
+                                type="text"
+                                placeholder="SP"
+                                required>
+                    
+
+                        
+
+                        <label for="icep">CEP:</label>
+                        <input 
+                            class="input-aluno"
+                            id="icep" 
+                            name="cep" 
+                            type="number"
+                            placeholder="00000.000">
+
+                        <label for="icpf">CPF:</label>
+                        <input 
+                            class="input-aluno"
+                            id="icpf" 
+                            name="cpf" 
+                            type="number"
+                            placeholder="000.000.000.00"
+                            required>
+
+                        <label for="irg">RG:</label>
+                        <input 
+                            class="input-aluno"
+                            id="irg" 
+                            name="rg" 
+                            type="number"
+                            placeholder="00.000.000.0"
+                            required>
+
+
+
+                        <label for="iniss">NISS:</label>
+                        <input 
+                            class="input-aluno"
+                            id="inss" 
+                            name="niss" 
+                            type="number"
+                            placeholder="000.00000.00-0">
+
+                        <label for="iturma">Turma:</label>
+                        <select name="turma" id="iturma">
+                            <option value="disabled" selected>Selecione uma turma</option>
+                            <option value="infantil-I a">Infantil I A</option>
+                            <option value="infantil-I b">Infantil I B</option>
+                            <option value="infantil-II a">Infantil II A</option>
+                            <option value="infantil-II b">Infantil II B</option>
+                            <option value="infantil-III a">Infantil III A</option>
+                            <option value="infantil-III b">Infantil III B</option>
+                            <option value="1ano-a">1º Ano A</option>
+                            <option value="1ano-b">1º Ano B</option>
+                            <option value="2ano-a">2º Ano A</option>
+                            <option value="2ano-b">2º Ano B</option>
+                            <option value="3ano-a">3º Ano A</option>
+                            <option value="1ano-a">4º Ano A</option>
+                            <option value="1ano-b">4º Ano B</option>
+                            <option value="2ano-a">5º Ano A</option>
+                            <option value="2ano-b">5º Ano B</option>
+                            <option value="3ano-a">6º Ano A</option>
+                            <option value="1ano-a">7º Ano A</option>
+                            <option value="2ano-a">7º Ano A</option>
+                            <option value="3ano-a">8º Ano A</option>
+                            <option value="3ano-a">8º Ano A</option>
+                        </select>
+        
+                        <label for="iobs">Observação:</label>
+                        <textarea name="nobs" id="iobs" placeholder="Digete alguma observação sobre o aluno."></textarea>
+
+                    </section>
+                </form>
+            </fieldset>
+        </div>
+       
+        <!--
+            <section class="etapa">
+             
+                <div class="botoes">
+                    <button type="button" class="btnVoltar">
+                        Voltar
+                    </button>
+                    <button type="submit">
+                        Finalizar matrícula
+                    </button>
+                </div>
+                
+            </section>
+
+        -->
+
+
+       <div class="etapa2">
+            <fieldset class="dados-aluno">
+                <legend class="titulo">Dados Pessoais dos Responsáveis</legend>
+                <form id="formulario">
+                    <section class="etapa">
+                        
+                        <label for="inameP">Nome do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="inomeP"
+                                name="nome"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o nome completo do aluno"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="iprofissao-pai">Profissão do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iprofissao-pai"
+                                name="profissao-pai"
+                                type="text"
+                                placeholder="Digite a profissão do pai"
+                                autocomplete="on"
+                               
+                            >
+                        <label for="#iidentidade-pai">Identidade do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iidentidade-pai"
+                                name="identidade-pai"
+                                type="text"
+                                method="post"
+                                placeholder="Digite a identidade do pai"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="icpf-pai">Cpf do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="icpf-pai"
+                                name="cpf-pai"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o CPF do pai"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="iwhatsapp-pai">WhatsApp do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iwhatsapp-pai"
+                                name="whatsapp-pai"
+                               type="text"
+                                method="post"
+                                 placeholder="Digite o WhatsApp do pai"
+                               
+                            >
+                        <label for="itelefone-pai">Telefone do Pai:</label>
+                            <input
+                                class="input-responsavel"
+                                id="itelefone-pai"
+                                name="telefone-pai"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o telefone do pai"
+                               
+                            >
+                       
+                        <label for="inome-mae">Nome da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="inome-mae"
+                                name="nome-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o nome completo da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="iprofissao-mae">Profissão da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iprofissao-mae"
+                                name="profissao-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite a profissão da mãe"
+                                
+                            >
+                        <label for="#iidentidade-mae">Identidade da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iidentidade-mae"
+                                name="identidade-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite a identidade da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="icpf-mae">Cpf da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="icpf-mae"
+                                name="cpf-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o CPF da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="iwhatsapp-mae">WhatsApp da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="iwhatsapp-mae"
+                                name="whatsapp-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o WhatsApp da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                        <label for="itelefone-mae">Telefone da Mãe:</label>
+                            <input
+                                class="input-responsavel"
+                                id="itelefone-mae"
+                                name="telefone-mae"
+                                type="text"
+                                method="post"
+                                placeholder="Digite o telefone da mãe"
+                                autocomplete="on"
+                                required
+                            >
+                      
+
+                        <label for="iresponsavel">Nome do Responsável:</label>
+                        <select name="responsavel" id="iresponsavel">
+                            <option value="pai">Pai</option>
+                            <option value="mãe">Mãe</option>
+                        </select>
+
+                        <label for="iresponsavelO">Escolha o Responsavel</label>
+                        <br>
+                        <input type="text" id="iresponsavelO" placeholder="Avó / Avô / Tio ou Tia">
+                        
+                    </section>
+                </form>
+            </fieldset>
+
+        </div>
+
+
+        <div class="botoes">
+            <button type="button" id="btnProximo" onclick="proximo()">
+                    Próximo
+            </button>
+            <button type="button" id="btnVoltar" onclick="voltar()">
+                    Voltar
+            </button>
+            <button type="submit" id="btnFinalizar" onclick="finalizar()">
+            Finalizar matrícula
+        </button>
+        </div>
+
+    
+     
+    </main>
+    
+    <footer>
+        <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
+
+    </footer>
+
+    <script src="style/matriculas/script/script.js"></script>
+
+</body>
+
+</html>
