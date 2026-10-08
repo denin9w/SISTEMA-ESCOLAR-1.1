@@ -1,111 +1,51 @@
-let elemento_Turma = document.querySelector("#iturma");
-let elemento_Aluno = document.querySelector("#ialuno");
-let nome_Aluno = document.querySelector("#inome-Aluno")
-let list_Alunos = document.querySelector("#lista-Alunos");
-let elemento_Button = document.querySelector(".Adicionar")
-
-let lancar_Notas = document.querySelector("#lancar-Notas");
-
-let Alunos = [];
-
-elemento_Aluno.style.display = "none";
-
-elemento_Turma.addEventListener("change", selecionarTurma);
-elemento_Button.addEventListener("click", adicionarAluno);
+let selecionarTurma = document.querySelector('#iturma');
+let aluno = document.querySelector('#ialuno');
+let buttonAdiconar = document.querySelector('.adicionar')
+let listaDeAlunos = document.querySelector('#lista-Alunos')
 
 
-function selecionarTurma(){
+const formulario = document.querySelector('#formulario');
 
-    if(elemento_Turma.value !== ""){
-        elemento_Aluno.style.display = "block";
-       
-    }else{
-        elemento_Aluno.style.display ="none";
-
-    }
-
-    renderTarefas()
-}
+selecionarTurma.addEventListener('click', function(){
+    aluno.style.display = "block"
+});
 
 
-function renderTarefas(){
-    list_Alunos.innerHTML = ""
+let listaAlunos = [];
 
-    let ulElement = document.createElement("ol");
 
-    if(elemento_Turma.value !==""){
-        let turmaText = document.createTextNode(elemento_Turma.value);
-        ulElement.appendChild(turmaText);
-    }
-
-    Alunos.forEach(function (aluno, posicao){
-
-    let novoAluno = document.createElement("li");
-    let tarefasText = document.createTextNode(aluno);
+function MostrarAluno(){
     
-    let linkElement = document.createElement("button");
-    linkElement.setAttribute("type", "button");
-    linkElement.setAttribute("class", "btn-notas");
-    linkElement.textContent = "Lançar Notas";
-    linkElement.addEventListener("click", bimestral);
+};
+
+function AdicionarAluno(){
+    if(aluno.value === ""){
+        alert("Digite um alunos para adicionar")
+    };
+  listaAlunos.push(aluno.value)
+  aluno.value = '';
+
+
+};
+buttonAdiconar.addEventListener('click', AdicionarAluno);
 
 
 
-    //let alunoElement = document.createElement("a");
-    //alunoElement.setAttribute("href", "#");
 
-    //alunoElement.appendChild(document.createTextNode("Laçar Notas"));
+let alunoMedia = {};
 
 
-    //linkElement.setAttribute("onclick", " bimestral(" + posicao + "); return false;");
+formulario.addEventListener("subimit", function(event){
+    event.preventDefault();
+    const dados = new FormData(formulario);
+    const nota = Object.fromEntries(dados);
 
-    
-   // nome_Aluno.appendChild(alunoElement)
-    
-   
-    novoAluno.appendChild(tarefasText);
-    novoAluno.appendChild(linkElement);
-    ulElement.appendChild(novoAluno);
+    alunoMedia = nota
 
-    });
+    localStorage.setItem("@nota", JSON.stringify(alunoMedia));
+    console.log(alunoMedia);
 
-    list_Alunos.appendChild(ulElement); 
-  
-
-}
-
-
-
-function adicionarAluno(){
-
-    if(nome_Aluno.value === ""){
-        alert("Digite o Nome do Aluno")
-        return false;
-    }else{
-        let novoAluno = nome_Aluno.value
-        Alunos.push(nome_Aluno.value.trim());
-        nome_Aluno.value = "";
-        nome_Aluno.focus();
-
-        renderTarefas();
-        
-    }
-}
-
-
-function bimestral (evento){
-    if(evento) evento.preventDefault();
-    if(!lancar_Notas){
-        console.log("id não encontrado: confira se é lacar-notas no HTML")
-        return;
-    }
-    lancar_Notas.style.display ="block";
-     lancar_Notas.scrollIntoView({ behavior: "smooth", block: "start" });
-  
-}
-
-
-
+});
 
   
 
