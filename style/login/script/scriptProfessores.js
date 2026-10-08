@@ -6,6 +6,8 @@ let listaDeAlunos = document.querySelector('#lista-Alunos')
 
 const formulario = document.querySelector('#formulario');
 
+
+
 selecionarTurma.addEventListener('click', function(){
     aluno.style.display = "block"
 });
@@ -40,14 +42,16 @@ formulario.addEventListener("subimit", function(event){
     const dados = new FormData(formulario);
     const nota = Object.fromEntries(dados);
 
+    matriculasSalva = nota
+
     alunoMedia = nota
 
     localStorage.setItem("@nota", JSON.stringify(alunoMedia));
+
     console.log(alunoMedia);
 
 });
 
-  
 
 
 
