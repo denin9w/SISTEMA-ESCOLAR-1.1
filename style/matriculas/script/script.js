@@ -15,13 +15,13 @@ const elementoListaMatriculas = document.querySelector("#listaMatriculas")
 const dadosSalvos = localStorage.getItem("@matricula");
 if(dadosSalvos){
     listaDeMatriculas =JSON.parse(dadosSalvos);
-
-    mostrarMatricula();
+   
 };
 
 
 
 function mostrarMatricula(){
+
     elementoListaMatriculas.innerHTML = "";
 
 
