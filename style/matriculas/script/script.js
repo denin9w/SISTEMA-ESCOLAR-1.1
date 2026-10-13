@@ -1,60 +1,165 @@
+
 const etapa1 = document.querySelector('.etapa1');
 const etapa2 = document.querySelector('.etapa2');
+
 const btnproximo = document.querySelector('#btnProximo');
 const btnvoltar = document.querySelector('#btnVoltar');
 const btnfinalizar = document.querySelector('#btnFinalizar');
 
-
 const formulario = document.querySelector("#formulario");
 
+const elementoListaMatriculas =
+    document.querySelector("#listaMatriculas");
 
-let listaDeMatriculas = []
+const informacoesMatricula =
+    document.querySelector("#informacoesMatricula");
 
-const elementoListaMatriculas = document.querySelector("#listaMatriculas")
+const btnGerarDocumento =
+    document.querySelector("#gerarDocumento");
+
+let listaDeMatriculas = [];
+
+let matriculaSelecionada = null;
+
+let indiceSelecionado = null;
+
+
+// RECUPERAR MATRÍCULAS SALVAS
 
 const dadosSalvos = localStorage.getItem("@matricula");
-if(dadosSalvos){
-    listaDeMatriculas =JSON.parse(dadosSalvos);
-   
-};
+
+if (dadosSalvos) {
+
+    try {
+
+        const dadosRecuperados = JSON.parse(dadosSalvos);
+
+        if (Array.isArray(dadosRecuperados)) {
+
+            listaDeMatriculas = dadosRecuperados;
+
+        } else if (
+            dadosRecuperados !== null &&
+            typeof dadosRecuperados === "object"
+        ) {
+
+            listaDeMatriculas = [dadosRecuperados];
+
+        }
+
+    } catch (erro) {
+
+        console.error("Erro ao recuperar matrículas:", erro);
+
+    }
+}
 
 
+// RECUPERAR MATRÍCULA SELECIONADA
 
-function mostrarMatricula(){
+const indiceSalvo =
+    localStorage.getItem("@indiceSelecionado");
+
+if (indiceSalvo !== null) {
+
+    const indice = Number(indiceSalvo);
+
+    if (
+        Number.isInteger(indice) &&
+        indice >= 0 &&
+        indice < listaDeMatriculas.length
+    ) {
+
+        indiceSelecionado = indice;
+
+        matriculaSelecionada =
+            listaDeMatriculas[indice];
+
+    }
+}
+
+
+// MOSTRAR DADOS DA MATRÍCULA
+
+function mostrarDadosSelecionados(matricula) {
+
+    if (!informacoesMatricula) {
+        console.error(
+            "Elemento #informacoesMatricula não encontrado"
+        );
+        return;
+    }
+
+    informacoesMatricula.innerHTML = "";
+
+    Object.entries(matricula).forEach(function([campo, valor]) {
+
+        const paragrafo = document.createElement("p");
+
+        paragrafo.textContent = campo + ": " + valor;
+
+        informacoesMatricula.appendChild(paragrafo);
+
+    });
+}
+
+
+// MOSTRAR MATRÍCULAS CADASTRADAS
+
+function mostrarMatricula() {
+
+    if (!elementoListaMatriculas) {
+        console.error(
+            "Elemento #listaMatriculas não encontrado"
+        );
+        return;
+    }
 
     elementoListaMatriculas.innerHTML = "";
 
-
-    listaDeMatriculas.forEach(function(matricula,indice){
+    listaDeMatriculas.forEach(function(matricula, indice) {
 
         const item = document.createElement("li");
 
-        item.textContent = 
-            matricula.nome + "-" + matricula.turma;
-        
+        item.textContent =
+            matricula.nome + " - " + matricula.turma + " ";
+
+
+        // CRIAR BOTÃO SELECIONAR
+
         const botao = document.createElement("button");
 
         botao.textContent = "Selecionar";
+        botao.type = "button";
 
-        botao.addEventListener("click", function(){
 
-            const matriculaSelecionada = listaDeMatriculas[indice];
+        botao.addEventListener("click", function() {
 
-            console.log(matriculaSelecionada);
-            console.log(matriculaSelecionada.nome);
+            indiceSelecionado = indice;
 
-            console.log(
-                matriculaSelecionada["data-nascimento"]
+            matriculaSelecionada =
+                listaDeMatriculas[indice];
+
+
+            // GUARDAR A SELEÇÃO
+
+            localStorage.setItem(
+                "@indiceSelecionado",
+                String(indiceSelecionado)
             );
 
-            console.log(matriculaSelecionada.cpf);
 
+            // MOSTRAR DADOS
+
+            mostrarDadosSelecionados(matriculaSelecionada);
+
+            console.log("Matrícula selecionada:");
+            console.log(matriculaSelecionada);
 
         });
-        
+
 
         item.appendChild(botao);
-  
 
         elementoListaMatriculas.appendChild(item);
 
@@ -62,30 +167,75 @@ function mostrarMatricula(){
 }
 
 
+// FINALIZAR MATRÍCULA
 
-formulario.addEventListener("submit", function(event){
+if (formulario) {
 
-    event.preventDefault();
+    formulario.addEventListener("submit", function(event) {
 
-    const dados = new FormData(formulario);
+        event.preventDefault();
 
-    const matricula = Object.fromEntries(dados);
+        const dados = new FormData(formulario);
 
-    listaDeMatriculas.push(matricula)
-
-   
-    localStorage.setItem(
-        "@matricula", 
-        JSON.stringify(listaDeMatriculas)
-
-    );
-
-    
-    formulario.reset();
-    mostrarMatricula();
+        const matricula = Object.fromEntries(dados);
 
 
-});
+        // ADICIONAR AO ARRAY
+
+        listaDeMatriculas.push(matricula);
+
+
+        // SALVAR MATRÍCULAS
+
+        localStorage.setItem(
+            "@matricula",
+            JSON.stringify(listaDeMatriculas)
+        );
+
+
+        // LIMPAR FORMULÁRIO
+
+        formulario.reset();
+
+
+        // ATUALIZAR LISTA
+
+        mostrarMatricula();
+
+    });
+}
+
+
+// PREPARAR DOCUMENTO
+
+if (btnGerarDocumento) {
+
+    btnGerarDocumento.addEventListener("click", function() {
+
+        if (matriculaSelecionada === null) {
+
+            alert("Selecione uma matrícula primeiro!");
+
+            return;
+        }
+
+        console.log("Matrícula para o documento:");
+
+        console.log(matriculaSelecionada);
+
+    });
+}
+
+
+// INICIAR EXIBIÇÃO
+
+mostrarMatricula();
+
+if (matriculaSelecionada !== null) {
+
+    mostrarDadosSelecionados(matriculaSelecionada);
+
+}
 
 
 
