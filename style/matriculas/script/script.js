@@ -79,7 +79,7 @@ if (indiceSalvo !== null) {
 }
 
 
-// MOSTRAR DADOS DA MATRÍCULA
+/* MOSTRAR DADOS DA MATRÍCULA SELECIONADA
 
 function mostrarDadosSelecionados(matricula) {
 
@@ -102,7 +102,7 @@ function mostrarDadosSelecionados(matricula) {
 
     });
 }
-
+*/
 
 // MOSTRAR MATRÍCULAS CADASTRADAS
 
@@ -124,14 +124,10 @@ function mostrarMatricula() {
         item.textContent =
             matricula.nome + " - " + matricula.turma + " ";
 
-
-        // CRIAR BOTÃO SELECIONAR
-
         const botao = document.createElement("button");
 
         botao.textContent = "Selecionar";
         botao.type = "button";
-
 
         botao.addEventListener("click", function() {
 
@@ -140,16 +136,10 @@ function mostrarMatricula() {
             matriculaSelecionada =
                 listaDeMatriculas[indice];
 
-
-            // GUARDAR A SELEÇÃO
-
             localStorage.setItem(
                 "@indiceSelecionado",
                 String(indiceSelecionado)
             );
-
-
-            // MOSTRAR DADOS
 
             mostrarDadosSelecionados(matriculaSelecionada);
 
@@ -157,7 +147,6 @@ function mostrarMatricula() {
             console.log(matriculaSelecionada);
 
         });
-
 
         item.appendChild(botao);
 
@@ -179,26 +168,14 @@ if (formulario) {
 
         const matricula = Object.fromEntries(dados);
 
-
-        // ADICIONAR AO ARRAY
-
         listaDeMatriculas.push(matricula);
-
-
-        // SALVAR MATRÍCULAS
 
         localStorage.setItem(
             "@matricula",
             JSON.stringify(listaDeMatriculas)
         );
 
-
-        // LIMPAR FORMULÁRIO
-
         formulario.reset();
-
-
-        // ATUALIZAR LISTA
 
         mostrarMatricula();
 
@@ -206,11 +183,35 @@ if (formulario) {
 }
 
 
+// CARREGAR MODELO WORD
+
+async function carregarModelo() {
+
+    const resposta = await fetch(
+        "./documentos/ficha-matricula.docx"
+    );
+
+    if (!resposta.ok) {
+
+        throw new Error(
+            "Não foi possível carregar o modelo Word."
+        );
+
+    }
+
+    const arquivo = await resposta.arrayBuffer();
+
+    console.log("Modelo Word carregado:", arquivo);
+
+    return arquivo;
+}
+
+
 // PREPARAR DOCUMENTO
 
 if (btnGerarDocumento) {
 
-    btnGerarDocumento.addEventListener("click", function() {
+    btnGerarDocumento.addEventListener("click", async function() {
 
         if (matriculaSelecionada === null) {
 
@@ -219,9 +220,23 @@ if (btnGerarDocumento) {
             return;
         }
 
-        console.log("Matrícula para o documento:");
+        try {
 
-        console.log(matriculaSelecionada);
+            const modelo = await carregarModelo();
+
+            console.log("Aluno selecionado:");
+            console.log(matriculaSelecionada);
+
+            console.log("Arquivo Word:");
+            console.log(modelo);
+
+        } catch (erro) {
+
+            console.error(erro);
+
+            alert("Erro ao carregar o modelo Word.");
+
+        }
 
     });
 }
@@ -229,13 +244,13 @@ if (btnGerarDocumento) {
 
 // INICIAR EXIBIÇÃO
 
-mostrarMatricula();
+//mostrarMatricula();
 
-if (matriculaSelecionada !== null) {
+//if (matriculaSelecionada !== null) {
 
-    mostrarDadosSelecionados(matriculaSelecionada);
+ //   mostrarDadosSelecionados(matriculaSelecionada);
 
-}
+//}
 
 
 
