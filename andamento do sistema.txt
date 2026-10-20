@@ -1,0 +1,28 @@
+Criamos a área do professor 
+
+// Cada aluno recebe transferência e desistência ou exclusão que será salvo no banco de dados a situação (Que teremos acesso na área do gestor) 
+
+// O professor só tem acesso à turma que contenha sua senha de login.
+
+
+
+
+
+
+Criamos o botão adicionar aluno . que salvará os alunos no banco de dados e o código está preparado para que na área do gestor apareça um aviso de que o aluno precisa preencher os dados que faltam
+
+
+
+// FALTA FAZER
+
+-Completar Area do Professor e corrigir o Css-
+
+
+-Deixar o código preparado da área do responsável para a solicitação de documentos
+
+GESTOR 1-Lembrar de criar o sistema de alerta na área do gestor em relação à área do responsável ao solicitar os documentos adicionar o aluno-
+
+GESTOR 1-Lembrar de criar o sistema de alerta na área do gestor em relação ao professor adicionar o aluno-
+
+
+POR ÚLTIMO -Falta criar um backup para todos os dados salvos- 

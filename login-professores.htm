@@ -6,14 +6,114 @@
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/login/login-professores.css">
     <link rel="stylesheet" href="style/login/login-professoresExpansivo.css">
+    <title> CEJE - Área do Professor </title>
+    <style>
+        /* --- ESTILOS DA LISTA E EDIÇÃO --- */
+        .aluno-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--fundo-card);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            gap: 10px;
+        }
+        .btn-nome-aluno {
+            flex: 1;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--titlecor);
+            font-weight: bold;
+        }
+        .btn-editar {
+            background-color: #28a745;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-editar:hover { background-color: #218838; }
+        
+        .painel-edicao {
+            display: none;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ffeeba;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn-acao {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-transferir { background-color: #ffc107; color: #000; }
+        .btn-desistente { background-color: #fd7e14; }
+        .btn-excluir { background-color: #dc3545; }
 
-    <title> CEJE </title>
+        /* --- ESTILOS DO BOTÃO DE ADICIONAR E DO MODAL --- */
+        .btn-add-aluno {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--destaque);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-add-aluno:hover { background-color: #0056b3; }
 
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .modal-content h2 { color: var(--titlecor); margin-bottom: 20px; }
+        .modal-content label { display: block; margin-top: 10px; font-weight: bold; }
+        .modal-content input, .modal-content select {
+            width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;
+        }
+        .modal-botoes { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-salvar { flex: 1; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;}
+        .btn-cancelar { flex: 1; padding: 10px; background: #ccc; color: #333; border: none; border-radius: 5px; cursor: pointer;}
+    </style>
 </head>
-
 <body>
-
-    
     <section id="header">
         <header class="text-fixo">
             <h1>Centro Educacional Jardin do Éden</h1>
@@ -21,144 +121,103 @@
         </header>
     </section>
    
-
     <section id="ficha">
-
         <nav id="MCL">
-            <a href="index.html">Inicio <i class="fa-solid fa-home-cap"></i></a>
-        
+            <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
             <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
+            <a href="login.htm" id="btnSair">Sair <i class="fa-solid fa-door-open"></i></a>
         </nav>
 
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-        <img  class="moeda" src="imagens/moeda.png" alt="Moeda">
+        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
 
         <div class="text-baner">
-            <h1>Bem vindo a Area do professor</h1>
+            <h1>Bem vindo a Area do Professor</h1>
+            <p id="nomeProfessorLogado" style="text-align: center; font-weight: bold; color: var(--titlecor);"></p>
         </div>
     
-        <form id="formulario" action="/registro" method="post">
-            <div id="Boletim">
-                <label for="iturma">Turma:</label>
+        <div id="Boletim">
+            <div id="selecionarTurma">
+                <label for="iturma">Minhas Turmas:</label>
                 <select name="turma" id="iturma">
-                    <option value="disabled" selected>Selecione Uma Turma</option>
-                    <option value="1º Ano-A">1º Ano A</option>
-                    <option value="1º Ano B">1º Ano B</option>
-                    <option value="2º Ano A">2º Ano A</option>
-                    <option value="2º Ano B">2º Ano B</option>
-                    <option value="3º Ano A">3º Ano A</option>
-                    <option value="3º Ano B">3º Ano B</option>
-                    <option value="4º Ano A">4º Ano A</option>
-                    <option value="4º Ano B">4º Ano B</option>
-                    <option value="5º Ano A">5º Ano A</option>
-                    <option value="5º Ano B">5º Ano B</option>
-                    <option value="6º Ano A">6º Ano A</option>
-                    <option value="7º Ano A">7º Ano A</option>
-                    <option value="8º Ano A">8º Ano A</option>
-                    <option value="9º Ano A ">9º Ano A</option>
+                    <option value="" selected disabled>Selecione uma turma</option>
                 </select>
-            
-                <div id="ialuno">
-                    <input type="text" placeholder="Digite o nome do aluno" id="inome-Aluno">
-                    <button class="adicionar">
-                        Adicionar
-                    </button>
-            
-                </div>
-                <div id="lista-Alunos">
+            </div>
 
-                </div>
-                <div id="lancar-Notas">
-                    <div class="MB1">
-                        <h1>1 Bimestre</h1>
-                        <label for="in1">N1</label>
-                        <input type="number" name="n1" id="in1" placeholder="N1">
-                        <label for="in2">N2</label>
-                        <input type="number" name="n2" id="in2" placeholder="N2">
-                        <label for="in3">N3</label>
-                        <input type="number" name="n3" id="in3" placeholder="N3">
-                        <div class="resp">
-                           Media Bimestral:
-                        </div>
-            
-                        <button
-                        class="input-b"
-                        type="submit">
-                        Lançar Nota
-                        </button>
-                    </div>
-            
-                    <div class="MB2">
-                        <h1>2 Bimestre</h1>
-                        <label for="in1">N1</label>
-                        <input type="number" name="n1" id="in1" placeholder="N1">
-                        <label for="in2">N2</label>
-                        <input type="number" name="n2" id="in2" placeholder="N2">
-                        <label for="in3">N3</label>
-                        <input type="number" name="n3" id="in3" placeholder="N3">
-                        <div class="resp">
-                           Media Bimestral:
-                        </div>
-                        <button
-                        class="input-b"
-                        type="submit">
-                        Lançar Nota
-                        </button>
-                    </div>
-                    <div class="MB3">
-                        <h1>3 Bimestre</h1>
-                        <label for="in1">N1</label>
-                        <input type="number" name="n1" id="in1" placeholder="N1">
-                        <label for="in2">N2</label>
-                        <input type="number" name="n2" id="in2" placeholder="N2">
-                        <label for="in3">N3</label>
-                        <input type="number" name="n3" id="in3" placeholder="N3">
-                        <div class="resp">
-                            Media Bimestral:
-                        </div>
-                        <button
-                        class="input-b"
-                        type="submit">
-                        Lançar Nota
-                        </button>
-                    </div>
-                    <div class="MB4">
-                        <h1>4 Bimestre</h1>
-                        <label for="in1">N1</label>
-                        <input type="number" name="n1" id="in1" placeholder="N1">
-                        <label for="in2">N2</label>
-                        <input type="number" name="n2" id="in2" placeholder="N2">
-                        <label for="in3">N3</label>
-                        <input type="number" name="n3" id="in3" placeholder="N3">
-                        <div class="resp">
-                            Media Bimestral:
-                        </div>
-                            <button
-                            class="input-b"
-                            type="submit">
-                            Lançar Nota
-                            </button>
-                        <div class="resp-Media">
-                            Media Anual:
-                        </div>
-                    </div>
-                </div>
+            <div id="lista-Alunos" style="display: none;"></div>
 
-            </div>  
-        </form>
-
-
-       
+            <!-- Tela de Lançar Notas -->
+            <div id="lancar-Notas" style="display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 20px;">
+                <h2 id="nomeAlunoNota" style="color: var(--titlecor); margin-bottom: 20px;">Notas do Aluno</h2>
+                <form id="formularioNotas">
+                    <div class="bimestre-box">
+                        <h3>1º Bimestre</h3>
+                        <input type="number" name="n1_b1" id="n1_b1" placeholder="Nota 1" step="0.1" min="0" max="10">
+                        <input type="number" name="n2_b1" id="n2_b1" placeholder="Nota 2" step="0.1" min="0" max="10">
+                        <input type="number" name="n3_b1" id="n3_b1" placeholder="Nota 3" step="0.1" min="0" max="10">
+                        <div class="media-box" id="media_b1">Média 1º Bim: --</div>
+                    </div>
+                    <div class="bimestre-box">
+                        <h3>2º Bimestre</h3>
+                        <input type="number" name="n1_b2" id="n1_b2" placeholder="Nota 1" step="0.1" min="0" max="10">
+                        <input type="number" name="n2_b2" id="n2_b2" placeholder="Nota 2" step="0.1" min="0" max="10">
+                        <input type="number" name="n3_b2" id="n3_b2" placeholder="Nota 3" step="0.1" min="0" max="10">
+                        <div class="media-box" id="media_b2">Média 2º Bim: --</div>
+                    </div>
+                    <div class="bimestre-box">
+                        <h3>3º Bimestre</h3>
+                        <input type="number" name="n1_b3" id="n1_b3" placeholder="Nota 1" step="0.1" min="0" max="10">
+                        <input type="number" name="n2_b3" id="n2_b3" placeholder="Nota 2" step="0.1" min="0" max="10">
+                        <input type="number" name="n3_b3" id="n3_b3" placeholder="Nota 3" step="0.1" min="0" max="10">
+                        <div class="media-box" id="media_b3">Média 3º Bim: --</div>
+                    </div>
+                    <div class="bimestre-box">
+                        <h3>4º Bimestre</h3>
+                        <input type="number" name="n1_b4" id="n1_b4" placeholder="Nota 1" step="0.1" min="0" max="10">
+                        <input type="number" name="n2_b4" id="n2_b4" placeholder="Nota 2" step="0.1" min="0" max="10">
+                        <input type="number" name="n3_b4" id="n3_b4" placeholder="Nota 3" step="0.1" min="0" max="10">
+                        <div class="media-box" id="media_b4">Média 4º Bim: --</div>
+                    </div>
+                    <div class="media-anual-box">
+                        Média Anual Final: <span id="media_anual_texto">--</span>
+                    </div>
+                    <button type="submit" class="input-b" style="margin-top: 20px; width: 100%;">Salvar Notas</button>
+                    <button type="button" id="btnCancelarNotas" style="margin-top: 10px; width: 100%; background: #ccc; color: #333; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">Voltar</button>
+                </form>
+            </div>
+        </div>
 
         <a class="back" href="index.html">Clica aqui para voltar a página inicial</a>
-        
     </section>
 
-    <footer >
-    <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
+    <!-- MODAL DE ADICIONAR ALUNO -->
+    <div class="modal-overlay" id="modalAddAluno">
+        <div class="modal-content">
+            <h2>Adicionar Aluno Rápido</h2>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">O aluno será salvo na turma atual. O gestor será avisado para preencher os dados restantes.</p>
+            
+            <form id="formAddAluno">
+                <label>Nome Completo do Aluno:</label>
+                <input type="text" id="addNome" required>
+                
+                <label>Data de Nascimento:</label>
+                <input type="date" id="addData" required>
+                
+                <label>CPF do Responsável (Para Login futuro):</label>
+                <input type="text" id="addCpfResp" placeholder="000.000.000-00" required>
+
+                <div class="modal-botoes">
+                    <button type="button" class="btn-cancelar" id="btnFecharModal">Cancelar</button>
+                    <button type="submit" class="btn-salvar">Salvar Aluno</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
     </footer>
 
-<script src="./style/login/script/scriptProfessores.js"></script>
+    <script src="style/login/script/scriptProfessores.js"></script>
 </body>
-
 </html>
