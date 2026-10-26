@@ -62,18 +62,26 @@ async function entrar(){
 
     try {
         if (tipoSelecionado === "responsavel") {
-            // Busca na tabela alunos se o CPF bate com o pai, mãe ou responsável
+            // Busca na tabela alunos se o CPF bate com pai, mãe ou responsável-outro
             const { data, error } = await supabaseClient
                 .from('alunos')
-                .select('id, nome')
+                .select('id, nome, status')
                 .or(`cpf_pai.eq.${cpfDigitado},cpf_mae.eq.${cpfDigitado},responsavel_outro.eq.${cpfDigitado}`)
                 .limit(1);
 
             if (error) throw error;
 
             if (data && data.length > 0) {
-                localStorage.setItem("@alunoLogadoId", data[0].id);
-                localStorage.setItem("@alunoLogadoNome", data[0].nome);
+                const aluno = data[0];
+
+                // Bloqueia aluno Transferido/Desistente
+                if (aluno.status && aluno.status !== 'Ativa') {
+                    alert(`O acesso está indisponível: o aluno consta como "${aluno.status}".`);
+                    return;
+                }
+
+                localStorage.setItem("@alunoLogadoId", aluno.id);
+                localStorage.setItem("@alunoLogadoNome", aluno.nome);
                 window.location.href = PAGINAS[tipoSelecionado];
             } else {
                 alert("CPF de responsável não encontrado. Verifique o número digitado.");
@@ -91,11 +99,18 @@ async function entrar(){
             if (error) throw error;
 
             if (data && data.length > 0) {
-                // SALVA OS DADOS COM O NOME EXATO QUE O OUTRO SCRIPT PROCURA
+                const usuario = data[0];
+
+                // Professor precisa estar autorizado pelo gestor
+                if (tipoSelecionado === 'professor' && !usuario.autorizado) {
+                    alert("Seu cadastro de professor ainda não foi autorizado pelo gestor. Aguarde a liberação.");
+                    return;
+                }
+
                 if (tipoSelecionado === 'professor') {
-                    localStorage.setItem("@professorLogado", JSON.stringify(data[0]));
+                    localStorage.setItem("@professorLogado", JSON.stringify(usuario));
                 } else if (tipoSelecionado === 'gestor') {
-                    localStorage.setItem("@gestorLogado", JSON.stringify(data[0]));
+                    localStorage.setItem("@gestorLogado", JSON.stringify(usuario));
                 }
                 window.location.href = PAGINAS[tipoSelecionado];
             } else {

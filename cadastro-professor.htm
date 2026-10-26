@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style/login/login.css">
+    <link rel="stylesheet" href="style/login/expansinvo-L.css">
+    <title>CEJE - Cadastro de Professor</title>
+    <style>
+        /* Ajustes só desta página — não alteram o CSS global */
+        #cadastroBox {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 90%;
+            max-width: 520px;
+            margin: 20px auto;
+            padding: 20px;
+            background: var(--titlecor);
+            border-radius: 8px;
+            color: var(--texto-inverso);
+        }
+        #cadastroBox label {
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+        #cadastroBox input[type="text"],
+        #cadastroBox input[type="email"],
+        #cadastroBox input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+        }
+        #cadastroBox fieldset {
+            border: 1px dashed var(--destaque-inverso);
+            border-radius: 6px;
+            padding: 10px;
+        }
+        #cadastroBox legend {
+            font-weight: bold;
+            color: var(--texto-inverso);
+            padding: 0 6px;
+        }
+        .turmas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 6px 12px;
+            margin-top: 8px;
+        }
+        .turmas-grid label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        #btnCadastrar {
+            margin-top: 14px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--fundo-card);
+            color: var(--texto);
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        #btnCadastrar:hover { background: var(--destaque-inverso); }
+        #btnCadastrar:disabled { opacity: 0.6; cursor: wait; }
+        .msg-erro { color: #ffb3b3; font-weight: bold; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <header class="text-fixo">
+        <h1>Centro Educacional Jardin do Éden</h1>
+        <h2>Uma escola de Gerações</h2>
+    </header>
+
+    <section id="ficha">
+        <nav id="MCL">
+            <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
+            <a href="login.htm">Login <i class="fa-solid fa-key"></i></a>
+        </nav>
+
+        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
+        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+
+        <div class="text-banerL">
+            <h1>Cadastro de Professor</h1>
+            <p style="text-align:center; color:var(--texto); margin-top:8px;">
+                Preencha seus dados. O gestor irá autorizar seu acesso.
+            </p>
+        </div>
+
+        <form id="formCadastroProf" autocomplete="off">
+            <div id="cadastroBox">
+                <label for="nomeProf">Nome completo:</label>
+                <input type="text" id="nomeProf" required placeholder="Seu nome completo">
+
+                <label for="cpfProf">CPF (usado como senha de acesso):</label>
+                <input type="text" id="cpfProf" required placeholder="000.000.000-00" maxlength="14">
+
+                <label for="emailProf">E-mail (opcional):</label>
+                <input type="email" id="emailProf" placeholder="professor@exemplo.com">
+
+                <label for="telProf">Telefone (opcional):</label>
+                <input type="tel" id="telProf" placeholder="(00) 00000-0000">
+
+                <fieldset>
+                    <legend>Turmas que leciona:</legend>
+                    <div class="turmas-grid" id="turmasGrid"><!-- preenchido via JS --></div>
+                </fieldset>
+
+                <button type="submit" id="btnCadastrar">Cadastrar</button>
+                <div class="msg-erro" id="msgErro" style="display:none;"></div>
+
+                <a class="back" href="login.htm" style="color:var(--texto-inverso); text-align:center; margin-top:10px;">
+                    Já tem cadastro? Voltar ao login
+                </a>
+            </div>
+        </form>
+
+        <footer>
+            <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
+        </footer>
+    </section>
+
+    <script src="style/login/script/cadastro-professor.js"></script>
+</body>
+</html>

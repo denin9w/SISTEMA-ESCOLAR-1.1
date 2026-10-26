@@ -6,133 +6,197 @@
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/login/login-gestor.css">
     <link rel="stylesheet" href="style/login/login-professoresExpansivo.css">
+    <title>CEJE - Área do Gestor</title>
 
-    <title> CEJE </title>
+    <!-- Bibliotecas para gerar DOCX -->
+    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3/build/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
+    <style>
+        /* --- Extras só do gestor (não mexem no CSS global) --- */
+        #gestorTopo {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+        }
+        #gestorNome {
+            color: var(--titlecor);
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+        #barraBusca {
+            width: 90%;
+            margin: 10px auto;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+        #buscaAluno {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 50px;
+            border: 1px solid var(--titlecor);
+            font-size: 1rem;
+            max-width: 420px;
+        }
+        #painelAvisos {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 780px) {
+            #painelAvisos { grid-template-columns: 1fr; }
+        }
+        .aviso-painel {
+            background: var(--fundo-card);
+            border: 1px dashed var(--destaque);
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .aviso-painel h3 {
+            color: var(--titlecor);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .aviso-item {
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            font-size: 0.92rem;
+            line-height: 1.4;
+        }
+        .aviso-item:last-child { border-bottom: none; }
+        .btn-mini {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 6px;
+            margin-right: 6px;
+        }
+        .btn-gerar   { background: var(--destaque); color: #fff; }
+        .btn-marcar  { background: #28a745; color: #fff; }
+        .btn-autorizar { background: var(--btncor); color: #fff; }
+    </style>
 </head>
 
 <body>
-
-    
     <section id="header">
         <header class="text-fixo">
             <h1>Centro Educacional Jardin do Éden</h1>
             <h2>Uma escola de Gerações</h2>
         </header>
     </section>
-   
 
     <section id="ficha">
-
         <nav id="MCL">
-            <a href="index.html">Inicio <i class="fa-solid fa-home-cap"></i></a>
-        
+            <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
             <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
+            <a href="login.htm" id="btnSair">Sair <i class="fa-solid fa-door-open"></i></a>
         </nav>
 
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-        <img  class="moeda" src="imagens/moeda.png" alt="Moeda">
+        <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
 
         <div class="text-baner">
-            <h1>Bem vindo a Area do Gestor</h1>
+            <h1>Bem vindo à Área do Gestor</h1>
+            <p id="gestorNome" style="text-align:center;"></p>
         </div>
 
+        <!-- ==================================================== -->
+        <!-- PAINEL DE AVISOS                                     -->
+        <!-- ==================================================== -->
+        <div id="painelAvisos">
+            <div class="aviso-painel">
+                <h3><i class="fa-solid fa-user-check"></i> Professores pendentes de autorização</h3>
+                <div id="listaProfessoresPendentes">Carregando...</div>
+            </div>
+            <div class="aviso-painel">
+                <h3><i class="fa-solid fa-file-circle-exclamation"></i> Solicitações de documentos</h3>
+                <div id="listaSolicitacoes">Carregando...</div>
+            </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- BUSCA                                                -->
+        <!-- ==================================================== -->
+        <div id="barraBusca">
+            <input type="text" id="buscaAluno" placeholder="Pesquisar aluno pelo nome..." />
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- COLUNAS: TURMA / ALUNOS / DOCUMENTOS                 -->
+        <!-- ==================================================== -->
         <div id="colunasContainer">
-    
-              <div id="selecionarTurma">
+
+            <div id="selecionarTurma">
                 <label for="iturma">Turma:</label>
                 <select name="turma" id="iturma">
-                    <option value="disabled" selected>Selecione Uma Turma</option>
-                    <option value="1º Ano-A">1º Ano A</option>
-                    <option value="1º Ano B">1º Ano B</option>
-                    <option value="2º Ano A">2º Ano A</option>
-                    <option value="2º Ano B">2º Ano B</option>
-                    <option value="3º Ano A">3º Ano A</option>
-                    <option value="3º Ano B">3º Ano B</option>
-                    <option value="4º Ano A">4º Ano A</option>
-                    <option value="4º Ano B">4º Ano B</option>
-                    <option value="5º Ano A">5º Ano A</option>
-                    <option value="5º Ano B">5º Ano B</option>
-                    <option value="6º Ano A">6º Ano A</option>
-                    <option value="7º Ano A">7º Ano A</option>
-                    <option value="8º Ano A">8º Ano A</option>
-                    <option value="9º Ano A ">9º Ano A</option>
+                    <option value="" selected disabled>Selecione uma turma</option>
+                    <!-- preenchido via JS -->
                 </select>
             </div>
 
-            <div id="listaAlunos"> 
-                <a class="btn-aluno" >Aluno 1</a>
-                <a class="btn-aluno" >Aluno 2</a>
-                <a class="btn-aluno" >Aluno 3</a>
-                <a class="btn-aluno" >Aluno 4</a>
-                <a class="btn-aluno" >Aluno 5</a>
-                <a class="btn-aluno" >Aluno 6</a>
-                <a class="btn-aluno" >Aluno 7</a>
-               
-
-            </div>
-    
-    
-    
-            <div id="idocumentos">
-    
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Bolsa Familia</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Transferência</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Requerimento de Matrícula</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Provissoria</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Pagamento Escolar</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Ficha Individual</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Declaração Recibo</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Declaração Normal</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Declaração de Normal com o nome do Pai e da Mãe</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Declaração de Quitação de Debito</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Declaração de Quitação de Debito Tabela</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i>Declaração Professores que Saiu</a>
-                </div>
-    
+            <div id="listaAlunos" style="display:none;">
+                <!-- preenchido via JS -->
             </div>
 
-    
-           
+            <div id="idocumentos" style="display:none;">
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Bolsa Familia"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Bolsa Família</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Transferencia"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Transferência</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Requerimento de Matricula"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Requerimento de Matrícula</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Provissoria"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Provisória</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Pagamento Escolar"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Pagamento Escolar</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Ficha Individual"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Ficha Individual</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Declaracao Recibo"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração Recibo</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Declaracao Normal"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração Normal</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Declaracao Normal Pai Mae"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração Normal com nome do Pai e da Mãe</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Declaracao Quitacao Debito"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Quitação de Débito</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Declaracao Quitacao Debito Tabela"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Quitação de Débito (Tabela)</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Declaracao Professor Saiu"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Professor que Saiu</a>
+                </div>
+                <div class="cdocumentos">
+                    <a href="#" data-doc="Boletim"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Boletim</a>
+                </div>
+            </div>
+
         </div>
 
+        <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
 
+        <footer>
+            <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
+        </footer>
     </section>
 
- 
-
-
-
-
-
-    <footer >
-    <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
-    </footer>
-
-<script src="./style/login/script/scriptGestor.js"></script>
+    <script src="style/login/script/scriptGestor.js"></script>
 </body>
-
 </html>

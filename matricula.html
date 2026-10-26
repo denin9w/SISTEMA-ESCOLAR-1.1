@@ -1,18 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/matriculas/matriculas.css">
     <link rel="stylesheet" href="style/matriculas/expansivoM.css">
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
-
-    <title>CEJE</title>
-
+    <title>CEJE - Matrícula</title>
 </head>
 
 <body>
-    <header>   
+    <header>
         <div class="text-fixo">
             <h1>Centro Educacional Jardin do Éden</h1>
             <h2>Uma escola de Gerações</h2>
@@ -20,10 +18,8 @@
     </header>
     <nav id="MCL">
         <a href="index.html">Inicio <i class="fa-solid fa-graduation-cap"></i></a>
-      
         <a href="login.htm">Login <i class="fa-solid fa-key"></i></a>
     </nav>
-
 
 <main id="dados-container">
 
@@ -34,21 +30,13 @@
         <!-- ================================================= -->
         <!-- ETAPA 1 - DADOS DO ALUNO                         -->
         <!-- ================================================= -->
-
         <div class="etapa1">
-
             <fieldset class="dados-aluno">
-
-                <legend class="titulo">
-                    Dados Pessoais do Aluno
-                </legend>
+                <legend class="titulo">Dados Pessoais do Aluno</legend>
 
                 <section class="etapa-ativa">
 
-                    <!-- NOME -->
-
                     <label for="inome">Nome:</label>
-
                     <input
                         class="input-aluno"
                         id="inome"
@@ -59,13 +47,7 @@
                         required
                     >
 
-
-                    <!-- DATA DE NASCIMENTO -->
-
-                    <label for="idata">
-                        Data de Nascimento:
-                    </label>
-
+                    <label for="idata">Data de Nascimento:</label>
                     <input
                         class="input-aluno"
                         id="idata"
@@ -74,66 +56,21 @@
                         required
                     >
 
-
-                    <!-- SEXO -->
-
                     <fieldset class="sexo-aluno">
-
-                        <legend class="legend">
-                            Sexo:
-                        </legend>
-
+                        <legend class="legend">Sexo:</legend>
                         <div class="sexo">
-
                             <div class="sexo-m">
-
-                                <input
-                                    id="isexoM"
-                                    name="sexo"
-                                    type="radio"
-                                    value="Masculino"
-                                    checked
-                                >
-
-                                <label
-                                    class="subtitulo"
-                                    for="isexoM"
-                                >
-                                    Masculino
-                                </label>
-
+                                <input id="isexoM" name="sexo" type="radio" value="Masculino" checked>
+                                <label class="subtitulo" for="isexoM">Masculino</label>
                             </div>
-
-
                             <div class="sexo-f">
-
-                                <input
-                                    id="isexoF"
-                                    name="sexo"
-                                    type="radio"
-                                    value="Feminino"
-                                >
-
-                                <label
-                                    class="subtitulo"
-                                    for="isexoF"
-                                >
-                                    Feminino
-                                </label>
-
+                                <input id="isexoF" name="sexo" type="radio" value="Feminino">
+                                <label class="subtitulo" for="isexoF">Feminino</label>
                             </div>
-
                         </div>
-
                     </fieldset>
 
-
-                    <!-- NACIONALIDADE -->
-
-                    <label for="inacionalidade">
-                        Nacionalidade:
-                    </label>
-
+                    <label for="inacionalidade">Nacionalidade:</label>
                     <input
                         class="input-aluno"
                         id="inacionalidade"
@@ -142,13 +79,7 @@
                         placeholder="Digite a nacionalidade"
                     >
 
-
-                    <!-- CIDADE DE NASCIMENTO -->
-
-                    <label for="icidade-nascimento">
-                        Cidade de nascimento:
-                    </label>
-
+                    <label for="icidade-nascimento">Cidade de nascimento:</label>
                     <input
                         class="input-aluno"
                         id="icidade-nascimento"
@@ -158,20 +89,9 @@
                         required
                     >
 
-
-                    <!-- ================================================= -->
-                    <!-- ENDEREÇO                                           -->
-                    <!-- ================================================= -->
-
                     <h3>ENDEREÇO</h3>
 
-
-                    <!-- RUA -->
-
-                    <label for="iendereco">
-                        Rua:
-                    </label>
-
+                    <label for="iendereco">Rua:</label>
                     <input
                         class="input-aluno"
                         id="iendereco"
@@ -181,13 +101,7 @@
                         required
                     >
 
-
-                    <!-- BAIRRO -->
-
-                    <label for="ibairro">
-                        Bairro:
-                    </label>
-
+                    <label for="ibairro">Bairro:</label>
                     <input
                         class="input-aluno"
                         id="ibairro"
@@ -197,13 +111,7 @@
                         required
                     >
 
-
-                    <!-- NÚMERO -->
-
-                    <label for="inumero">
-                        Nº:
-                    </label>
-
+                    <label for="inumero">Nº:</label>
                     <input
                         class="input-aluno"
                         id="inumero"
@@ -213,13 +121,7 @@
                         required
                     >
 
-
-                    <!-- CIDADE -->
-
-                    <label for="icidade">
-                        Cidade:
-                    </label>
-
+                    <label for="icidade">Cidade:</label>
                     <input
                         class="input-aluno"
                         id="icidade"
@@ -229,13 +131,7 @@
                         required
                     >
 
-
-                    <!-- ESTADO -->
-
-                    <label for="iestado">
-                        UF:
-                    </label>
-
+                    <label for="iestado">UF:</label>
                     <input
                         class="input-aluno"
                         id="iestado"
@@ -246,13 +142,7 @@
                         required
                     >
 
-
-                    <!-- CEP -->
-
-                    <label for="icep">
-                        CEP:
-                    </label>
-
+                    <label for="icep">CEP:</label>
                     <input
                         class="input-aluno"
                         id="icep"
@@ -261,13 +151,7 @@
                         placeholder="00000-000"
                     >
 
-
-                    <!-- CPF -->
-
-                    <label for="icpf">
-                        CPF:
-                    </label>
-
+                    <label for="icpf">CPF:</label>
                     <input
                         class="input-aluno"
                         id="icpf"
@@ -277,13 +161,7 @@
                         required
                     >
 
-
-                    <!-- RG -->
-
-                    <label for="irg">
-                        RG:
-                    </label>
-
+                    <label for="irg">RG:</label>
                     <input
                         class="input-aluno"
                         id="irg"
@@ -293,13 +171,7 @@
                         required
                     >
 
-
-                    <!-- NISS -->
-
-                    <label for="inss">
-                        NISS:
-                    </label>
-
+                    <label for="inss">NISS:</label>
                     <input
                         class="input-aluno"
                         id="inss"
@@ -308,129 +180,44 @@
                         placeholder="000.00000.00-0"
                     >
 
+                    <!-- ================================================= -->
+                    <!-- TURMA — PADRONIZADA (A/B até 5º, só A do 6º ao 9º) -->
+                    <!-- ================================================= -->
+                    <label for="iturma">Turma:</label>
+                    <select name="turma" id="iturma" class="input-aluno" required>
+                        <option value="" selected disabled>Selecione uma turma</option>
 
-                    <!-- TURMA -->
+                        <optgroup label="Educação Infantil">
+                            <option value="infantil-I-a">Infantil I A</option>
+                            <option value="infantil-I-b">Infantil I B</option>
+                            <option value="infantil-II-a">Infantil II A</option>
+                            <option value="infantil-II-b">Infantil II B</option>
+                            <option value="infantil-III-a">Infantil III A</option>
+                            <option value="infantil-III-b">Infantil III B</option>
+                        </optgroup>
 
-                    <label for="iturma">
-                        Turma:
-                    </label>
+                        <optgroup label="Ensino Fundamental I">
+                            <option value="1ano-a">1º Ano A</option>
+                            <option value="1ano-b">1º Ano B</option>
+                            <option value="2ano-a">2º Ano A</option>
+                            <option value="2ano-b">2º Ano B</option>
+                            <option value="3ano-a">3º Ano A</option>
+                            <option value="3ano-b">3º Ano B</option>
+                            <option value="4ano-a">4º Ano A</option>
+                            <option value="4ano-b">4º Ano B</option>
+                            <option value="5ano-a">5º Ano A</option>
+                            <option value="5ano-b">5º Ano B</option>
+                        </optgroup>
 
-                    <select
-                        name="turma"
-                        id="iturma"
-                        class="input-aluno"
-                        required
-                    >
-
-                        <option value="" selected disabled>
-                            Selecione uma turma
-                        </option>
-
-                        <option value="infantil-I-a">
-                            Infantil I A
-                        </option>
-
-                        <option value="infantil-I-b">
-                            Infantil I B
-                        </option>
-
-                        <option value="infantil-II-a">
-                            Infantil II A
-                        </option>
-
-                        <option value="infantil-II-b">
-                            Infantil II B
-                        </option>
-
-                        <option value="infantil-III-a">
-                            Infantil III A
-                        </option>
-
-                        <option value="infantil-III-b">
-                            Infantil III B
-                        </option>
-
-                        <option value="1ano-a">
-                            1º Ano A
-                        </option>
-
-                        <option value="1ano-b">
-                            1º Ano B
-                        </option>
-
-                        <option value="2ano-a">
-                            2º Ano A
-                        </option>
-
-                        <option value="2ano-b">
-                            2º Ano B
-                        </option>
-
-                        <option value="3ano-a">
-                            3º Ano A
-                        </option>
-
-                        <option value="3ano-b">
-                            3º Ano B
-                        </option>
-
-                        <option value="4ano-a">
-                            4º Ano A
-                        </option>
-
-                        <option value="4ano-b">
-                            4º Ano B
-                        </option>
-
-                        <option value="5ano-a">
-                            5º Ano A
-                        </option>
-
-                        <option value="5ano-b">
-                            5º Ano B
-                        </option>
-
-                        <option value="6ano-a">
-                            6º Ano A
-                        </option>
-
-                        <option value="6ano-b">
-                            6º Ano B
-                        </option>
-
-                        <option value="7ano-a">
-                            7º Ano A
-                        </option>
-
-                        <option value="7ano-b">
-                            7º Ano B
-                        </option>
-
-                        <option value="8ano-a">
-                            8º Ano A
-                        </option>
-
-                        <option value="8ano-b">
-                            8º Ano B
-                        </option>
-
-                        <option value="9ano-a">
-                            9º Ano A
-                        </option>
-
-                        <option value="9ano-b">
-                            9º Ano B
-                        </option>
-
+                        <optgroup label="Ensino Fundamental II">
+                            <option value="6ano-a">6º Ano A</option>
+                            <option value="7ano-a">7º Ano A</option>
+                            <option value="8ano-a">8º Ano A</option>
+                            <option value="9ano-a">9º Ano A</option>
+                        </optgroup>
                     </select>
 
-
-                    <!-- OBSERVAÇÃO -->
-
-                    <label for="iobs">
-                        Observação:
-                    </label>
-
+                    <label for="iobs">Observação:</label>
                     <textarea
                         name="observacao"
                         id="iobs"
@@ -438,39 +225,21 @@
                     ></textarea>
 
                 </section>
-
             </fieldset>
-
         </div>
-
-
 
         <!-- ================================================= -->
         <!-- ETAPA 2 - RESPONSÁVEIS                           -->
         <!-- ================================================= -->
-
         <div class="etapa2">
-
             <fieldset class="dados-aluno">
-
-                <legend class="titulo">
-                    Dados Pessoais dos Responsáveis
-                </legend>
+                <legend class="titulo">Dados Pessoais dos Responsáveis</legend>
 
                 <section class="etapa">
 
-
-                    <!-- ========================== -->
-                    <!-- PAI                        -->
-                    <!-- ========================== -->
-
                     <h3>Dados do Pai</h3>
 
-
-                    <label for="inomeP">
-                        Nome do Pai:
-                    </label>
-
+                    <label for="inomeP">Nome do Pai:</label>
                     <input
                         class="input-responsavel"
                         id="inomeP"
@@ -480,11 +249,7 @@
                         autocomplete="on"
                     >
 
-
-                    <label for="iprofissao-pai">
-                        Profissão do Pai:
-                    </label>
-
+                    <label for="iprofissao-pai">Profissão do Pai:</label>
                     <input
                         class="input-responsavel"
                         id="iprofissao-pai"
@@ -494,11 +259,7 @@
                         autocomplete="on"
                     >
 
-
-                    <label for="iidentidade-pai">
-                        Identidade do Pai:
-                    </label>
-
+                    <label for="iidentidade-pai">Identidade do Pai:</label>
                     <input
                         class="input-responsavel"
                         id="iidentidade-pai"
@@ -507,11 +268,7 @@
                         placeholder="Digite a identidade do pai"
                     >
 
-
-                    <label for="icpf-pai">
-                        CPF do Pai:
-                    </label>
-
+                    <label for="icpf-pai">CPF do Pai:</label>
                     <input
                         class="input-responsavel"
                         id="icpf-pai"
@@ -520,11 +277,7 @@
                         placeholder="Digite o CPF do pai"
                     >
 
-
-                    <label for="iwhatsapp-pai">
-                        WhatsApp do Pai:
-                    </label>
-
+                    <label for="iwhatsapp-pai">WhatsApp do Pai:</label>
                     <input
                         class="input-responsavel"
                         id="iwhatsapp-pai"
@@ -533,11 +286,7 @@
                         placeholder="Digite o WhatsApp do pai"
                     >
 
-
-                    <label for="itelefone-pai">
-                        Telefone do Pai:
-                    </label>
-
+                    <label for="itelefone-pai">Telefone do Pai:</label>
                     <input
                         class="input-responsavel"
                         id="itelefone-pai"
@@ -546,19 +295,9 @@
                         placeholder="Digite o telefone do pai"
                     >
 
-
-
-                    <!-- ========================== -->
-                    <!-- MÃE                        -->
-                    <!-- ========================== -->
-
                     <h3>Dados da Mãe</h3>
 
-
-                    <label for="inome-mae">
-                        Nome da Mãe:
-                    </label>
-
+                    <label for="inome-mae">Nome da Mãe:</label>
                     <input
                         class="input-responsavel"
                         id="inome-mae"
@@ -568,11 +307,7 @@
                         autocomplete="on"
                     >
 
-
-                    <label for="iprofissao-mae">
-                        Profissão da Mãe:
-                    </label>
-
+                    <label for="iprofissao-mae">Profissão da Mãe:</label>
                     <input
                         class="input-responsavel"
                         id="iprofissao-mae"
@@ -581,11 +316,7 @@
                         placeholder="Digite a profissão da mãe"
                     >
 
-
-                    <label for="iidentidade-mae">
-                        Identidade da Mãe:
-                    </label>
-
+                    <label for="iidentidade-mae">Identidade da Mãe:</label>
                     <input
                         class="input-responsavel"
                         id="iidentidade-mae"
@@ -594,11 +325,7 @@
                         placeholder="Digite a identidade da mãe"
                     >
 
-
-                    <label for="icpf-mae">
-                        CPF da Mãe:
-                    </label>
-
+                    <label for="icpf-mae">CPF da Mãe:</label>
                     <input
                         class="input-responsavel"
                         id="icpf-mae"
@@ -607,11 +334,7 @@
                         placeholder="Digite o CPF da mãe"
                     >
 
-
-                    <label for="iwhatsapp-mae">
-                        WhatsApp da Mãe:
-                    </label>
-
+                    <label for="iwhatsapp-mae">WhatsApp da Mãe:</label>
                     <input
                         class="input-responsavel"
                         id="iwhatsapp-mae"
@@ -620,11 +343,7 @@
                         placeholder="Digite o WhatsApp da mãe"
                     >
 
-
-                    <label for="itelefone-mae">
-                        Telefone da Mãe:
-                    </label>
-
+                    <label for="itelefone-mae">Telefone da Mãe:</label>
                     <input
                         class="input-responsavel"
                         id="itelefone-mae"
@@ -633,43 +352,16 @@
                         placeholder="Digite o telefone da mãe"
                     >
 
-
-
-                    <!-- ========================== -->
-                    <!-- RESPONSÁVEL LEGAL          -->
-                    <!-- ========================== -->
-
                     <h3>Responsável pela Matrícula</h3>
 
-
-                    <label for="iresponsavel">
-                        Responsável:
-                    </label>
-
-                    <select
-                        name="responsavel"
-                        id="iresponsavel"
-                    >
-
-                        <option value="pai">
-                            Pai
-                        </option>
-
-                        <option value="mae">
-                            Mãe
-                        </option>
-
-                        <option value="outro">
-                            Outro
-                        </option>
-
+                    <label for="iresponsavel">Responsável:</label>
+                    <select name="responsavel" id="iresponsavel">
+                        <option value="pai">Pai</option>
+                        <option value="mae">Mãe</option>
+                        <option value="outro">Outro</option>
                     </select>
 
-
-                    <label for="iresponsavelO">
-                        Caso seja outro:
-                    </label>
-
+                    <label for="iresponsavelO">Caso seja outro:</label>
                     <input
                         type="text"
                         id="iresponsavelO"
@@ -678,73 +370,32 @@
                     >
 
                 </section>
-
             </fieldset>
-
         </div>
-
-
 
         <!-- ================================================= -->
         <!-- BOTÕES                                            -->
         <!-- ================================================= -->
-
         <div class="botoes">
-
-            <button
-                type="button"
-                id="btnProximo"
-                onclick="proximo()"
-            >
-                Próximo
-            </button>
-
-
-            <button
-                type="button"
-                id="btnVoltar"
-                onclick="voltar()"
-            >
-                Voltar
-            </button>
-
-
-            <button
-                type="submit"
-                id="btnFinalizar"
-            >
-                Finalizar matrícula
-            </button>
-
+            <button type="button" id="btnProximo" onclick="proximo()">Próximo</button>
+            <button type="button" id="btnVoltar"  onclick="voltar()">Voltar</button>
+            <button type="submit" id="btnFinalizar">Finalizar matrícula</button>
         </div>
-
-     
 
     </form>
 
-
-
 </main>
-
-
-
-
 
 <footer>
     <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
-
 </footer>
-<!-- Biblioteca para abrir arquivos DOCX -->
+
+<!-- Bibliotecas para abrir/preencher DOCX (mantidas) -->
 <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js"></script>
-
-<!-- Biblioteca para preencher o documento Word -->
 <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3/build/docxtemplater.js"></script>
-
-<!-- Biblioteca para baixar o documento -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <script src="style/matriculas/script/script.js"></script>
 
 </body>
-
 </html>

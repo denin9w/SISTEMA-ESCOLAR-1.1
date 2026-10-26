@@ -6,9 +6,9 @@
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/login/login-professores.css">
     <link rel="stylesheet" href="style/login/login-professoresExpansivo.css">
-    <title> CEJE - Área do Professor </title>
+    <title>CEJE - Área do Professor</title>
     <style>
-        /* --- ESTILOS DA LISTA E EDIÇÃO --- */
+        /* --- Estilos da lista e edição (mantidos do original) --- */
         .aluno-item {
             display: flex;
             justify-content: space-between;
@@ -19,6 +19,7 @@
             border-radius: 8px;
             border: 1px solid #ddd;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .btn-nome-aluno {
             flex: 1;
@@ -29,10 +30,11 @@
             cursor: pointer;
             color: var(--titlecor);
             font-weight: bold;
+            min-width: 200px;
         }
         .btn-editar {
             background-color: #28a745;
-            color: black;
+            color: #fff;
             border: none;
             border-radius: 5px;
             padding: 8px 12px;
@@ -40,7 +42,7 @@
             transition: 0.3s;
         }
         .btn-editar:hover { background-color: #218838; }
-        
+
         .painel-edicao {
             display: none;
             background: #fff3cd;
@@ -51,6 +53,7 @@
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
+            width: 100%;
         }
         .btn-acao {
             padding: 8px 15px;
@@ -65,9 +68,9 @@
         }
         .btn-transferir { background-color: #ffc107; color: #000; }
         .btn-desistente { background-color: #fd7e14; }
-        .btn-excluir { background-color: #dc3545; }
+        .btn-excluir    { background-color: #dc3545; }
 
-        /* --- ESTILOS DO BOTÃO DE ADICIONAR E DO MODAL --- */
+        /* --- Botão de adicionar e modal --- */
         .btn-add-aluno {
             width: 100%;
             padding: 15px;
@@ -105,12 +108,37 @@
         }
         .modal-content h2 { color: var(--titlecor); margin-bottom: 20px; }
         .modal-content label { display: block; margin-top: 10px; font-weight: bold; }
-        .modal-content input, .modal-content select {
-            width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;
+        .modal-content input {
+            width: 100%; padding: 10px; margin-top: 5px;
+            border: 1px solid #ccc; border-radius: 5px;
         }
         .modal-botoes { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-salvar { flex: 1; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;}
-        .btn-cancelar { flex: 1; padding: 10px; background: #ccc; color: #333; border: none; border-radius: 5px; cursor: pointer;}
+        .btn-salvar   { flex: 1; padding: 10px; background: #28a745; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-cancelar { flex: 1; padding: 10px; background: #ccc; color: #333; border: none; border-radius: 5px; cursor: pointer; }
+
+        /* --- Link cadastrar-se --- */
+        #topoProfessor {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 16px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        #topoProfessor a.link-cadastro {
+            color: var(--destaque);
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        #topoProfessor a.link-cadastro:hover { text-decoration: underline; }
+        #nomeProfessorLogado {
+            text-align: center;
+            font-weight: bold;
+            color: var(--titlecor);
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -120,7 +148,7 @@
             <h2>Uma escola de Gerações</h2>
         </header>
     </section>
-   
+
     <section id="ficha">
         <nav id="MCL">
             <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
@@ -129,13 +157,18 @@
         </nav>
 
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+        <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
 
         <div class="text-baner">
-            <h1>Bem vindo a Area do Professor</h1>
-            <p id="nomeProfessorLogado" style="text-align: center; font-weight: bold; color: var(--titlecor);"></p>
+            <h1>Bem vindo à Área do Professor</h1>
+            <div id="topoProfessor">
+                <span id="nomeProfessorLogado"></span>
+                <a class="link-cadastro" href="cadastro-professor.htm">
+                    <i class="fa-solid fa-user-plus"></i> Cadastrar-se (novo professor)
+                </a>
+            </div>
         </div>
-    
+
         <div id="Boletim">
             <div id="selecionarTurma">
                 <label for="iturma">Minhas Turmas:</label>
@@ -187,24 +220,23 @@
             </div>
         </div>
 
-        <a class="back" href="index.html">Clica aqui para voltar a página inicial</a>
+        <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
     </section>
 
-    <!-- MODAL DE ADICIONAR ALUNO -->
+    <!-- MODAL DE ADICIONAR ALUNO (simplificado: nome + data + turma) -->
     <div class="modal-overlay" id="modalAddAluno">
         <div class="modal-content">
             <h2>Adicionar Aluno Rápido</h2>
-            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">O aluno será salvo na turma atual. O gestor será avisado para preencher os dados restantes.</p>
-            
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
+                O aluno será salvo na turma atual. O gestor será avisado para completar os dados cadastrais.
+            </p>
+
             <form id="formAddAluno">
                 <label>Nome Completo do Aluno:</label>
                 <input type="text" id="addNome" required>
-                
+
                 <label>Data de Nascimento:</label>
                 <input type="date" id="addData" required>
-                
-                <label>CPF do Responsável (Para Login futuro):</label>
-                <input type="text" id="addCpfResp" placeholder="000.000.000-00" required>
 
                 <div class="modal-botoes">
                     <button type="button" class="btn-cancelar" id="btnFecharModal">Cancelar</button>

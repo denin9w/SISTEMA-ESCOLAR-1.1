@@ -8,54 +8,48 @@ section#ficha{
     min-height: 100vh;
     position: relative;
     background: url(../../imagens/fundo.png);
-    background-size:cover;
+    background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    border: 1px dashed rebeccapurple;
+   
 }
 
-
-
-
 img.boneco{
-    position:absolute;
+    position: absolute;
     width: 6rem;
-    top:500px;
-    left:200px;
-
+    top: 500px;
+    left: 200px;
 }
 
 img.moeda{
     position: absolute;
     z-index: 1;
     right: -2px;
-    bottom:100px;
-    width:5rem;
+    bottom: 100px;
+    width: 5rem;
 }
-
-
 
 div.text-baner h1{
     text-align: center;
     font-size: 1.8rem;
     padding: 0px;
     margin: 0px;
-    border: 1px solid black;
+    
 }
 
 div#colunasContainer{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
     width: 85%;
-   
+    margin: 0 auto;
     gap: 20px;
-   
 }
-
 
 #selecionarTurma{
     width: 100%;
-    border: 1px dashed green;
+    max-width: 360px;
     padding: 20px;
 }
 #selecionarTurma select{
@@ -65,17 +59,15 @@ div#colunasContainer{
     border-radius: 8px;
     color: var(--titlecor);
     font-weight: bold;
-
 }
-
 
 div#listaAlunos{
     width: 60%;
+    min-width: 280px;
     display: flex;
     flex-direction: column;
-    border: 1px dashed red;
     padding: 10px;
-    display:none ;
+    display: none;
 }
 div#listaAlunos a{
     width: 100%;
@@ -86,23 +78,179 @@ div#listaAlunos a{
     text-align: start;
     white-space: pre-line;
     cursor: pointer;
+    color: var(--titlecor);
+    text-decoration: none;
+    border-bottom: 1px solid #f0f0f0;
+}
+div#listaAlunos a:hover{
+    background: #f7f7f7;
+    border-radius: 6px;
 }
 
 div#idocumentos{
-    grid-column: 3 / span 1;
-    display:none ;
+    display: none;
     width: 100%;
+    max-width: 360px;
     flex-direction: column;
     gap: 10px;
     padding: 20px;
-    border: 1px dashed orange;
+   
 }
 
 .cdocumentos a{
     text-decoration: none;
     font-size: clamp(10px, 1.1vw, 22px);
     color: var(--texto);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.cdocumentos a:hover{
+    color: var(--destaque);
 }
 
+/* ============================================================
+   NOVOS ELEMENTOS — PAINEL, BUSCA E NOME DO GESTOR
+   ============================================================ */
 
+#gestorNome{
+    text-align: center;
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--titlecor);
+    margin-top: 8px;
+}
 
+#barraBusca{
+    width: 90%;
+    max-width: 720px;
+    margin: 12px auto 6px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+#buscaAluno{
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 50px;
+    border: 1px solid var(--titlecor);
+    font-size: 1rem;
+    outline: none;
+}
+#buscaAluno:focus{
+    border-color: var(--destaque);
+    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.15);
+}
+
+#painelAvisos{
+    width: 90%;
+    max-width: 1000px;
+    margin: 20px auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.aviso-painel{
+    background: var(--fundo-card);
+    border: 1px dashed var(--destaque);
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.aviso-painel h3{
+    color: var(--titlecor);
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.aviso-item{
+    border-bottom: 1px solid #eee;
+    padding: 8px 0;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--texto);
+}
+.aviso-item:last-child{
+    border-bottom: none;
+}
+
+.aviso-item p{
+    font-size: 0.9rem;
+    color: #666;
+    margin: 4px 0;
+}
+
+.btn-mini{
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 6px;
+    margin-right: 6px;
+    font-weight: 600;
+    transition: filter 0.2s ease;
+}
+.btn-mini:hover{
+    filter: brightness(0.92);
+}
+
+.btn-gerar{
+    background: var(--destaque);
+    color: #fff;
+}
+
+.btn-marcar{
+    background: #28a745;
+    color: #fff;
+}
+
+.btn-autorizar{
+    background: var(--btncor);
+    color: #fff;
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+
+@media (max-width: 780px){
+    #painelAvisos{
+        grid-template-columns: 1fr;
+    }
+
+    div#colunasContainer{
+        flex-direction: column;
+        align-items: center;
+        width: 95%;
+    }
+
+    div#listaAlunos{
+        width: 100%;
+    }
+
+    div#idocumentos{
+        max-width: 100%;
+    }
+
+    img.boneco{
+        top: 60px;
+        left: 10px;
+        width: 4.5rem;
+    }
+
+    img.moeda{
+        right: 8px;
+        bottom: 40px;
+        width: 3.5rem;
+    }
+}

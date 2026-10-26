@@ -6,105 +6,85 @@
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/login/login-responsavel.css">
     <link rel="stylesheet" href="style/login/login-responsavelExpansivo.css">
-    
-    <title> CEJE </title>
-
+    <title>CEJE - Área do Responsável</title>
 </head>
 
 <body>
-        <section id="header">
-            <header class="text-fixo">
-                    <h1>Centro Educacional Jardin do Éden</h1>
-                    <h2>Uma escola de Gerações</h2>
-            </header>
-        </section>
+    <section id="header">
+        <header class="text-fixo">
+            <h1>Centro Educacional Jardin do Éden</h1>
+            <h2>Uma escola de Gerações</h2>
+        </header>
+    </section>
 
-        
-        <img class="bonecoO" src="imagens/boneco1.png" alt="Boneco Azul">
-        <img  class="moedaO" src="imagens/moeda.png" alt="Moeda">
-        
-        <section id="ficha">
-            <nav id="MCL">
-                <a href="index.html">Inicio <i class="fa-solid fa-home-cap"></i></a>
-        
-                <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
-            </nav>
-            <div class="elemento-onput">
-                <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-                <img  class="moeda" src="imagens/moeda.png" alt="Moeda">
+    <img class="bonecoO" src="imagens/boneco1.png" alt="Boneco Azul">
+    <img class="moedaO"  src="imagens/moeda.png"   alt="Moeda">
+
+    <section id="ficha">
+        <nav id="MCL">
+            <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
+            <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
+            <a href="login.htm" id="btnSair">Sair <i class="fa-solid fa-door-open"></i></a>
+        </nav>
+
+        <div class="elemento-onput">
+            <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
+            <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
+        </div>
+
+        <div class="text-banerL">
+            <h1>Bem vindo à Área do Responsável</h1>
+            <p id="alunoLogadoNome" style="text-align:center; font-weight:bold; color:var(--titlecor); margin-top:10px;"></p>
+            <h2>Solicite seu documento</h2>
+        </div>
+
+        <div id="documentos">
+            <div class="documentos-itens">
+
+                <label for="itransferencia" class="opçao-card">
+                    <input type="checkbox" name="Transferencia" id="itransferencia">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
+                        <span class="texto-icone">Transferência</span>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Ficha Individual" id="ificha-Individual">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-clipboard-list"></i></span>
+                        <span class="texto-icone">Ficha Individual</span>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Bolsa Família" id="ibolsa-Familia">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-file-lines"></i></span>
+                        <span class="texto-icone">Bolsa Família</span>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Boletim" id="iBoletim">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-regular fa-file-pdf"></i></span>
+                        <span class="texto-icone">Boletim</span>
+                    </div>
+                </label>
+
             </div>
-            <div class="text-banerL">
-                <h1>Bem vindo a Area do responsavel</h1>
-                <h2>Solicite seu documento</h2>
-            </div>
-        
-            <div id="documentos">
-                <div class="documentos-itens">
-                    <label for="itransferencia" class="opçao-card">
-                        <input type="checkbox" name="transferencia" id="itransferencia">
-                        <div class="conteudo-card">
-                            <span class="icone">
-                                <i class="fa-solid fa-arrow-right-arrow-left"></i>
-                            </span>
-                            <span class="texto-icone">
-                                Transferencia
-                            </span>
-                        </div>
-                    </label>
-                    <label class="opçao-card">
-                        <input type="checkbox" name="ficha-Individual" id="ificha-Individual">
-                        <div class="conteudo-card">
-                            <span class="icone">
-                                <i class="fa-solid fa-clipboard-list"></i>
-                            </span>
-                            <span class="texto-icone">
-                                Ficha-Individual
-                            </span>
-                        </div>
-                    </label>
-                    <label class="opçao-card">
-                        <input type="checkbox" name="bolsa-Familia" id="ibolsa-Familia">
-                        <div class="conteudo-card">
-                            <span class="icone">
-                                <i class="fa-solid fa-file-lines"></i>
-                            </span>
-                            <span class="texto-icone">
-                                Bolsa familia
-                            </span>
-                        </div>
-                    </label>
-        
-                    <label class="opçao-card">
-                        <input type="checkbox" name="Boletim" id="iBoletim">
-                        <div class="conteudo-card">
-                            <span class="icone">
-                               <i class="fa-regular fa-file-pdf"></i>
-                            </span>
-                            <span class="texto-icone">
-                                Boletim
-                            </span>
-                        </div>
-                    </label>
-        
-                </div>
-        
-                <button
-                    class="input-br"
-                    type="submit">
-                    solicitar
-                </button>
-        
-                <a class="back" href="index.html">Clica aqui para voltar a página inicial</a>
-        
-            </div>
-            <footer >
+
+            <button class="input-br" id="btnSolicitar" type="button">Solicitar</button>
+
+            <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
+        </div>
+
+        <footer>
             <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
-            </footer>
-        
-        </section>
- 
+        </footer>
+    </section>
 
-<script src="script.js"></script>
+    <script src="style/login/script/scriptResponsavel.js"></script>
 </body>
-
 </html>

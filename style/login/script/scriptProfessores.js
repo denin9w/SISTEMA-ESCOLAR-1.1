@@ -26,6 +26,16 @@ const btnFecharModal = document.querySelector('#btnFecharModal');
 let professorLogado = null;
 let alunoSelecionadoId = null;
 
+// --- UTIL: formata data YYYY-MM-DD -> DD/MM/AAAA ---
+function formatarDataBR(iso) {
+    if (!iso) return 'Sem data';
+    // aceita 'YYYY-MM-DD' ou ISO completo
+    const apenasData = String(iso).slice(0, 10);
+    const partes = apenasData.split('-');
+    if (partes.length !== 3) return apenasData;
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
 function iniciarSistema() {
     const profString = localStorage.getItem("@professorLogado");
     if (!profString) {
@@ -35,16 +45,28 @@ function iniciarSistema() {
     }
 
     professorLogado = JSON.parse(profString);
-    document.querySelector('#nomeProfessorLogado').textContent = `Prof. ${professorLogado.nome}`;
+
+    // Garante que turmas seja array
+    let turmas = professorLogado.turmas;
+    if (typeof turmas === 'string') {
+        try { turmas = JSON.parse(turmas); } catch (e) { turmas = turmas.split(',').map(t => t.trim()); }
+    }
+    if (!Array.isArray(turmas)) turmas = [];
+    professorLogado.turmas = turmas;
+
+    const nomeEl = document.querySelector('#nomeProfessorLogado');
+    if (nomeEl) nomeEl.textContent = `Prof. ${professorLogado.nome}`;
 
     selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>';
-    if (professorLogado.turmas && professorLogado.turmas.length > 0) {
-        professorLogado.turmas.forEach(turma => {
+    if (turmas.length > 0) {
+        turmas.forEach(turma => {
             const option = document.createElement('option');
             option.value = turma;
             option.textContent = turma.toUpperCase();
             selectTurma.appendChild(option);
         });
+    } else {
+        selectTurma.innerHTML = '<option value="" selected disabled>Nenhuma turma vinculada</option>';
     }
 }
 
@@ -56,15 +78,15 @@ selectTurma.addEventListener('change', async function() {
 
     const { data: alunos, error } = await supabaseClient
         .from('alunos')
-        .select('id, nome, numero_matricula, notas, status')
+        .select('id, nome, numero_matricula, data_nascimento, notas, status')
         .eq('turma', turmaSelecionada)
-        .eq('status', 'Ativa') 
+        .eq('status', 'Ativa')
         .order('nome', { ascending: true });
 
-    if (error) return console.error(error);
+    if (error) { console.error(error); listaAlunosDiv.innerHTML = "<p>Erro ao carregar.</p>"; return; }
 
     listaAlunosDiv.innerHTML = "";
-    
+
     if (alunos.length === 0) {
         listaAlunosDiv.innerHTML = "<p>Nenhum aluno ativo nesta turma.</p>";
     } else {
@@ -74,13 +96,14 @@ selectTurma.addEventListener('change', async function() {
 
             const btnNome = document.createElement('button');
             btnNome.classList.add('btn-nome-aluno');
-            btnNome.textContent = `${aluno.nome} (Mat: ${aluno.numero_matricula || 'Sem Matrícula'})`;
+            // >>> AQUI: data de nascimento em vez do número de matrícula
+            btnNome.textContent = `${aluno.nome} (Nasc: ${formatarDataBR(aluno.data_nascimento)})`;
             btnNome.addEventListener('click', () => abrirTelaNotas(aluno));
 
             const btnEditar = document.createElement('button');
             btnEditar.classList.add('btn-editar');
             btnEditar.innerHTML = '<i class="fa-solid fa-pencil" style="color: black;"></i>';
-            
+
             const painelEdicao = document.createElement('div');
             painelEdicao.classList.add('painel-edicao');
             painelEdicao.style.width = "100%";
@@ -101,7 +124,7 @@ selectTurma.addEventListener('change', async function() {
         });
     }
 
-    // ADICIONA O BOTÃO DE ADICIONAR ALUNO NO FINAL DA LISTA
+    // Botão de adicionar aluno no final
     const btnAdd = document.createElement('button');
     btnAdd.classList.add('btn-add-aluno');
     btnAdd.innerHTML = '<i class="fa-solid fa-plus"></i> Adicionar Novo Aluno';
@@ -112,7 +135,7 @@ selectTurma.addEventListener('change', async function() {
     listaAlunosDiv.appendChild(btnAdd);
 });
 
-// --- LÓGICA DO MODAL DE ADICIONAR ALUNO ---
+// --- MODAL DE ADICIONAR ALUNO ---
 btnFecharModal.addEventListener('click', () => {
     modalAddAluno.style.display = "none";
     formAddAluno.reset();
@@ -123,7 +146,6 @@ formAddAluno.addEventListener('submit', async function(e) {
 
     const nome = document.querySelector('#addNome').value.trim();
     const dataNasc = document.querySelector('#addData').value;
-    const cpfResp = document.querySelector('#addCpfResp').value.trim();
     const turmaSelecionada = selectTurma.value;
 
     if (!turmaSelecionada) {
@@ -131,15 +153,14 @@ formAddAluno.addEventListener('submit', async function(e) {
         return;
     }
 
-    // Gera um número de matrícula provisório
+    // Matrícula provisória
     const anoAtual = new Date().getFullYear();
     const numProvisorio = `PROV-${anoAtual}-${Math.floor(Math.random() * 10000)}`;
 
-    // Salva o aluno no banco
+    // Spec: aluno novo entra só com nome + turma (+ data para listagem)
     const { data, error } = await supabaseClient.from('alunos').insert([{
         nome: nome,
-        data_nascimento: dataNasc,
-        cpf_pai: cpfResp, // Colocamos o CPF no campo do pai provisoriamente para permitir o login do responsável
+        data_nascimento: dataNasc || null,
         turma: turmaSelecionada,
         status: 'Ativa',
         numero_matricula: numProvisorio,
@@ -154,7 +175,7 @@ formAddAluno.addEventListener('submit', async function(e) {
 
     const novoAlunoId = data[0].id;
 
-    // Cria o aviso para o Gestor
+    // Aviso para o gestor
     await supabaseClient.from('avisos').insert([{
         tipo: 'Aluno Incompleto',
         mensagem: `O professor adicionou o aluno "${nome}" na turma ${turmaSelecionada.toUpperCase()}. Faltam dados cadastrais.`,
@@ -165,21 +186,20 @@ formAddAluno.addEventListener('submit', async function(e) {
     alert("Aluno adicionado com sucesso! O Gestor foi notificado.");
     modalAddAluno.style.display = "none";
     formAddAluno.reset();
-    selectTurma.dispatchEvent(new Event('change')); // Recarrega a lista
+    selectTurma.dispatchEvent(new Event('change'));
 });
-
 
 // --- FUNÇÕES GLOBAIS DE EDIÇÃO ---
 window.mudarStatus = async function(id, novoStatus) {
     if (!confirm(`Tem certeza que deseja marcar este aluno como ${novoStatus}?`)) return;
-    
+
     const dataAtual = new Date().toISOString().split('T')[0];
     let updateData = { status: novoStatus };
     if (novoStatus === 'Transferido') updateData.data_transferencia = dataAtual;
     if (novoStatus === 'Desistente') updateData.data_desistencia = dataAtual;
 
     const { error } = await supabaseClient.from('alunos').update(updateData).eq('id', id);
-    
+
     if (error) alert("Erro ao atualizar status.");
     else {
         alert(`Aluno marcado como ${novoStatus}!`);
@@ -190,10 +210,11 @@ window.mudarStatus = async function(id, novoStatus) {
 window.excluirAluno = async function(id) {
     if (!confirm("⚠️ ATENÇÃO: Tem certeza que deseja EXCLUIR este aluno permanentemente?")) return;
 
-    // Exclui os avisos relacionados e depois o aluno
     await supabaseClient.from('avisos').delete().eq('aluno_id', id);
+    await supabaseClient.from('notas').delete().eq('aluno_id', id);
+    await supabaseClient.from('solicitacoes_documentos').delete().eq('aluno_id', id);
     const { error } = await supabaseClient.from('alunos').delete().eq('id', id);
-    
+
     if (error) alert("Erro ao excluir aluno.");
     else {
         alert("Aluno excluído.");
@@ -201,7 +222,7 @@ window.excluirAluno = async function(id) {
     }
 };
 
-// --- CÁLCULO DE MÉDIAS E SALVAMENTO DE NOTAS (Mantidos) ---
+// --- CÁLCULO DE MÉDIAS ---
 function calcularMediaBimestre(bimestre) {
     let notas = [];
     for (let i = 1; i <= 3; i++) {
@@ -258,7 +279,7 @@ function abrirTelaNotas(aluno) {
         }
         ['b1', 'b2', 'b3', 'b4'].forEach(b => {
             const media = calcularMediaBimestre(b);
-            if(media > 0) {
+            if (media > 0) {
                 const textoMedia = media % 1 === 0 ? media.toFixed(0) : media.toFixed(1);
                 document.querySelector(`#media_${b}`).textContent = `Média ${b.toUpperCase()}: ${textoMedia}`;
             }
@@ -296,12 +317,36 @@ formNotas.addEventListener('submit', async function(event) {
         b4: { n1: Number(dados.get('n1_b4')), n2: Number(dados.get('n2_b4')), n3: Number(dados.get('n3_b4')) }
     };
 
-    const { error } = await supabaseClient.from('alunos').update({ notas: notasObj, media_b1: m_b1, media_b2: m_b2, media_b3: m_b3, media_b4: m_b4, media_anual: media_anual }).eq('id', alunoSelecionadoId);
+    // 1) Salva no JSONB de alunos (compatibilidade)
+    const { error } = await supabaseClient
+        .from('alunos')
+        .update({
+            notas: notasObj,
+            media_b1: m_b1, media_b2: m_b2, media_b3: m_b3, media_b4: m_b4,
+            media_anual: media_anual
+        })
+        .eq('id', alunoSelecionadoId);
 
-    if (error) alert("Erro ao salvar as notas.");
-    else {
-        alert("Notas salvas!");
-        telaNotas.style.display = "none";
-        selectTurma.dispatchEvent(new Event('change'));
-    }
+    if (error) { alert("Erro ao salvar as notas."); return; }
+
+    // 2) Espelha na tabela notas (upsert por aluno/bimestre)
+    const mapMedias = { b1: m_b1, b2: m_b2, b3: m_b3, b4: m_b4 };
+    const linhas = ['b1','b2','b3','b4'].map(b => ({
+        aluno_id: alunoSelecionadoId,
+        bimestre: b,
+        n1: notasObj[b].n1 || null,
+        n2: notasObj[b].n2 || null,
+        n3: notasObj[b].n3 || null,
+        media: mapMedias[b] || null
+    }));
+
+    const { error: errorNotas } = await supabaseClient
+        .from('notas')
+        .upsert(linhas, { onConflict: 'aluno_id,bimestre' });
+
+    if (errorNotas) console.warn("Aviso: notas salvas no aluno, mas falhou espelhar em 'notas':", errorNotas);
+
+    alert("Notas salvas!");
+    telaNotas.style.display = "none";
+    selectTurma.dispatchEvent(new Event('change'));
 });

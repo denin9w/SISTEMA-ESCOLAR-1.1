@@ -35,10 +35,10 @@ function voltar(){
     btnvoltar.style.display = 'none';
 }
 
-// --- FUNÇÃO PARA GERAR O NÚMERO DE MATRÍCULA AUTOMÁTICO ---
+// --- GERA NÚMERO DE MATRÍCULA AUTOMÁTICO ---
 async function gerarNumeroMatricula() {
     const anoAtual = new Date().getFullYear();
-    
+
     const { data, error } = await supabaseClient
         .from('alunos')
         .select('numero_matricula')
@@ -50,18 +50,18 @@ async function gerarNumeroMatricula() {
     }
 
     const ultimaMatricula = data[0].numero_matricula;
-    
+
     if (!ultimaMatricula || !ultimaMatricula.startsWith(anoAtual.toString())) {
         return `${anoAtual}0001`;
     }
 
     const ultimoNumero = parseInt(ultimaMatricula.slice(-4));
     const novoNumero = (ultimoNumero + 1).toString().padStart(4, '0');
-    
+
     return `${anoAtual}${novoNumero}`;
 }
 
-// --- FINALIZAR MATRÍCULA E SALVAR NO SUPABASE ---
+// --- FINALIZAR MATRÍCULA ---
 if (formulario) {
     formulario.addEventListener("submit", async function(event) {
         event.preventDefault();
@@ -79,7 +79,16 @@ if (formulario) {
 
         const numeroMatriculaGerado = await gerarNumeroMatricula();
 
-        // Monta o objeto com TODOS os dados (Mapeamento EXATO com o HTML)
+        // Trata responsável: se for "outro", mantém o texto; senão limpa
+        const tipoResponsavel = matricula.responsavel || '';
+        const responsavelOutro = tipoResponsavel === 'outro'
+            ? (matricula['responsavel-outro'] || '').trim()
+            : null;
+
+        // Normaliza CPFs (remove espaços)
+        const cpfPai = (matricula['cpf-pai'] || '').trim();
+        const cpfMae = (matricula['cpf-mae'] || '').trim();
+
         const novoAluno = {
             numero_matricula: numeroMatriculaGerado,
             nome: matricula.nome,
@@ -89,7 +98,7 @@ if (formulario) {
             cidade_nascimento: matricula['cidade-nascimento'],
             endereco: matricula.endereco,
             bairro: matricula.bairro,
-            numero_endereco: matricula['numero-endereco'], // AQUI FOI CORRIGIDO PARA FICAR IGUAL AO HTML
+            numero_endereco: matricula['numero-endereco'],
             cidade: matricula.cidade,
             estado: matricula.estado,
             cep: matricula.cep,
@@ -98,24 +107,24 @@ if (formulario) {
             niss: matricula.niss,
             turma: matricula.turma,
             observacao: matricula.observacao,
-            
+
             nome_pai: matricula['nome-pai'],
             profissao_pai: matricula['profissao-pai'],
             identidade_pai: matricula['identidade-pai'],
-            cpf_pai: matricula['cpf-pai'],
+            cpf_pai: cpfPai || null,
             whatsapp_pai: matricula['whatsapp-pai'],
             telefone_pai: matricula['telefone-pai'],
-            
+
             nome_mae: matricula['nome-mae'],
             profissao_mae: matricula['profissao-mae'],
             identidade_mae: matricula['identidade-mae'],
-            cpf_mae: matricula['cpf-mae'],
+            cpf_mae: cpfMae || null,
             whatsapp_mae: matricula['whatsapp-mae'],
             telefone_mae: matricula['telefone-mae'],
-            
-            responsavel: matricula.responsavel,
-            responsavel_outro: matricula['responsavel-outro'],
-            
+
+            responsavel: tipoResponsavel,
+            responsavel_outro: responsavelOutro,
+
             status: 'Ativa',
             notas: {}
         };
