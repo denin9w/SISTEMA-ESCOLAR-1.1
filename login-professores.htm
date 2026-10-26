@@ -7,139 +7,6 @@
     <link rel="stylesheet" href="style/login/login-professores.css">
     <link rel="stylesheet" href="style/login/login-professoresExpansivo.css">
     <title>CEJE - Área do Professor</title>
-    <style>
-        /* --- Estilos da lista e edição (mantidos do original) --- */
-        .aluno-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--fundo-card);
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .btn-nome-aluno {
-            flex: 1;
-            background: none;
-            border: none;
-            text-align: left;
-            font-size: 1rem;
-            cursor: pointer;
-            color: var(--titlecor);
-            font-weight: bold;
-            min-width: 200px;
-        }
-        .btn-editar {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-editar:hover { background-color: #218838; }
-
-        .painel-edicao {
-            display: none;
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ffeeba;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            width: 100%;
-        }
-        .btn-acao {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-transferir { background-color: #ffc107; color: #000; }
-        .btn-desistente { background-color: #fd7e14; }
-        .btn-excluir    { background-color: #dc3545; }
-
-        /* --- Botão de adicionar e modal --- */
-        .btn-add-aluno {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--destaque);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        .btn-add-aluno:hover { background-color: #0056b3; }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            position: relative;
-        }
-        .modal-content h2 { color: var(--titlecor); margin-bottom: 20px; }
-        .modal-content label { display: block; margin-top: 10px; font-weight: bold; }
-        .modal-content input {
-            width: 100%; padding: 10px; margin-top: 5px;
-            border: 1px solid #ccc; border-radius: 5px;
-        }
-        .modal-botoes { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-salvar   { flex: 1; padding: 10px; background: #28a745; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-        .btn-cancelar { flex: 1; padding: 10px; background: #ccc; color: #333; border: none; border-radius: 5px; cursor: pointer; }
-
-        /* --- Link cadastrar-se --- */
-        #topoProfessor {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 16px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        #topoProfessor a.link-cadastro {
-            color: var(--destaque);
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 0.95rem;
-        }
-        #topoProfessor a.link-cadastro:hover { text-decoration: underline; }
-        #nomeProfessorLogado {
-            text-align: center;
-            font-weight: bold;
-            color: var(--titlecor);
-            font-size: 1rem;
-        }
-    </style>
 </head>
 <body>
     <section id="header">
@@ -182,38 +49,144 @@
             <!-- Tela de Lançar Notas -->
             <div id="lancar-Notas" style="display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 20px;">
                 <h2 id="nomeAlunoNota" style="color: var(--titlecor); margin-bottom: 20px;">Notas do Aluno</h2>
+                
                 <form id="formularioNotas">
+                    <!-- 1º Bimestre -->
                     <div class="bimestre-box">
                         <h3>1º Bimestre</h3>
-                        <input type="number" name="n1_b1" id="n1_b1" placeholder="Nota 1" step="0.1" min="0" max="10">
-                        <input type="number" name="n2_b1" id="n2_b1" placeholder="Nota 2" step="0.1" min="0" max="10">
-                        <input type="number" name="n3_b1" id="n3_b1" placeholder="Nota 3" step="0.1" min="0" max="10">
-                        <div class="media-box" id="media_b1">Média 1º Bim: --</div>
+                        <div class="materias-grid-3notas">
+                            <div><label>Português</label><div class="inputs-notas"><input type="number" name="b1_portugues_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_portugues_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_portugues_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>História</label><div class="inputs-notas"><input type="number" name="b1_historia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_historia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_historia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Geografia</label><div class="inputs-notas"><input type="number" name="b1_geografia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_geografia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_geografia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ciências</label><div class="inputs-notas"><input type="number" name="b1_ciencias_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_ciencias_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_ciencias_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Matemática</label><div class="inputs-notas"><input type="number" name="b1_matematica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_matematica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_matematica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ed. Física</label><div class="inputs-notas"><input type="number" name="b1_ed_fisica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_ed_fisica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_ed_fisica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Inglês</label><div class="inputs-notas"><input type="number" name="b1_ingles_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_ingles_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_ingles_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Arte</label><div class="inputs-notas"><input type="number" name="b1_arte_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_arte_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_arte_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ética</label><div class="inputs-notas"><input type="number" name="b1_etica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b1_etica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b1_etica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                        </div>
+                        
+                        <!-- Tabela de Médias B1 -->
+                        <div class="medias-finais-grid" style="background: #e6f2ff; padding: 15px; border-radius: 8px; border: 1px solid #cce5ff; margin-top: 15px;">
+                            <div><span>Português:</span> <strong id="mb1_portugues">--</strong></div>
+                            <div><span>História:</span> <strong id="mb1_historia">--</strong></div>
+                            <div><span>Geografia:</span> <strong id="mb1_geografia">--</strong></div>
+                            <div><span>Ciências:</span> <strong id="mb1_ciencias">--</strong></div>
+                            <div><span>Matemática:</span> <strong id="mb1_matematica">--</strong></div>
+                            <div><span>Ed. Física:</span> <strong id="mb1_ed_fisica">--</strong></div>
+                            <div><span>Inglês:</span> <strong id="mb1_ingles">--</strong></div>
+                            <div><span>Arte:</span> <strong id="mb1_arte">--</strong></div>
+                            <div><span>Ética:</span> <strong id="mb1_etica">--</strong></div>
+                        </div>
                     </div>
+
+                    <!-- 2º Bimestre -->
                     <div class="bimestre-box">
                         <h3>2º Bimestre</h3>
-                        <input type="number" name="n1_b2" id="n1_b2" placeholder="Nota 1" step="0.1" min="0" max="10">
-                        <input type="number" name="n2_b2" id="n2_b2" placeholder="Nota 2" step="0.1" min="0" max="10">
-                        <input type="number" name="n3_b2" id="n3_b2" placeholder="Nota 3" step="0.1" min="0" max="10">
-                        <div class="media-box" id="media_b2">Média 2º Bim: --</div>
+                        <div class="materias-grid-3notas">
+                            <div><label>Português</label><div class="inputs-notas"><input type="number" name="b2_portugues_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_portugues_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_portugues_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>História</label><div class="inputs-notas"><input type="number" name="b2_historia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_historia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_historia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Geografia</label><div class="inputs-notas"><input type="number" name="b2_geografia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_geografia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_geografia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ciências</label><div class="inputs-notas"><input type="number" name="b2_ciencias_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_ciencias_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_ciencias_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Matemática</label><div class="inputs-notas"><input type="number" name="b2_matematica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_matematica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_matematica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ed. Física</label><div class="inputs-notas"><input type="number" name="b2_ed_fisica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_ed_fisica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_ed_fisica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Inglês</label><div class="inputs-notas"><input type="number" name="b2_ingles_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_ingles_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_ingles_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Arte</label><div class="inputs-notas"><input type="number" name="b2_arte_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_arte_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_arte_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ética</label><div class="inputs-notas"><input type="number" name="b2_etica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b2_etica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b2_etica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                        </div>
+                        
+                        <!-- Tabela de Médias B2 -->
+                        <div class="medias-finais-grid" style="background: #e6f2ff; padding: 15px; border-radius: 8px; border: 1px solid #cce5ff; margin-top: 15px;">
+                            <div><span>Português:</span> <strong id="mb2_portugues">--</strong></div>
+                            <div><span>História:</span> <strong id="mb2_historia">--</strong></div>
+                            <div><span>Geografia:</span> <strong id="mb2_geografia">--</strong></div>
+                            <div><span>Ciências:</span> <strong id="mb2_ciencias">--</strong></div>
+                            <div><span>Matemática:</span> <strong id="mb2_matematica">--</strong></div>
+                            <div><span>Ed. Física:</span> <strong id="mb2_ed_fisica">--</strong></div>
+                            <div><span>Inglês:</span> <strong id="mb2_ingles">--</strong></div>
+                            <div><span>Arte:</span> <strong id="mb2_arte">--</strong></div>
+                            <div><span>Ética:</span> <strong id="mb2_etica">--</strong></div>
+                        </div>
                     </div>
+
+                    <!-- 3º Bimestre -->
                     <div class="bimestre-box">
                         <h3>3º Bimestre</h3>
-                        <input type="number" name="n1_b3" id="n1_b3" placeholder="Nota 1" step="0.1" min="0" max="10">
-                        <input type="number" name="n2_b3" id="n2_b3" placeholder="Nota 2" step="0.1" min="0" max="10">
-                        <input type="number" name="n3_b3" id="n3_b3" placeholder="Nota 3" step="0.1" min="0" max="10">
-                        <div class="media-box" id="media_b3">Média 3º Bim: --</div>
+                        <div class="materias-grid-3notas">
+                            <div><label>Português</label><div class="inputs-notas"><input type="number" name="b3_portugues_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_portugues_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_portugues_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>História</label><div class="inputs-notas"><input type="number" name="b3_historia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_historia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_historia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Geografia</label><div class="inputs-notas"><input type="number" name="b3_geografia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_geografia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_geografia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ciências</label><div class="inputs-notas"><input type="number" name="b3_ciencias_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_ciencias_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_ciencias_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Matemática</label><div class="inputs-notas"><input type="number" name="b3_matematica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_matematica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_matematica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ed. Física</label><div class="inputs-notas"><input type="number" name="b3_ed_fisica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_ed_fisica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_ed_fisica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Inglês</label><div class="inputs-notas"><input type="number" name="b3_ingles_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_ingles_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_ingles_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Arte</label><div class="inputs-notas"><input type="number" name="b3_arte_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_arte_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_arte_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ética</label><div class="inputs-notas"><input type="number" name="b3_etica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b3_etica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b3_etica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                        </div>
+                        
+                        <!-- Tabela de Médias B3 -->
+                        <div class="medias-finais-grid" style="background: #e6f2ff; padding: 15px; border-radius: 8px; border: 1px solid #cce5ff; margin-top: 15px;">
+                            <div><span>Português:</span> <strong id="mb3_portugues">--</strong></div>
+                            <div><span>História:</span> <strong id="mb3_historia">--</strong></div>
+                            <div><span>Geografia:</span> <strong id="mb3_geografia">--</strong></div>
+                            <div><span>Ciências:</span> <strong id="mb3_ciencias">--</strong></div>
+                            <div><span>Matemática:</span> <strong id="mb3_matematica">--</strong></div>
+                            <div><span>Ed. Física:</span> <strong id="mb3_ed_fisica">--</strong></div>
+                            <div><span>Inglês:</span> <strong id="mb3_ingles">--</strong></div>
+                            <div><span>Arte:</span> <strong id="mb3_arte">--</strong></div>
+                            <div><span>Ética:</span> <strong id="mb3_etica">--</strong></div>
+                        </div>
                     </div>
+
+                    <!-- 4º Bimestre -->
                     <div class="bimestre-box">
                         <h3>4º Bimestre</h3>
-                        <input type="number" name="n1_b4" id="n1_b4" placeholder="Nota 1" step="0.1" min="0" max="10">
-                        <input type="number" name="n2_b4" id="n2_b4" placeholder="Nota 2" step="0.1" min="0" max="10">
-                        <input type="number" name="n3_b4" id="n3_b4" placeholder="Nota 3" step="0.1" min="0" max="10">
-                        <div class="media-box" id="media_b4">Média 4º Bim: --</div>
+                        <div class="materias-grid-3notas">
+                            <div><label>Português</label><div class="inputs-notas"><input type="number" name="b4_portugues_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_portugues_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_portugues_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>História</label><div class="inputs-notas"><input type="number" name="b4_historia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_historia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_historia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Geografia</label><div class="inputs-notas"><input type="number" name="b4_geografia_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_geografia_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_geografia_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ciências</label><div class="inputs-notas"><input type="number" name="b4_ciencias_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_ciencias_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_ciencias_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Matemática</label><div class="inputs-notas"><input type="number" name="b4_matematica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_matematica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_matematica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ed. Física</label><div class="inputs-notas"><input type="number" name="b4_ed_fisica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_ed_fisica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_ed_fisica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Inglês</label><div class="inputs-notas"><input type="number" name="b4_ingles_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_ingles_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_ingles_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Arte</label><div class="inputs-notas"><input type="number" name="b4_arte_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_arte_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_arte_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                            <div><label>Ética</label><div class="inputs-notas"><input type="number" name="b4_etica_1" placeholder="N1" step="0.1" min="0" max="10"><input type="number" name="b4_etica_2" placeholder="N2" step="0.1" min="0" max="10"><input type="number" name="b4_etica_3" placeholder="N3" step="0.1" min="0" max="10"></div></div>
+                        </div>
+                        
+                        <!-- Tabela de Médias B4 -->
+                        <div class="medias-finais-grid" style="background: #e6f2ff; padding: 15px; border-radius: 8px; border: 1px solid #cce5ff; margin-top: 15px;">
+                            <div><span>Português:</span> <strong id="mb4_portugues">--</strong></div>
+                            <div><span>História:</span> <strong id="mb4_historia">--</strong></div>
+                            <div><span>Geografia:</span> <strong id="mb4_geografia">--</strong></div>
+                            <div><span>Ciências:</span> <strong id="mb4_ciencias">--</strong></div>
+                            <div><span>Matemática:</span> <strong id="mb4_matematica">--</strong></div>
+                            <div><span>Ed. Física:</span> <strong id="mb4_ed_fisica">--</strong></div>
+                            <div><span>Inglês:</span> <strong id="mb4_ingles">--</strong></div>
+                            <div><span>Arte:</span> <strong id="mb4_arte">--</strong></div>
+                            <div><span>Ética:</span> <strong id="mb4_etica">--</strong></div>
+                        </div>
                     </div>
+
+                    <!-- PAINEL DE MÉDIAS ANUAIS POR MATÉRIA -->
+                    <div class="bimestre-box" style="background-color: #e6f2ff; border-color: var(--destaque);">
+                        <h3 style="color: var(--destaque); border-color: var(--destaque);">Médias Anuais por Matéria</h3>
+                        <div class="medias-finais-grid">
+                            <div><span>Português:</span> <strong id="ma_portugues">--</strong></div>
+                            <div><span>História:</span> <strong id="ma_historia">--</strong></div>
+                            <div><span>Geografia:</span> <strong id="ma_geografia">--</strong></div>
+                            <div><span>Ciências:</span> <strong id="ma_ciencias">--</strong></div>
+                            <div><span>Matemática:</span> <strong id="ma_matematica">--</strong></div>
+                            <div><span>Ed. Física:</span> <strong id="ma_ed_fisica">--</strong></div>
+                            <div><span>Inglês:</span> <strong id="ma_ingles">--</strong></div>
+                            <div><span>Arte:</span> <strong id="ma_arte">--</strong></div>
+                            <div><span>Ética:</span> <strong id="ma_etica">--</strong></div>
+                        </div>
+                    </div>
+
                     <div class="media-anual-box">
-                        Média Anual Final: <span id="media_anual_texto">--</span>
+                        Média Anual Geral: <span id="media_anual_texto">--</span>
                     </div>
+                    
                     <button type="submit" class="input-b" style="margin-top: 20px; width: 100%;">Salvar Notas</button>
                     <button type="button" id="btnCancelarNotas" style="margin-top: 10px; width: 100%; background: #ccc; color: #333; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">Voltar</button>
                 </form>
@@ -223,7 +196,7 @@
         <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
     </section>
 
-    <!-- MODAL DE ADICIONAR ALUNO (simplificado: nome + data + turma) -->
+    <!-- MODAL DE ADICIONAR ALUNO -->
     <div class="modal-overlay" id="modalAddAluno">
         <div class="modal-content">
             <h2>Adicionar Aluno Rápido</h2>

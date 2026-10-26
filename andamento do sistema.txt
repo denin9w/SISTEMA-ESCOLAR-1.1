@@ -1,8 +1,39 @@
+
+
+precisa colocar os indices para preencher os documentos que serão gerados.
+e fazer um teste geral do sitema para possiveis erros
+
+lembra de fazer um comite para cada alteração.
+
+
+
+
+
+
+- temos matricula salvando os dados. ok
+- temos a area do responsavel solicitando os documentos e aparecendo na area do gestor. ok
+- temos a area do professor podendo adicionar aluno simples e lançar notas no banco de dados. ok
+- temos a area do gestor recebendo os alerta avisos e solicitações. ok
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Criamos a área do professor 
 
-// Cada aluno recebe transferência e desistência ou exclusão que será salvo no banco de dados a situação (Que teremos acesso na área do gestor) 
+// Cada aluno recebe transferência e desistência ou exclusão que será salvo no banco de dados a situação (Que teremos acesso na área do gestor) ok
 
-// O professor só tem acesso à turma que contenha sua senha de login.
+// O professor só tem acesso à turma que contenha sua senha de login. ok
 
 
 

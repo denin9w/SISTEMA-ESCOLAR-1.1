@@ -6,6 +6,7 @@
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/login/login-responsavel.css">
     <link rel="stylesheet" href="style/login/login-responsavelExpansivo.css">
+    
     <title>CEJE - Área do Responsável</title>
 </head>
 
@@ -35,7 +36,7 @@
         <div class="text-banerL">
             <h1>Bem vindo à Área do Responsável</h1>
             <p id="alunoLogadoNome" style="text-align:center; font-weight:bold; color:var(--titlecor); margin-top:10px;"></p>
-            <h2>Solicite seu documento</h2>
+            <h2>Solicite seus documentos</h2>
         </div>
 
         <div id="documentos">
@@ -46,6 +47,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
                         <span class="texto-icone">Transferência</span>
+                        <button class="btn-visualizar" type="button" data-doc="transferencia">Visualizar</button>
                     </div>
                 </label>
 
@@ -54,6 +56,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-clipboard-list"></i></span>
                         <span class="texto-icone">Ficha Individual</span>
+                        <button class="btn-visualizar" type="button" data-doc="ficha-individual">Visualizar</button>
                     </div>
                 </label>
 
@@ -62,6 +65,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-file-lines"></i></span>
                         <span class="texto-icone">Bolsa Família</span>
+                        <button class="btn-visualizar" type="button" data-doc="bolsa-familia">Visualizar</button>
                     </div>
                 </label>
 
@@ -70,13 +74,67 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-regular fa-file-pdf"></i></span>
                         <span class="texto-icone">Boletim</span>
+                        <button class="btn-visualizar" type="button" data-doc="boletim">Visualizar</button>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Declaração de Quitação Simples" id="ideclaracao-quitacao-simples">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+                        <span class="texto-icone">Quitação Simples</span>
+                        <button class="btn-visualizar" type="button" data-doc="declaracao-quitacao-debito">Visualizar</button>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Declaração de Quitação Tabela" id="ideclaracao-quitacao-tabela">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-table"></i></span>
+                        <span class="texto-icone">Quitação Tabela</span>
+                        <button class="btn-visualizar" type="button" data-doc="declaracao-quitacao-debito-tabela">Visualizar</button>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Declaração de Matrícula" id="ideclaracao-matricula">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-id-card"></i></span>
+                        <span class="texto-icone">Declaração de Matrícula</span>
+                        <button class="btn-visualizar" type="button" data-doc="declaracao-matricula">Visualizar</button>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Declaração Provisória" id="iprovissoria">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-file-circle-exclamation"></i></span>
+                        <span class="texto-icone">Provisória</span>
+                        <button class="btn-visualizar" type="button" data-doc="provissoria">Visualizar</button>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Recibo" id="irecibo">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-receipt"></i></span>
+                        <span class="texto-icone">Recibo</span>
+                        <button class="btn-visualizar" type="button" data-doc="recibo">Visualizar</button>
+                    </div>
+                </label>
+
+                <label class="opçao-card">
+                    <input type="checkbox" name="Recibo de Pagamento" id="irecibo-pagamento">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-money-check-dollar"></i></span>
+                        <span class="texto-icone">Recibo de Pagamento</span>
+                        <button class="btn-visualizar" type="button" data-doc="recibo-pagamento">Visualizar</button>
                     </div>
                 </label>
 
             </div>
 
             <button class="input-br" id="btnSolicitar" type="button">Solicitar</button>
-
             <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
         </div>
 
@@ -85,6 +143,21 @@
         </footer>
     </section>
 
+    <!-- Script de visualização (Abre o PDF em nova aba) -->
+    <script>
+        document.querySelectorAll('.btn-visualizar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                // Pega o nome do arquivo configurado no data-doc
+                const slug = btn.dataset.doc; 
+                
+                // Abre o arquivo PDF na nova aba
+                window.open(`documentos/${slug}.pdf`, '_blank');
+            });
+        });
+    </script>
+    
+    <!-- Script que gerencia a solicitação e o login do aluno -->
     <script src="style/login/script/scriptResponsavel.js"></script>
 </body>
 </html>

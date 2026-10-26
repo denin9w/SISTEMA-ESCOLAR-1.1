@@ -1,8 +1,5 @@
 // ============================================================
 // scriptGestor.js — Área do Gestor
-// Requer no HTML (item 10/17):
-//  #gestorNome, #iturma, #buscaAluno, #listaAlunos, #idocumentos
-//  #painelAvisos, #listaSolicitacoes, #listaProfessoresPendentes
 // ============================================================
 
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
@@ -22,31 +19,19 @@ const selectTurma       = document.querySelector('#iturma');
 const listaDeAlunos     = document.querySelector('#listaAlunos');
 const documentoporAluno = document.querySelector('#idocumentos');
 const inputBusca        = document.querySelector('#buscaAluno');
-const painelAvisos      = document.querySelector('#painelAvisos');
 const listaSolicitacoes = document.querySelector('#listaSolicitacoes');
 const listaProfsPend    = document.querySelector('#listaProfessoresPendentes');
 const gestorNomeEl      = document.querySelector('#gestorNome');
 
 let gestorLogado = null;
 
-// --- TURMAS PADRONIZADAS (igual matrícula) ---
 const TURMAS = [
-    'infantil-I-a','infantil-I-b',
-    'infantil-II-a','infantil-II-b',
-    'infantil-III-a','infantil-III-b',
-    '1ano-a','1ano-b',
-    '2ano-a','2ano-b',
-    '3ano-a','3ano-b',
-    '4ano-a','4ano-b',
-    '5ano-a','5ano-b',
-    '6ano-a',
-    '7ano-a',
-    '8ano-a',
-    '9ano-a'
+    'infantil-I-a','infantil-I-b', 'infantil-II-a','infantil-II-b', 'infantil-III-a','infantil-III-b',
+    '1ano-a','1ano-b', '2ano-a','2ano-b', '3ano-a','3ano-b', '4ano-a','4ano-b', '5ano-a','5ano-b',
+    '6ano-a', '7ano-a', '8ano-a', '9ano-a'
 ];
 
 function labelTurma(t) {
-    // 1ano-a -> 1º Ano A
     const m = t.match(/^(\d)ano-([ab])$/i);
     if (m) return `${m[1]}º Ano ${m[2].toUpperCase()}`;
     const inf = t.match(/^infantil-([IVX]+)-([ab])$/i);
@@ -65,7 +50,6 @@ function iniciarGestor() {
     gestorLogado = JSON.parse(gString);
     if (gestorNomeEl) gestorNomeEl.textContent = `Gestor: ${gestorLogado.nome}`;
 
-    // Popula select de turmas
     selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>';
     TURMAS.forEach(t => {
         const opt = document.createElement('option');
@@ -76,7 +60,6 @@ function iniciarGestor() {
 
     carregarAvisos();
     carregarProfessoresPendentes();
-    carregarSolicitacoes();
 }
 
 // --- ALUNOS POR TURMA ---
@@ -100,7 +83,7 @@ async function carregarAlunos(turma) {
 
     const { data, error } = await supabaseClient
         .from('alunos')
-        .select('id, nome, data_nascimento, status, numero_matricula')
+        .select('id, nome, data_nascimento, status, numero_matricula, turma')
         .eq('turma', turma)
         .order('nome', { ascending: true });
 
@@ -131,7 +114,6 @@ function abrirDocumentos(aluno) {
     documentoporAluno.dataset.alunoId = aluno.id;
     documentoporAluno.dataset.alunoNome = aluno.nome;
 
-    // Reaproveita os links .cdocumentos já existentes no HTML
     documentoporAluno.querySelectorAll('.cdocumentos a').forEach(link => {
         link.onclick = (ev) => {
             ev.preventDefault();
@@ -140,77 +122,67 @@ function abrirDocumentos(aluno) {
     });
 }
 
-// --- GERAÇÃO DE DOCUMENTO (DOCX genérico) ---
-// Requer docxtemplater + pizzip + FileSaver carregados no HTML.
-// Coloque seus templates em: documentos/<nome>.docx
+// --- GERAÇÃO E DOWNLOAD DE DOCUMENTO (Corrigido para não travar) ---
 async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
     if (typeof PizZip === 'undefined' || typeof docxtemplater === 'undefined') {
         alert("Bibliotecas de DOCX não carregadas nesta página.");
         return;
     }
 
-    // Busca todos os dados do aluno
-    const { data: aluno, error } = await supabaseClient
-        .from('alunos')
-        .select('*')
-        .eq('id', alunoId)
-        .single();
+    const slug = nomeDoc.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase();
+    const urlTemplate = `documentos/${slug}.docx`;
 
-    if (error || !aluno) { alert("Erro ao buscar dados do aluno."); return; }
-
-    // Busca notas (tabela notas) para preencher boletins
-    const { data: notasRows } = await supabaseClient
-        .from('notas')
-        .select('bimestre, n1, n2, n3, media')
-        .eq('aluno_id', alunoId);
-
-    const notasMap = {};
-    (notasRows || []).forEach(r => notasMap[r.bimestre] = r);
-
-    // Monta contexto para o template (use {{nome}}, {{turma}}, {{media_b1}}...)
-    const contexto = {
-        ...aluno,
-        data_nascimento_br: aluno.data_nascimento
-            ? aluno.data_nascimento.split('-').reverse().join('/') : '',
-        turma_label: labelTurma(aluno.turma || ''),
-        media_b1: notasMap.b1?.media ?? aluno.media_b1 ?? '',
-        media_b2: notasMap.b2?.media ?? aluno.media_b2 ?? '',
-        media_b3: notasMap.b3?.media ?? aluno.media_b3 ?? '',
-        media_b4: notasMap.b4?.media ?? aluno.media_b4 ?? '',
-        media_anual: aluno.media_anual ?? ''
-    };
-
-    // Nome do arquivo do template = nome do documento (slug)
-    const slug = nomeDoc.normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase();
-
-    const url = `documentos/${slug}.docx`;
-
+    // Mostra um feedback na tela
+    const avisoOriginal = document.querySelector('.aviso-painel');
+    
     try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error("template não encontrado: " + url);
-        const blob = await resp.arrayBuffer();
+        // 1. Busca dados do aluno
+        const { data: aluno, error } = await supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
+        if (error || !aluno) throw new Error("Aluno não encontrado.");
 
+        // 2. Busca notas (para boletins)
+        const { data: notasRows } = await supabaseClient.from('notas').select('bimestre, media').eq('aluno_id', alunoId);
+        const notasMap = {};
+        (notasRows || []).forEach(r => notasMap[r.bimestre] = r);
+
+        // 3. Busca o template
+        const resp = await fetch(urlTemplate);
+        if (!resp.ok) throw new Error(`Template não encontrado na pasta: ${urlTemplate}`);
+        
+        const blob = await resp.arrayBuffer();
         const zip = new PizZip(blob);
         const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const contexto = {
+            ...aluno,
+            data_nascimento_br: aluno.data_nascimento ? aluno.data_nascimento.split('-').reverse().join('/') : '',
+            turma_label: labelTurma(aluno.turma || ''),
+            media_b1: notasMap.b1?.media ?? aluno.media_b1 ?? '',
+            media_b2: notasMap.b2?.media ?? aluno.media_b2 ?? '',
+            media_b3: notasMap.b3?.media ?? aluno.media_b3 ?? '',
+            media_b4: notasMap.b4?.media ?? aluno.media_b4 ?? '',
+            media_anual: aluno.media_anual ?? ''
+        };
+
         doc.render(contexto);
         const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        
+        // No Gestor, a regra é BAIXAR o arquivo
         saveAs(out, `${slug}-${alunoNome.replace(/\s+/g,'_')}.docx`);
 
-        alert(`Documento "${nomeDoc}" gerado para ${alunoNome}.`);
     } catch (e) {
         console.error(e);
-        alert(`Não foi possível gerar "${nomeDoc}".\nDetalhe: ${e.message}\n\nColoque o template em: documentos/${slug}.docx`);
+        alert(`Não foi possível gerar "${nomeDoc}".\nDetalhe: ${e.message}`);
     }
 }
 
-// --- AVISOS ---
+// --- AVISOS (Solicitações de documentos) ---
 async function carregarAvisos() {
     if (!listaSolicitacoes) return;
 
     const { data, error } = await supabaseClient
         .from('solicitacoes_documentos')
-        .select('id, documento, status, criado_em, alunos(nome, turma)')
+        .select('id, documento, status, criado_em, aluno_id, alunos(nome, turma)')
         .eq('status', 'Pendente')
         .order('criado_em', { ascending: true });
 
@@ -227,27 +199,26 @@ async function carregarAvisos() {
         div.className = 'aviso-item';
         const nomeAluno = s.alunos?.nome || '(aluno removido)';
         const turma = s.alunos?.turma ? labelTurma(s.alunos.turma) : '';
+        
         div.innerHTML = `
             <strong>${nomeAluno}</strong> ${turma ? '('+turma+')' : ''}<br>
             Documento: <b>${s.documento}</b><br>
-            <button class="btn-mini btn-gerar" data-id="${s.id}" data-aluno="${s.alunos?.nome || ''}" data-doc="${s.documento}">Gerar</button>
+            <button class="btn-mini btn-gerar" data-id="${s.id}" data-aluno-id="${s.aluno_id}" data-aluno="${nomeAluno}" data-doc="${s.documento}">Gerar</button>
             <button class="btn-mini btn-marcar" data-id="${s.id}">Marcar entregue</button>
         `;
         listaSolicitacoes.appendChild(div);
     });
 
+    // Botão Gerar do Aviso
     listaSolicitacoes.querySelectorAll('.btn-gerar').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const alunoId = document.querySelector(`#listaAlunos .btn-aluno[data-id]`)?.dataset.id;
-            // Se não houver aluno selecionado, orienta o gestor
-            if (!documentoporAluno?.dataset.alunoId) {
-                alert("Selecione o aluno na lista à esquerda antes de gerar.");
-                return;
-            }
-            gerarDocumento(documentoporAluno.dataset.alunoId, documentoporAluno.dataset.alunoNome, btn.dataset.doc);
+        btn.addEventListener('click', async () => {
+            btn.textContent = "Gerando...";
+            await gerarDocumento(btn.dataset.alunoId, btn.dataset.aluno, btn.dataset.doc);
+            btn.textContent = "Gerar";
         });
     });
 
+    // Botão Marcar Entregue do Aviso
     listaSolicitacoes.querySelectorAll('.btn-marcar').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
@@ -261,7 +232,7 @@ async function carregarAvisos() {
     });
 }
 
-// --- PROFESSORES PENDENTES DE AUTORIZAÇÃO ---
+// --- PROFESSORES PENDENTES ---
 async function carregarProfessoresPendentes() {
     if (!listaProfsPend) return;
 

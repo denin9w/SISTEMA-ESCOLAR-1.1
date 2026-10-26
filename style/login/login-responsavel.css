@@ -195,3 +195,18 @@ footer{
     cursor: wait;
     filter: none;
 }
+
+.btn-visualizar {
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: var(--destaque-inverso);
+    color: var(--titlecor);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+    transition: 0.2s;
+    width: 100%;
+}
+.btn-visualizar:hover { background: var(--destaque); color: white; }
