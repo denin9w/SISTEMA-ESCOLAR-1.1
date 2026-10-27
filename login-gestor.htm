@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="style/login/login-gestor.css">
     <link rel="stylesheet" href="style/login/login-professoresExpansivo.css">
     <title>CEJE - Área do Gestor</title>
-
-    <!-- Bibliotecas para gerar DOCX -->
-    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3/build/docxtemplater.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 
 <body>
@@ -37,9 +32,6 @@
             <p id="gestorNome" style="text-align:center;"></p>
         </div>
 
-        <!-- ==================================================== -->
-        <!-- PAINEL DE AVISOS                                     -->
-        <!-- ==================================================== -->
         <div id="painelAvisos">
             <div class="aviso-painel">
                 <h3><i class="fa-solid fa-user-check"></i> Professores pendentes de autorização</h3>
@@ -51,82 +43,32 @@
             </div>
         </div>
 
-        <!-- ==================================================== -->
-        <!-- BUSCA                                                -->
-        <!-- ==================================================== -->
         <div id="barraBusca">
             <input type="text" id="buscaAluno" placeholder="Pesquisar aluno pelo nome..." />
         </div>
 
-        <!-- ==================================================== -->
-        <!-- COLUNAS: TURMA / ALUNOS / DOCUMENTOS                 -->
-        <!-- ==================================================== -->
         <div id="colunasContainer">
 
             <div id="selecionarTurma">
                 <label for="iturma">Turma:</label>
                 <select name="turma" id="iturma">
                     <option value="" selected disabled>Selecione uma turma</option>
-                    <!-- preenchido via JS -->
                 </select>
             </div>
 
-            <div id="listaAlunos" style="display:none;">
-                <!-- preenchido via JS -->
-            </div>
+            <div id="listaAlunos" style="display:none;"></div>
 
             <div id="idocumentos" style="display:none;">
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Bolsa Familia"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Bolsa Família</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Transferencia"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Transferência</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Requerimento de Matricula"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Requerimento de Matrícula</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Provissoria"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Provisória</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Pagamento Escolar"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Pagamento Escolar</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Ficha Individual"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Ficha Individual</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Declaracao Recibo"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração Recibo</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Declaracao Normal"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração Normal</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Declaracao Normal Pai Mae"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração Normal com nome do Pai e da Mãe</a>
-                </div>
-                
-                <!-- QUITAÇÕES ATUALIZADAS -->
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Declaracao Quitacao Debito"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Quitação Simples</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Declaracao Quitacao Debito Tabela"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Quitação Tabela</a>
-                </div>
-                
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Declaracao Professor Saiu"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Professor que Saiu</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Declaracao Matricula"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Matrícula</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Recibo"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Recibo</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Recibo Pagamento"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Recibo de Pagamento</a>
-                </div>
-                <div class="cdocumentos">
-                    <a href="#" data-doc="Boletim"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Boletim</a>
-                </div>
+                <div class="cdocumentos"><a href="#" data-doc="Bolsa Família"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Bolsa Família</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Transferência"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Transferência</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Declaração de Matrícula"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Matrícula</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Declaração Provisória"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Provisória</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Recibo de Pagamento"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Recibo de Pagamento</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Ficha Individual"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Ficha Individual</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Recibo"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Recibo</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Declaração de Quitação Simples"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Quitação Simples</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Declaração de Quitação Tabela"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Quitação Tabela</a></div>
+                <div class="cdocumentos"><a href="#" data-doc="Boletim"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Boletim</a></div>
             </div>
 
         </div>
@@ -138,6 +80,25 @@
         </footer>
     </section>
 
+    <!-- Modelos HTML -->
+    <script src="documentos/html/templates-docs.js"></script>
     <script src="style/login/script/scriptGestor.js"></script>
+
+    <!-- Botão Sair -->
+    <script>
+    (function () {
+        const sair = document.getElementById('btnSair');
+        if (sair) {
+            sair.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.removeItem("@alunoLogadoId");
+                localStorage.removeItem("@alunoLogadoNome");
+                localStorage.removeItem("@professorLogado");
+                localStorage.removeItem("@gestorLogado");
+                window.location.href = "login.htm";
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

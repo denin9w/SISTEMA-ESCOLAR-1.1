@@ -10,6 +10,7 @@ const scriptSupabase = document.createElement('script');
 scriptSupabase.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 scriptSupabase.onload = () => {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.supabaseClient = supabaseClient;
     iniciarGestor();
 };
 document.head.appendChild(scriptSupabase);
@@ -49,25 +50,29 @@ function iniciarGestor() {
     gestorLogado = JSON.parse(gString);
     if (gestorNomeEl) gestorNomeEl.textContent = `Gestor: ${gestorLogado.nome}`;
 
-    selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>';
-    TURMAS.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t;
-        opt.textContent = labelTurma(t);
-        selectTurma.appendChild(opt);
-    });
+    if (selectTurma) {
+        selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>';
+        TURMAS.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = labelTurma(t);
+            selectTurma.appendChild(opt);
+        });
+    }
 
     carregarAvisos();
     carregarProfessoresPendentes();
 }
 
-selectTurma.addEventListener('change', () => carregarAlunos(selectTurma.value));
+if (selectTurma) {
+    selectTurma.addEventListener('change', () => carregarAlunos(selectTurma.value));
+}
 
 if (inputBusca) {
     inputBusca.addEventListener('input', () => {
         const termo = inputBusca.value.trim().toLowerCase();
-        const itens = listaDeAlunos.querySelectorAll('.btn-aluno');
-        itens.forEach(el => {
+        if (!listaDeAlunos) return;
+        listaDeAlunos.querySelectorAll('.btn-aluno').forEach(el => {
             el.style.display = el.dataset.nome.toLowerCase().includes(termo) ? 'block' : 'none';
         });
         listaDeAlunos.style.display = 'block';
@@ -75,7 +80,7 @@ if (inputBusca) {
 }
 
 async function carregarAlunos(turma) {
-    if (!turma) return;
+    if (!turma || !listaDeAlunos) return;
     listaDeAlunos.style.display = 'block';
     listaDeAlunos.innerHTML = '<p>Carregando...</p>';
 
@@ -115,201 +120,59 @@ function abrirDocumentos(aluno) {
         link.onclick = (ev) => {
             ev.preventDefault();
             const docName = link.dataset.doc || link.textContent.trim();
-            if (docName === 'Boletim' || docName === 'boletim') {
-                gerarBoletimHTML(aluno.id); // Usa o HTML para o boletim
-            } else {
-                gerarDocumento(aluno.id, aluno.nome, docName); // Usa o Word para os outros
-            }
+            mostrarAcoesDocumento(aluno.id, docName);
         };
     });
 }
 
-// --- NOVA FUNÇÃO: BOLETIM EM HTML PARA NÃO QUEBRAR NO WORD ---
-async function gerarBoletimHTML(alunoId) {
-    try {
-        const { data: aluno, error } = await supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
-        if (error || !aluno) throw new Error("Aluno não encontrado.");
+// --- Exibe modal com "Imprimir" e "Baixar Word" ---
+function mostrarAcoesDocumento(alunoId, nomeDoc) {
+    supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
+        .then(({ data: aluno, error }) => {
+            if (error || !aluno) { alert("Erro ao carregar aluno."); return; }
+            const fn = DOCUMENTOS_HTML[nomeDoc];
+            if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
 
-        const hoje = new Date();
-        const dataFormatada = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}/${hoje.getFullYear()}`;
-        
-        const materias = [
-            { nome: 'Português', id: 'portugues' },
-            { nome: 'Matemática', id: 'matematica' },
-            { nome: 'História', id: 'historia' },
-            { nome: 'Geografia', id: 'geografia' },
-            { nome: 'Ciências', id: 'ciencias' },
-            { nome: 'Ed. Física', id: 'ed_fisica' },
-            { nome: 'Inglês', id: 'ingles' },
-            { nome: 'Arte', id: 'arte' },
-            { nome: 'Ética e Cidadania', id: 'etica' }
-        ];
+            const html = fn(aluno);
 
-        let linhasTabela = '';
-        materias.forEach(mat => {
-            const b1 = aluno[`b1_${mat.id}`] || '-';
-            const b2 = aluno[`b2_${mat.id}`] || '-';
-            const b3 = aluno[`b3_${mat.id}`] || '-';
-            const b4 = aluno[`b4_${mat.id}`] || '-';
-            const mdf = aluno[`mdf_${mat.id}`] || '-';
-            const status = aluno[`status_${mat.id}`] || '-';
-
-            linhasTabela += `
-                <tr>
-                    <td style="text-align: left; padding-left: 10px;">${mat.nome}</td>
-                    <td>${b1}</td>
-                    <td>${b2}</td>
-                    <td>${b3}</td>
-                    <td>${b4}</td>
-                    <td><strong>${mdf}</strong></td>
-                    <td><strong>${status}</strong></td>
-                </tr>
+            // Cria overlay simples
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:#fff;padding:24px;border-radius:10px;max-width:400px;width:90%;text-align:center;">
+                    <h3 style="color:#003869;margin-top:0;">${nomeDoc}</h3>
+                    <p style="font-size:14px;color:#555;">Escolha uma ação:</p>
+                    <button id="btnImprimir" style="padding:10px 16px;margin:6px;border:none;border-radius:6px;background:#0077ff;color:#fff;cursor:pointer;font-weight:bold;">Imprimir</button>
+                    <button id="btnWord" style="padding:10px 16px;margin:6px;border:none;border-radius:6px;background:#28a745;color:#fff;cursor:pointer;font-weight:bold;">Baixar Word</button>
+                    <br>
+                    <button id="btnFechar" style="margin-top:10px;padding:8px 14px;border:1px solid #ccc;border-radius:6px;background:#f5f5f5;cursor:pointer;">Fechar</button>
+                </div>
             `;
-        });
+            document.body.appendChild(overlay);
 
-        const html = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Boletim - ${aluno.nome}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
-                    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #003869; padding-bottom: 10px; }
-                    .header h1 { margin: 0; color: #003869; font-size: 24px; }
-                    .header h2 { margin: 5px 0; font-size: 16px; font-weight: normal; }
-                    .info { margin-bottom: 20px; font-size: 16px; }
-                    .info strong { color: #003869; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                    th, td { border: 1px solid #333; padding: 8px; text-align: center; font-size: 14px; }
-                    th { background-color: #f0f0f0; color: #003869; }
-                    .footer { text-align: center; margin-top: 50px; font-size: 14px; }
-                    @media print {
-                        body { padding: 0; }
-                        @page { margin: 2cm; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
-                    <h2>BOLETIM DE NOTAS - ${hoje.getFullYear()}</h2>
-                </div>
-                <div class="info">
-                    <p><strong>Aluno(a):</strong> ${aluno.nome.toUpperCase()}</p>
-                    <p><strong>Turma:</strong> ${labelTurma(aluno.turma)} &nbsp;&nbsp;&nbsp; <strong>Matrícula:</strong> ${aluno.numero_matricula || '---'}</p>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Disciplina</th>
-                            <th>1º Bim</th>
-                            <th>2º Bim</th>
-                            <th>3º Bim</th>
-                            <th>4º Bim</th>
-                            <th>Média Final</th>
-                            <th>Resultado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${linhasTabela}
-                    </tbody>
-                </table>
-                <div class="footer">
-                    <p>Garanhuns, ${dataFormatada}</p>
-                    <br><br>
-                    <p>_______________________________________________________<br>Assinatura da Direção</p>
-                </div>
-                <script>
-                    window.onload = function() { window.print(); }
-                </script>
-            </body>
-            </html>
-        `;
+            overlay.querySelector('#btnImprimir').onclick = () => {
+                const win = window.open('', '_blank');
+                win.document.write(html);
+                win.document.close();
+                win.onload = () => { win.print(); };
+            };
 
-        const novaAba = window.open('', '_blank');
-        novaAba.document.write(html);
-        novaAba.document.close();
+            overlay.querySelector('#btnWord').onclick = () => {
+                const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${nomeDoc.replace(/\s+/g,'_')}-${aluno.nome.replace(/\s+/g,'_')}.doc`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
 
-    } catch (e) {
-        console.error(e);
-        alert(`Erro ao gerar boletim: ${e.message}`);
-    }
+            overlay.querySelector('#btnFechar').onclick = () => overlay.remove();
+        })
+        .catch(e => { console.error(e); alert("Erro ao gerar documento."); });
 }
 
-// --- FUNÇÃO PARA GERAR OS OUTROS DOCUMENTOS EM WORD ---
-async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
-    if (typeof PizZip === 'undefined' || typeof docxtemplater === 'undefined') {
-        alert("Bibliotecas de DOCX não carregadas nesta página.");
-        return;
-    }
-
-    const slug = nomeDoc.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase();
-    const urlTemplate = `documentos/${slug}.docx`;
-
-    try {
-        const { data: aluno, error } = await supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
-        if (error || !aluno) throw new Error("Aluno não encontrado.");
-
-        const resp = await fetch(urlTemplate);
-        if (!resp.ok) throw new Error(`Template não encontrado na pasta: ${urlTemplate}`);
-        
-        const arrayBuffer = await resp.arrayBuffer();
-        
-        // MÁGICA DA LIMPEZA DO WORD (Mantida)
-        const zipIn = new PizZip(arrayBuffer);
-        let xml = zipIn.file("word/document.xml").asText();
-        xml = xml.replace(/(\{\{[\s\S]*?\}\})/g, function(match) {
-            return match.replace(/<[^>]+>/g, ''); 
-        });
-        zipIn.file("word/document.xml", xml);
-        const bufferLimpo = zipIn.generate({ type: "arraybuffer" });
-        
-        const zip = new PizZip(bufferLimpo);
-        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
-
-        const hoje = new Date();
-        const dia = String(hoje.getDate()).padStart(2, '0');
-        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-        const dataFormatada = `${dia} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
-
-        const contexto = {
-            ...aluno,
-            data_hoje: dataFormatada,
-            data_nascimento_br: aluno.data_nascimento ? aluno.data_nascimento.split('-').reverse().join('/') : '',
-            turma_label: labelTurma(aluno.turma || ''),
-        };
-
-        const camposTexto = [
-            'nome', 'nacionalidade', 'cidade_nascimento', 'endereco', 'bairro', 'cidade', 'estado', 
-            'nome_pai', 'profissao_pai', 'nome_mae', 'profissao_mae', 'responsavel', 'responsavel_outro',
-            'turma_label', 'status'
-        ];
-        const camposNotas = ['portugues', 'matematica', 'historia', 'geografia', 'ciencias', 'ed_fisica', 'ingles', 'arte', 'etica'];
-
-        camposTexto.forEach(campo => {
-            if (contexto[campo]) {
-                contexto[`${campo}_maiusculo`] = String(contexto[campo]).toUpperCase();
-            }
-        });
-
-        camposNotas.forEach(mat => {
-            if (contexto[`status_${mat}`]) {
-                contexto[`status_${mat}`] = String(contexto[`status_${mat}`]).toUpperCase();
-            }
-        });
-
-        doc.render(contexto);
-        const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-        
-        saveAs(out, `${slug}-${alunoNome.replace(/\s+/g,'_')}.docx`);
-
-    } catch (e) {
-        console.error(e);
-        alert(`Não foi possível gerar "${nomeDoc}".\nDetalhe: ${e.message}`);
-    }
-}
-
-// --- AVISOS ---
+// --- AVISOS / SOLICITAÇÕES ---
 async function carregarAvisos() {
     if (!listaSolicitacoes) return;
     const { data, error } = await supabaseClient
@@ -331,7 +194,7 @@ async function carregarAvisos() {
         div.className = 'aviso-item';
         const nomeAluno = s.alunos?.nome || '(aluno removido)';
         const turma = s.alunos?.turma ? labelTurma(s.alunos.turma) : '';
-        
+
         div.innerHTML = `
             <strong>${nomeAluno}</strong> ${turma ? '('+turma+')' : ''}<br>
             Documento: <b>${s.documento}</b><br>
@@ -342,15 +205,8 @@ async function carregarAvisos() {
     });
 
     listaSolicitacoes.querySelectorAll('.btn-gerar').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            btn.textContent = "Gerando...";
-            const docName = btn.dataset.doc;
-            if (docName === 'Boletim' || docName === 'boletim') {
-                await gerarBoletimHTML(btn.dataset.alunoId);
-            } else {
-                await gerarDocumento(btn.dataset.alunoId, btn.dataset.aluno, docName);
-            }
-            btn.textContent = "Gerar";
+        btn.addEventListener('click', () => {
+            mostrarAcoesDocumento(btn.dataset.alunoId, btn.dataset.doc);
         });
     });
 

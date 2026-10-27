@@ -28,8 +28,8 @@ let alunoSelecionadoId = null;
 const MATERIAS = ['portugues', 'matematica', 'historia', 'geografia', 'ciencias', 'ed_fisica', 'ingles', 'arte', 'etica'];
 
 function formatarNota(valor) {
-    if (valor === null || valor === undefined || isNaN(valor) || valor === 0) return "--";
-    return Number(valor).toFixed(1); // Força a exibição com .0
+    if (valor === null || valor === undefined || isNaN(valor)) return "--";
+    return Number(valor).toFixed(1);
 }
 
 function formatarDataBR(iso) {
@@ -59,120 +59,145 @@ function iniciarSistema() {
     const nomeEl = document.querySelector('#nomeProfessorLogado');
     if (nomeEl) nomeEl.textContent = `Prof. ${professorLogado.nome}`;
 
-    selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>';
-    if (turmas.length > 0) {
-        turmas.forEach(turma => {
-            const option = document.createElement('option');
-            option.value = turma;
-            option.textContent = turma.toUpperCase();
-            selectTurma.appendChild(option);
-        });
+    if (selectTurma) {
+        selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>';
+        if (turmas.length > 0) {
+            turmas.forEach(turma => {
+                const option = document.createElement('option');
+                option.value = turma;
+                option.textContent = turma.toUpperCase();
+                selectTurma.appendChild(option);
+            });
+        }
     }
 }
 
-// --- CARREGAR ALUNOS ---
-selectTurma.addEventListener('change', async function() {
-    const turmaSelecionada = selectTurma.value;
-    listaAlunosDiv.style.display = "block";
-    listaAlunosDiv.innerHTML = "<p>Carregando alunos...</p>";
-
-    const { data: alunos, error } = await supabaseClient
-        .from('alunos')
-        .select('id, nome, numero_matricula, data_nascimento, notas, status')
-        .eq('turma', turmaSelecionada)
-        .eq('status', 'Ativa')
-        .order('nome', { ascending: true });
-
-    if (error) { console.error(error); listaAlunosDiv.innerHTML = "<p>Erro ao carregar.</p>"; return; }
-
-    listaAlunosDiv.innerHTML = "";
-
-    if (alunos.length === 0) {
-        listaAlunosDiv.innerHTML = "<p>Nenhum aluno ativo nesta turma.</p>";
-    } else {
-        alunos.forEach(aluno => {
-            const itemContainer = document.createElement('div');
-            itemContainer.classList.add('aluno-item');
-
-            const btnNome = document.createElement('button');
-            btnNome.classList.add('btn-nome-aluno');
-            btnNome.textContent = `${aluno.nome} (Nasc: ${formatarDataBR(aluno.data_nascimento)})`;
-            btnNome.addEventListener('click', () => abrirTelaNotas(aluno));
-
-            const btnEditar = document.createElement('button');
-            btnEditar.classList.add('btn-editar');
-            btnEditar.innerHTML = '<i class="fa-solid fa-pencil" style="color: black;"></i>';
-
-            const painelEdicao = document.createElement('div');
-            painelEdicao.classList.add('painel-edicao');
-            painelEdicao.style.width = "100%";
-            painelEdicao.innerHTML = `
-                <button class="btn-acao btn-transferir" onclick="mudarStatus('${aluno.id}', 'Transferido')"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transferir</button>
-                <button class="btn-acao btn-desistente" onclick="mudarStatus('${aluno.id}', 'Desistente')"><i class="fa-solid fa-user-slash"></i> Desistente</button>
-                <button class="btn-acao btn-excluir" onclick="excluirAluno('${aluno.id}')"><i class="fa-solid fa-trash"></i> Excluir</button>
-            `;
-
-            btnEditar.addEventListener('click', () => {
-                painelEdicao.style.display = painelEdicao.style.display === "flex" ? "none" : "flex";
-            });
-
-            itemContainer.appendChild(btnNome);
-            itemContainer.appendChild(btnEditar);
-            itemContainer.appendChild(painelEdicao);
-            listaAlunosDiv.appendChild(itemContainer);
-        });
+// --- AUTO-FORMATAR O INPUT DE NOTA AO SAIR DO CAMPO (8 vira 8.0) ---
+document.addEventListener('blur', function(e) {
+    if (e.target && e.target.type === 'number' && e.target.name && e.target.name.includes('_')) {
+        const val = e.target.value.trim();
+        if (val !== "") {
+            const num = parseFloat(val);
+            if (!isNaN(num)) {
+                e.target.value = num.toFixed(1); // Força 1 casa decimal (ex: 8 -> 8.0)
+            }
+        }
     }
+}, true); // true para pegar no capture phase
 
-    const btnAdd = document.createElement('button');
-    btnAdd.classList.add('btn-add-aluno');
-    btnAdd.innerHTML = '<i class="fa-solid fa-plus"></i> Adicionar Novo Aluno';
-    btnAdd.addEventListener('click', () => {
-        modalAddAluno.style.display = "flex";
-        document.querySelector('#addNome').focus();
+// --- CARREGAR ALUNOS ---
+if (selectTurma) {
+    selectTurma.addEventListener('change', async function() {
+        const turmaSelecionada = selectTurma.value;
+        if (!listaAlunosDiv) return;
+        listaAlunosDiv.style.display = "block";
+        listaAlunosDiv.innerHTML = "<p>Carregando alunos...</p>";
+
+        const { data: alunos, error } = await supabaseClient
+            .from('alunos')
+            .select('id, nome, numero_matricula, data_nascimento, notas, status')
+            .eq('turma', turmaSelecionada)
+            .eq('status', 'Ativa')
+            .order('nome', { ascending: true });
+
+        if (error) { console.error(error); listaAlunosDiv.innerHTML = "<p>Erro ao carregar.</p>"; return; }
+
+        listaAlunosDiv.innerHTML = "";
+
+        if (alunos.length === 0) {
+            listaAlunosDiv.innerHTML = "<p>Nenhum aluno ativo nesta turma.</p>";
+        } else {
+            alunos.forEach(aluno => {
+                const itemContainer = document.createElement('div');
+                itemContainer.classList.add('aluno-item');
+
+                const btnNome = document.createElement('button');
+                btnNome.classList.add('btn-nome-aluno');
+                btnNome.textContent = `${aluno.nome} (Nasc: ${formatarDataBR(aluno.data_nascimento)})`;
+                btnNome.addEventListener('click', () => abrirTelaNotas(aluno));
+
+                const btnEditar = document.createElement('button');
+                btnEditar.classList.add('btn-editar');
+                btnEditar.innerHTML = '<i class="fa-solid fa-pencil" style="color: black;"></i>';
+
+                const painelEdicao = document.createElement('div');
+                painelEdicao.classList.add('painel-edicao');
+                painelEdicao.style.width = "100%";
+                painelEdicao.innerHTML = `
+                    <button class="btn-acao btn-transferir" onclick="mudarStatus('${aluno.id}', 'Transferido')"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transferir</button>
+                    <button class="btn-acao btn-desistente" onclick="mudarStatus('${aluno.id}', 'Desistente')"><i class="fa-solid fa-user-slash"></i> Desistente</button>
+                    <button class="btn-acao btn-excluir" onclick="excluirAluno('${aluno.id}')"><i class="fa-solid fa-trash"></i> Excluir</button>
+                `;
+
+                btnEditar.addEventListener('click', () => {
+                    painelEdicao.style.display = painelEdicao.style.display === "flex" ? "none" : "flex";
+                });
+
+                itemContainer.appendChild(btnNome);
+                itemContainer.appendChild(btnEditar);
+                itemContainer.appendChild(painelEdicao);
+                listaAlunosDiv.appendChild(itemContainer);
+            });
+        }
+
+        const btnAdd = document.createElement('button');
+        btnAdd.classList.add('btn-add-aluno');
+        btnAdd.innerHTML = '<i class="fa-solid fa-plus"></i> Adicionar Novo Aluno';
+        btnAdd.addEventListener('click', () => {
+            if (modalAddAluno) {
+                modalAddAluno.style.display = "flex";
+                const addNome = document.querySelector('#addNome');
+                if (addNome) addNome.focus();
+            }
+        });
+        listaAlunosDiv.appendChild(btnAdd);
     });
-    listaAlunosDiv.appendChild(btnAdd);
-});
+}
 
 // --- MODAL ADICIONAR ALUNO ---
-btnFecharModal.addEventListener('click', () => {
-    modalAddAluno.style.display = "none";
-    formAddAluno.reset();
-});
+if (btnFecharModal) {
+    btnFecharModal.addEventListener('click', () => {
+        if (modalAddAluno) modalAddAluno.style.display = "none";
+        if (formAddAluno) formAddAluno.reset();
+    });
+}
 
-formAddAluno.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const nome = document.querySelector('#addNome').value.trim();
-    const dataNasc = document.querySelector('#addData').value;
-    const turmaSelecionada = selectTurma.value;
+if (formAddAluno) {
+    formAddAluno.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const nome = document.querySelector('#addNome').value.trim();
+        const dataNasc = document.querySelector('#addData').value;
+        const turmaSelecionada = selectTurma.value;
 
-    if (!turmaSelecionada) return alert("Selecione uma turma primeiro.");
+        if (!turmaSelecionada) return alert("Selecione uma turma primeiro.");
 
-    const anoAtual = new Date().getFullYear();
-    const numProvisorio = `PROV-${anoAtual}-${Math.floor(Math.random() * 10000)}`;
+        const anoAtual = new Date().getFullYear();
+        const numProvisorio = `PROV-${anoAtual}-${Math.floor(Math.random() * 10000)}`;
 
-    const { data, error } = await supabaseClient.from('alunos').insert([{
-        nome: nome,
-        data_nascimento: dataNasc || null,
-        turma: turmaSelecionada,
-        status: 'Ativa',
-        numero_matricula: numProvisorio,
-        notas: {}
-    }]).select();
+        const { data, error } = await supabaseClient.from('alunos').insert([{
+            nome: nome,
+            data_nascimento: dataNasc || null,
+            turma: turmaSelecionada,
+            status: 'Ativa',
+            numero_matricula: numProvisorio,
+            notas: {}
+        }]).select();
 
-    if (error) { console.error(error); return alert("Erro ao adicionar aluno."); }
+        if (error) { console.error(error); return alert("Erro ao adicionar aluno."); }
 
-    await supabaseClient.from('avisos').insert([{
-        tipo: 'Aluno Incompleto',
-        mensagem: `O professor adicionou o aluno "${nome}" na turma ${turmaSelecionada.toUpperCase()}. Faltam dados cadastrais.`,
-        aluno_id: data[0].id,
-        lido: false
-    }]);
+        await supabaseClient.from('avisos').insert([{
+            tipo: 'Aluno Incompleto',
+            mensagem: `O professor adicionou o aluno "${nome}" na turma ${turmaSelecionada.toUpperCase()}. Faltam dados cadastrais.`,
+            aluno_id: data[0].id,
+            lido: false
+        }]);
 
-    alert("Aluno adicionado com sucesso! O Gestor foi notificado.");
-    modalAddAluno.style.display = "none";
-    formAddAluno.reset();
-    selectTurma.dispatchEvent(new Event('change'));
-});
+        alert("Aluno adicionado com sucesso! O Gestor foi notificado.");
+        if (modalAddAluno) modalAddAluno.style.display = "none";
+        formAddAluno.reset();
+        selectTurma.dispatchEvent(new Event('change'));
+    });
+}
 
 // --- FUNÇÕES GLOBAIS DE EDIÇÃO ---
 window.mudarStatus = async function(id, novoStatus) {
@@ -198,8 +223,8 @@ window.excluirAluno = async function(id) {
 // --- CÁLCULO DE MÉDIAS ---
 function calcularMedias() {
     const mediasBimestrais = { b1: {}, b2: {}, b3: {}, b4: {} };
-    const mediasFinais = {}; 
-    
+    const mediasFinais = {};
+
     MATERIAS.forEach(materia => {
         let somaMateria = 0;
         let countBimestres = 0;
@@ -209,15 +234,15 @@ function calcularMedias() {
             let countNotas = 0;
 
             for (let i = 1; i <= 3; i++) {
-                const input = document.querySelector(`input[name="${bimestre}_${materia}_${i}"]`);
-                if (input && input.value.trim() !== "") {
-                    somaBim += parseFloat(input.value);
+                const inputNota = document.querySelector(`input[name="${bimestre}_${materia}_${i}"]`);
+                if (inputNota && inputNota.value.trim() !== "") {
+                    somaBim += parseFloat(inputNota.value);
                     countNotas++;
                 }
             }
 
             let mediaBim = countNotas > 0 ? (somaBim / countNotas) : 0;
-            mediaBim = Math.ceil(mediaBim * 2) / 2; 
+            mediaBim = Math.ceil(mediaBim * 2) / 2;
             mediasBimestrais[bimestre][materia] = mediaBim;
 
             const elBim = document.querySelector(`#mb${bimestre.slice(1)}_${materia}`);
@@ -247,29 +272,33 @@ function calcularMedias() {
     });
     let mediaGeral = countMaterias > 0 ? (somaTodasMaterias / countMaterias) : 0;
     mediaGeral = Math.ceil(mediaGeral * 2) / 2;
-    document.querySelector('#media_anual_texto').textContent = mediaGeral > 0 ? formatarNota(mediaGeral) : "--";
+    const elMediaGeral = document.querySelector('#media_anual_texto');
+    if (elMediaGeral) elMediaGeral.textContent = mediaGeral > 0 ? formatarNota(mediaGeral) : "--";
 
     return { mediasBimestrais, mediasFinais, mediaGeral };
 }
 
-document.querySelectorAll('.materias-grid-3notas input').forEach(input => {
-    input.addEventListener('input', calcularMedias);
+document.querySelectorAll('.materias-grid-3notas input').forEach(inputNota => {
+    inputNota.addEventListener('input', calcularMedias);
 });
 
 function abrirTelaNotas(aluno) {
+    if (!telaNotas) return;
     alunoSelecionadoId = aluno.id;
-    nomeAlunoNota.textContent = `Notas de: ${aluno.nome}`;
+    if (nomeAlunoNota) nomeAlunoNota.textContent = `Notas de: ${aluno.nome}`;
     telaNotas.style.display = "block";
-    formNotas.reset();
-    
+    if (formNotas) formNotas.reset();
+
     MATERIAS.forEach(m => {
-        document.querySelector(`#ma_${m}`).textContent = "--";
+        const elMa = document.querySelector(`#ma_${m}`);
+        if (elMa) elMa.textContent = "--";
         ['1','2','3','4'].forEach(b => {
             const el = document.querySelector(`#mb${b}_${m}`);
             if(el) el.textContent = "--";
         });
     });
-    document.querySelector('#media_anual_texto').textContent = "--";
+    const elMediaGeral = document.querySelector('#media_anual_texto');
+    if (elMediaGeral) elMediaGeral.textContent = "--";
 
     if (aluno.notas && Object.keys(aluno.notas).length > 0) {
         for (const bimestre in aluno.notas) {
@@ -279,9 +308,10 @@ function abrirTelaNotas(aluno) {
                     const notas = notasMateria[materia];
                     if (notas) {
                         for (let i = 1; i <= 3; i++) {
-                            const input = document.querySelector(`input[name="${bimestre}_${materia}_${i}"]`);
-                            if (input && notas[`n${i}`]) {
-                                input.value = notas[`n${i}`];
+                            const inputNota = document.querySelector(`input[name="${bimestre}_${materia}_${i}"]`);
+                            if (inputNota && notas[`n${i}`]) {
+                                // FORÇA A EXIBIÇÃO COM 1 CASA DECIMAL (8 vira 8.0)
+                                inputNota.value = Number(notas[`n${i}`]).toFixed(1);
                             }
                         }
                     }
@@ -293,69 +323,68 @@ function abrirTelaNotas(aluno) {
     telaNotas.scrollIntoView({ behavior: 'smooth' });
 }
 
-btnCancelarNotas.addEventListener('click', () => {
-    telaNotas.style.display = "none";
-    alunoSelecionadoId = null;
-});
-
-formNotas.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    if (!alunoSelecionadoId) return;
-
-    const { mediasBimestrais, mediasFinais, mediaGeral } = calcularMedias();
-
-    const dados = new FormData(formNotas);
-    const notasObj = { b1: {}, b2: {}, b3: {}, b4: {} };
-
-    MATERIAS.forEach(materia => {
-        ['b1', 'b2', 'b3', 'b4'].forEach(b => {
-            notasObj[b][materia] = {
-                n1: Number(dados.get(`${b}_${materia}_1`)) || null,
-                n2: Number(dados.get(`${b}_${materia}_2`)) || null,
-                n3: Number(dados.get(`${b}_${materia}_3`)) || null
-            };
-        });
+if (btnCancelarNotas) {
+    btnCancelarNotas.addEventListener('click', () => {
+        telaNotas.style.display = "none";
+        alunoSelecionadoId = null;
     });
+}
 
-    const colunasParaSalvar = { notas: notasObj };
-    
-    MATERIAS.forEach(materia => {
-        // Salva as médias bimestrais
-        ['b1', 'b2', 'b3', 'b4'].forEach(b => {
-            const valor = mediasBimestrais[b][materia];
-            // CORREÇÃO AQUI: Usa .toFixed(1) para salvar sempre com .0 ou .5
-            colunasParaSalvar[`${b}_${materia}`] = valor > 0 ? Number(valor).toFixed(1) : null;
+if (formNotas) {
+    formNotas.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        if (!alunoSelecionadoId) return;
+
+        const { mediasBimestrais, mediasFinais, mediaGeral } = calcularMedias();
+
+        const dados = new FormData(formNotas);
+        const notasObj = { b1: {}, b2: {}, b3: {}, b4: {} };
+
+        MATERIAS.forEach(materia => {
+            ['b1', 'b2', 'b3', 'b4'].forEach(b => {
+                notasObj[b][materia] = {
+                    n1: Number(dados.get(`${b}_${materia}_1`)) || null,
+                    n2: Number(dados.get(`${b}_${materia}_2`)) || null,
+                    n3: Number(dados.get(`${b}_${materia}_3`)) || null
+                };
+            });
         });
-        
-        // Salva a MDF (Média Final)
-        const mdf = mediasFinais[materia];
-        // CORREÇÃO AQUI: Usa .toFixed(1) para salvar sempre com .0 ou .5
-        colunasParaSalvar[`mdf_${materia}`] = mdf > 0 ? Number(mdf).toFixed(1) : null;
 
-        // NOVO: Regra de Aprovação (Aprovado se >= 6.0)
-        if (mdf > 0) {
-            if (mdf >= 6.0) {
-                colunasParaSalvar[`status_${materia}`] = "APROVADO";
+        const colunasParaSalvar = { notas: notasObj };
+
+        MATERIAS.forEach(materia => {
+            ['b1', 'b2', 'b3', 'b4'].forEach(b => {
+                const valor = mediasBimestrais[b][materia];
+                colunasParaSalvar[`${b}_${materia}`] = valor > 0 ? Number(valor).toFixed(1) : null;
+            });
+
+            const mdf = mediasFinais[materia];
+            colunasParaSalvar[`mdf_${materia}`] = mdf > 0 ? Number(mdf).toFixed(1) : null;
+
+            if (mdf > 0) {
+                if (mdf >= 6.0) {
+                    colunasParaSalvar[`status_${materia}`] = "APROVADO";
+                } else {
+                    colunasParaSalvar[`status_${materia}`] = "RECUPERAÇÃO";
+                }
             } else {
-                colunasParaSalvar[`status_${materia}`] = "RECUPERAÇÃO";
+                colunasParaSalvar[`status_${materia}`] = null;
             }
-        } else {
-            colunasParaSalvar[`status_${materia}`] = null;
+        });
+
+        const { error } = await supabaseClient
+            .from('alunos')
+            .update(colunasParaSalvar)
+            .eq('id', alunoSelecionadoId);
+
+        if (error) {
+            console.error(error);
+            alert("Erro ao salvar as notas.");
+            return;
         }
+
+        alert("Notas e status salvos com sucesso!");
+        telaNotas.style.display = "none";
+        selectTurma.dispatchEvent(new Event('change'));
     });
-
-    const { error } = await supabaseClient
-        .from('alunos')
-        .update(colunasParaSalvar)
-        .eq('id', alunoSelecionadoId);
-
-    if (error) { 
-        console.error(error); 
-        alert("Erro ao salvar as notas."); 
-        return; 
-    }
-
-    alert("Notas e status salvos com sucesso!");
-    telaNotas.style.display = "none";
-    selectTurma.dispatchEvent(new Event('change'));
-});
+}

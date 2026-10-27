@@ -20,45 +20,70 @@ scriptSupabase.onload = () => {
 document.head.appendChild(scriptSupabase);
 
 function proximo(){
+    if (!etapa1 || !etapa2) return;
     etapa1.style.display = 'none';
     etapa2.style.display = 'block';
-    btnproximo.style.display = 'none';
-    btnfinalizar.style.display = 'block';
-    btnvoltar.style.display = 'block';
+    if (btnproximo) btnproximo.style.display = 'none';
+    if (btnfinalizar) btnfinalizar.style.display = 'block';
+    if (btnvoltar) btnvoltar.style.display = 'block';
 }
 
 function voltar(){
+    if (!etapa1 || !etapa2) return;
     etapa1.style.display = 'block';
     etapa2.style.display = 'none';
-    btnproximo.style.display = 'block';
-    btnfinalizar.style.display = 'none';
-    btnvoltar.style.display = 'none';
+    if (btnproximo) btnproximo.style.display = 'block';
+    if (btnfinalizar) btnfinalizar.style.display = 'none';
+    if (btnvoltar) btnvoltar.style.display = 'none';
 }
 
-// --- GERA NÚMERO DE MATRÍCULA AUTOMÁTICO ---
+window.proximo = proximo;
+window.voltar = voltar;
+
+// --- GERA NÚMERO DE MATRÍCULA AUTOMÁTICO (CORRIGIDO) ---
 async function gerarNumeroMatricula() {
+    if (!supabaseClient) return `${new Date().getFullYear()}0001`;
+
     const anoAtual = new Date().getFullYear();
 
+    // Busca o MAIOR número de matrícula que começa com o ano atual
+    // O 'order' descendente + 'limit(1)' garante que pegamos o último
     const { data, error } = await supabaseClient
         .from('alunos')
         .select('numero_matricula')
+        .like('numero_matricula', `${anoAtual}%`) // Filtra apenas do ano atual
         .order('numero_matricula', { ascending: false })
         .limit(1);
 
-    if (error || !data || data.length === 0) {
+    if (error) {
+        console.error("Erro ao buscar última matrícula:", error);
+        // Fallback: tenta gerar um número baseado no timestamp para não travar
+        return `${anoAtual}${Date.now().toString().slice(-4)}`;
+    }
+
+    // Se não houver nenhum aluno no ano atual, começa do 0001
+    if (!data || data.length === 0) {
         return `${anoAtual}0001`;
     }
 
     const ultimaMatricula = data[0].numero_matricula;
 
-    if (!ultimaMatricula || !ultimaMatricula.startsWith(anoAtual.toString())) {
+    // Verifica se a última matrícula é válida e do ano atual
+    if (!ultimaMatricula || typeof ultimaMatricula !== 'string' || !ultimaMatricula.startsWith(anoAtual.toString())) {
         return `${anoAtual}0001`;
     }
 
-    const ultimoNumero = parseInt(ultimaMatricula.slice(-4));
-    const novoNumero = (ultimoNumero + 1).toString().padStart(4, '0');
-
-    return `${anoAtual}${novoNumero}`;
+    // Extrai a parte numérica e incrementa
+    try {
+        const ultimoNumero = parseInt(ultimaMatricula.slice(-4), 10);
+        if (isNaN(ultimoNumero)) return `${anoAtual}0001`;
+        
+        const novoNumero = (ultimoNumero + 1).toString().padStart(4, '0');
+        return `${anoAtual}${novoNumero}`;
+    } catch (e) {
+        console.error("Erro ao parsear matrícula:", e);
+        return `${anoAtual}0001`;
+    }
 }
 
 // --- FINALIZAR MATRÍCULA ---
@@ -74,18 +99,18 @@ if (formulario) {
         const dados = new FormData(formulario);
         const matricula = Object.fromEntries(dados);
 
-        btnfinalizar.disabled = true;
-        btnfinalizar.textContent = "Gerando matrícula...";
+        if (btnfinalizar) {
+            btnfinalizar.disabled = true;
+            btnfinalizar.textContent = "Gerando matrícula...";
+        }
 
         const numeroMatriculaGerado = await gerarNumeroMatricula();
 
-        // Trata responsável: se for "outro", mantém o texto; senão limpa
         const tipoResponsavel = matricula.responsavel || '';
         const responsavelOutro = tipoResponsavel === 'outro'
             ? (matricula['responsavel-outro'] || '').trim()
             : null;
 
-        // Normaliza CPFs (remove espaços)
         const cpfPai = (matricula['cpf-pai'] || '').trim();
         const cpfMae = (matricula['cpf-mae'] || '').trim();
 
@@ -129,14 +154,16 @@ if (formulario) {
             notas: {}
         };
 
-        btnfinalizar.textContent = "Salvando dados...";
+        if (btnfinalizar) btnfinalizar.textContent = "Salvando dados...";
 
         const { data, error } = await supabaseClient
             .from('alunos')
             .insert([novoAluno]);
 
-        btnfinalizar.disabled = false;
-        btnfinalizar.textContent = "Finalizar matrícula";
+        if (btnfinalizar) {
+            btnfinalizar.disabled = false;
+            btnfinalizar.textContent = "Finalizar matrícula";
+        }
 
         if (error) {
             console.error("Erro ao salvar no Supabase:", error);

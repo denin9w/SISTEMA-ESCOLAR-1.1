@@ -6,7 +6,6 @@
     <script src="https://kit.fontawesome.com/f1f95af2e7.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style/login/login-responsavel.css">
     <link rel="stylesheet" href="style/login/login-responsavelExpansivo.css">
-    
     <title>CEJE - Área do Responsável</title>
 </head>
 
@@ -36,18 +35,18 @@
         <div class="text-banerL">
             <h1>Bem vindo à Área do Responsável</h1>
             <p id="alunoLogadoNome" style="text-align:center; font-weight:bold; color:var(--titlecor); margin-top:10px;"></p>
-            <h2>Solicite seus documentos</h2>
+            <h2>Visualize e solicite seus documentos</h2>
         </div>
 
         <div id="documentos">
             <div class="documentos-itens">
 
-                <label for="itransferencia" class="opçao-card">
-                    <input type="checkbox" name="Transferencia" id="itransferencia">
+                <label class="opçao-card">
+                    <input type="checkbox" name="Transferência" id="itransferencia">
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
                         <span class="texto-icone">Transferência</span>
-                        <button class="btn-visualizar" type="button" data-doc="transferencia">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Transferência">Visualizar</button>
                     </div>
                 </label>
 
@@ -56,7 +55,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-clipboard-list"></i></span>
                         <span class="texto-icone">Ficha Individual</span>
-                        <button class="btn-visualizar" type="button" data-doc="ficha-individual">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Ficha Individual">Visualizar</button>
                     </div>
                 </label>
 
@@ -65,7 +64,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-file-lines"></i></span>
                         <span class="texto-icone">Bolsa Família</span>
-                        <button class="btn-visualizar" type="button" data-doc="bolsa-familia">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Bolsa Família">Visualizar</button>
                     </div>
                 </label>
 
@@ -74,7 +73,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-regular fa-file-pdf"></i></span>
                         <span class="texto-icone">Boletim</span>
-                        <button class="btn-visualizar" type="button" data-doc="boletim">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Boletim">Baixar</button>
                     </div>
                 </label>
 
@@ -83,7 +82,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-file-invoice-dollar"></i></span>
                         <span class="texto-icone">Quitação Simples</span>
-                        <button class="btn-visualizar" type="button" data-doc="declaracao-quitacao-debito">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Declaração de Quitação Simples">Visualizar</button>
                     </div>
                 </label>
 
@@ -92,7 +91,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-table"></i></span>
                         <span class="texto-icone">Quitação Tabela</span>
-                        <button class="btn-visualizar" type="button" data-doc="declaracao-quitacao-debito-tabela">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Declaração de Quitação Tabela">Visualizar</button>
                     </div>
                 </label>
 
@@ -101,7 +100,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-id-card"></i></span>
                         <span class="texto-icone">Declaração de Matrícula</span>
-                        <button class="btn-visualizar" type="button" data-doc="declaracao-matricula">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Declaração de Matrícula">Visualizar</button>
                     </div>
                 </label>
 
@@ -110,7 +109,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-file-circle-exclamation"></i></span>
                         <span class="texto-icone">Provisória</span>
-                        <button class="btn-visualizar" type="button" data-doc="provissoria">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Declaração Provisória">Visualizar</button>
                     </div>
                 </label>
 
@@ -119,7 +118,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-receipt"></i></span>
                         <span class="texto-icone">Recibo</span>
-                        <button class="btn-visualizar" type="button" data-doc="recibo">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Recibo">Visualizar</button>
                     </div>
                 </label>
 
@@ -128,7 +127,7 @@
                     <div class="conteudo-card">
                         <span class="icone"><i class="fa-solid fa-money-check-dollar"></i></span>
                         <span class="texto-icone">Recibo de Pagamento</span>
-                        <button class="btn-visualizar" type="button" data-doc="recibo-pagamento">Visualizar</button>
+                        <button class="btn-visualizar" type="button" data-doc="Recibo de Pagamento">Visualizar</button>
                     </div>
                 </label>
 
@@ -143,21 +142,85 @@
         </footer>
     </section>
 
-    <!-- Script de visualização (Abre o PDF em nova aba) -->
+    <!-- Carrega modelos e Supabase -->
+    <script src="documentos/html/templates-docs.js"></script>
+    <script src="style/login/script/scriptResponsavel.js"></script>
+
+    <!-- Visualização / download dos documentos -->
     <script>
+    (function () {
+        function abrirDocHTML(nomeDoc) {
+            const alunoId = localStorage.getItem("@alunoLogadoId");
+            if (!alunoId) { alert("Sessão expirada."); return; }
+
+            // Busca os dados do aluno no Supabase (o cliente do scriptResponsavel.js)
+            if (!window.supabaseClient) {
+                alert("Aguarde, conectando ao banco...");
+                return;
+            }
+            window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
+                .then(({ data, error }) => {
+                    if (error || !data) { alert("Erro ao carregar dados do aluno."); return; }
+                    const fn = DOCUMENTOS_HTML[nomeDoc];
+                    if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
+                    const html = fn(data);
+                    const win = window.open('', '_blank');
+                    win.document.write(html);
+                    win.document.close();
+                })
+                .catch(e => { console.error(e); alert("Erro ao abrir documento."); });
+        }
+
+        function baixarBoletim(nomeDoc) {
+            const alunoId = localStorage.getItem("@alunoLogadoId");
+            if (!alunoId) { alert("Sessão expirada."); return; }
+            window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
+                .then(({ data, error }) => {
+                    if (error || !data) { alert("Erro ao carregar dados."); return; }
+                    const fn = DOCUMENTOS_HTML[nomeDoc];
+                    if (!fn) return alert("Modelo não encontrado.");
+                    const html = fn(data);
+                    // Baixa como .doc (Word abre HTML nativamente)
+                    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Boletim-${data.nome.replace(/\s+/g,'_')}.doc`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+        }
+
         document.querySelectorAll('.btn-visualizar').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                e.preventDefault(); 
-                // Pega o nome do arquivo configurado no data-doc
-                const slug = btn.dataset.doc; 
-                
-                // Abre o arquivo PDF na nova aba
-                window.open(`documentos/${slug}.pdf`, '_blank');
+                e.preventDefault();
+                e.stopPropagation();
+                const nomeDoc = btn.dataset.doc;
+                if (nomeDoc === 'Boletim') {
+                    baixarBoletim(nomeDoc);
+                } else {
+                    abrirDocHTML(nomeDoc);
+                }
             });
         });
+    })();
     </script>
-    
-    <!-- Script que gerencia a solicitação e o login do aluno -->
-    <script src="style/login/script/scriptResponsavel.js"></script>
+
+    <!-- Botão Sair -->
+    <script>
+    (function () {
+        const sair = document.getElementById('btnSair');
+        if (sair) {
+            sair.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.removeItem("@alunoLogadoId");
+                localStorage.removeItem("@alunoLogadoNome");
+                localStorage.removeItem("@professorLogado");
+                localStorage.removeItem("@gestorLogado");
+                window.location.href = "login.htm";
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

@@ -62,7 +62,6 @@ async function entrar(){
 
     try {
         if (tipoSelecionado === "responsavel") {
-            // Busca na tabela alunos se o CPF bate com pai, mãe ou responsável-outro
             const { data, error } = await supabaseClient
                 .from('alunos')
                 .select('id, nome, status')
@@ -74,7 +73,6 @@ async function entrar(){
             if (data && data.length > 0) {
                 const aluno = data[0];
 
-                // Bloqueia aluno Transferido/Desistente
                 if (aluno.status && aluno.status !== 'Ativa') {
                     alert(`O acesso está indisponível: o aluno consta como "${aluno.status}".`);
                     return;
@@ -88,7 +86,6 @@ async function entrar(){
             }
 
         } else {
-            // Busca na tabela usuarios (professor ou gestor)
             const { data, error } = await supabaseClient
                 .from('usuarios')
                 .select('*')
@@ -101,7 +98,6 @@ async function entrar(){
             if (data && data.length > 0) {
                 const usuario = data[0];
 
-                // Professor precisa estar autorizado pelo gestor
                 if (tipoSelecionado === 'professor' && !usuario.autorizado) {
                     alert("Seu cadastro de professor ainda não foi autorizado pelo gestor. Aguarde a liberação.");
                     return;
@@ -133,10 +129,3 @@ if(input) input.addEventListener("keydown", function (evento){
         entrar();
     }
 });
-
-// --- SEGURANÇA: LIMPAR SESSÃO AO ENTRAR NA TELA DE LOGIN ---
-// Isso garante que se alguém clicar em "Sair", a sessão é destruída.
-localStorage.removeItem("@alunoLogadoId");
-localStorage.removeItem("@alunoLogadoNome");
-localStorage.removeItem("@professorLogado");
-localStorage.removeItem("@gestorLogado");
