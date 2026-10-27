@@ -14,7 +14,6 @@ scriptSupabase.onload = () => {
 };
 document.head.appendChild(scriptSupabase);
 
-// --- REFERÊNCIAS ---
 const selectTurma       = document.querySelector('#iturma');
 const listaDeAlunos     = document.querySelector('#listaAlunos');
 const documentoporAluno = document.querySelector('#idocumentos');
@@ -40,7 +39,6 @@ function labelTurma(t) {
     return t.toUpperCase();
 }
 
-// --- INICIALIZAÇÃO ---
 function iniciarGestor() {
     const gString = localStorage.getItem("@gestorLogado");
     if (!gString) {
@@ -63,7 +61,6 @@ function iniciarGestor() {
     carregarProfessoresPendentes();
 }
 
-// --- ALUNOS POR TURMA ---
 selectTurma.addEventListener('change', () => carregarAlunos(selectTurma.value));
 
 if (inputBusca) {
@@ -108,7 +105,6 @@ async function carregarAlunos(turma) {
     });
 }
 
-// --- DOCUMENTOS DO ALUNO SELECIONADO ---
 function abrirDocumentos(aluno) {
     if (!documentoporAluno) return;
     documentoporAluno.style.display = 'block';
@@ -118,12 +114,129 @@ function abrirDocumentos(aluno) {
     documentoporAluno.querySelectorAll('.cdocumentos a').forEach(link => {
         link.onclick = (ev) => {
             ev.preventDefault();
-            gerarDocumento(aluno.id, aluno.nome, link.dataset.doc || link.textContent.trim());
+            const docName = link.dataset.doc || link.textContent.trim();
+            if (docName === 'Boletim' || docName === 'boletim') {
+                gerarBoletimHTML(aluno.id); // Usa o HTML para o boletim
+            } else {
+                gerarDocumento(aluno.id, aluno.nome, docName); // Usa o Word para os outros
+            }
         };
     });
 }
 
-// --- GERAÇÃO E DOWNLOAD DE DOCUMENTO ---
+// --- NOVA FUNÇÃO: BOLETIM EM HTML PARA NÃO QUEBRAR NO WORD ---
+async function gerarBoletimHTML(alunoId) {
+    try {
+        const { data: aluno, error } = await supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
+        if (error || !aluno) throw new Error("Aluno não encontrado.");
+
+        const hoje = new Date();
+        const dataFormatada = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}/${hoje.getFullYear()}`;
+        
+        const materias = [
+            { nome: 'Português', id: 'portugues' },
+            { nome: 'Matemática', id: 'matematica' },
+            { nome: 'História', id: 'historia' },
+            { nome: 'Geografia', id: 'geografia' },
+            { nome: 'Ciências', id: 'ciencias' },
+            { nome: 'Ed. Física', id: 'ed_fisica' },
+            { nome: 'Inglês', id: 'ingles' },
+            { nome: 'Arte', id: 'arte' },
+            { nome: 'Ética e Cidadania', id: 'etica' }
+        ];
+
+        let linhasTabela = '';
+        materias.forEach(mat => {
+            const b1 = aluno[`b1_${mat.id}`] || '-';
+            const b2 = aluno[`b2_${mat.id}`] || '-';
+            const b3 = aluno[`b3_${mat.id}`] || '-';
+            const b4 = aluno[`b4_${mat.id}`] || '-';
+            const mdf = aluno[`mdf_${mat.id}`] || '-';
+            const status = aluno[`status_${mat.id}`] || '-';
+
+            linhasTabela += `
+                <tr>
+                    <td style="text-align: left; padding-left: 10px;">${mat.nome}</td>
+                    <td>${b1}</td>
+                    <td>${b2}</td>
+                    <td>${b3}</td>
+                    <td>${b4}</td>
+                    <td><strong>${mdf}</strong></td>
+                    <td><strong>${status}</strong></td>
+                </tr>
+            `;
+        });
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Boletim - ${aluno.nome}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #003869; padding-bottom: 10px; }
+                    .header h1 { margin: 0; color: #003869; font-size: 24px; }
+                    .header h2 { margin: 5px 0; font-size: 16px; font-weight: normal; }
+                    .info { margin-bottom: 20px; font-size: 16px; }
+                    .info strong { color: #003869; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                    th, td { border: 1px solid #333; padding: 8px; text-align: center; font-size: 14px; }
+                    th { background-color: #f0f0f0; color: #003869; }
+                    .footer { text-align: center; margin-top: 50px; font-size: 14px; }
+                    @media print {
+                        body { padding: 0; }
+                        @page { margin: 2cm; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
+                    <h2>BOLETIM DE NOTAS - ${hoje.getFullYear()}</h2>
+                </div>
+                <div class="info">
+                    <p><strong>Aluno(a):</strong> ${aluno.nome.toUpperCase()}</p>
+                    <p><strong>Turma:</strong> ${labelTurma(aluno.turma)} &nbsp;&nbsp;&nbsp; <strong>Matrícula:</strong> ${aluno.numero_matricula || '---'}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Disciplina</th>
+                            <th>1º Bim</th>
+                            <th>2º Bim</th>
+                            <th>3º Bim</th>
+                            <th>4º Bim</th>
+                            <th>Média Final</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${linhasTabela}
+                    </tbody>
+                </table>
+                <div class="footer">
+                    <p>Garanhuns, ${dataFormatada}</p>
+                    <br><br>
+                    <p>_______________________________________________________<br>Assinatura da Direção</p>
+                </div>
+                <script>
+                    window.onload = function() { window.print(); }
+                </script>
+            </body>
+            </html>
+        `;
+
+        const novaAba = window.open('', '_blank');
+        novaAba.document.write(html);
+        novaAba.document.close();
+
+    } catch (e) {
+        console.error(e);
+        alert(`Erro ao gerar boletim: ${e.message}`);
+    }
+}
+
+// --- FUNÇÃO PARA GERAR OS OUTROS DOCUMENTOS EM WORD ---
 async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
     if (typeof PizZip === 'undefined' || typeof docxtemplater === 'undefined') {
         alert("Bibliotecas de DOCX não carregadas nesta página.");
@@ -134,64 +247,24 @@ async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
     const urlTemplate = `documentos/${slug}.docx`;
 
     try {
-        // --- INÍCIO DA LÓGICA DO BOLETIM DA TURMA ---
-        if (slug === 'boletim-turma') {
-            const turmaSelecionada = selectTurma.value;
-            if (!turmaSelecionada) throw new Error("Selecione uma turma no painel antes de gerar o boletim da turma.");
-
-            const { data: alunos, error } = await supabaseClient
-                .from('alunos')
-                .select('*')
-                .eq('turma', turmaSelecionada)
-                .eq('status', 'Ativa')
-                .order('nome', { ascending: true });
-
-            if (error || !alunos || alunos.length === 0) throw new Error("Nenhum aluno encontrado nesta turma.");
-
-            const resp = await fetch(urlTemplate);
-            if (!resp.ok) throw new Error(`Template não encontrado na pasta: ${urlTemplate}`);
-            
-            const blob = await resp.arrayBuffer();
-            const zip = new PizZip(blob);
-            const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
-
-            const hoje = new Date();
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            const dataFormatada = `${dia} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
-
-            // Prepara a lista de alunos para o template do Word (usando {{#alunos}} ... {{/alunos}})
-            const listaFormatada = alunos.map(a => {
-                return {
-                    ...a,
-                    turma_label: labelTurma(a.turma),
-                    data_nascimento_br: a.data_nascimento ? a.data_nascimento.split('-').reverse().join('/') : '',
-                    nome_maiusculo: a.nome.toUpperCase()
-                };
-            });
-
-            // Renderiza o documento com o loop da tabela
-            doc.render({
-                turma_label: labelTurma(turmaSelecionada),
-                data_hoje: dataFormatada,
-                alunos: listaFormatada
-            });
-
-            const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-            saveAs(out, `boletim-turma-${turmaSelecionada}.docx`);
-            return; // Encerra a função aqui
-        }
-        // --- FIM DA LÓGICA DO BOLETIM DA TURMA ---
-
-        // Se não for boletim de turma, é documento individual
         const { data: aluno, error } = await supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
         if (error || !aluno) throw new Error("Aluno não encontrado.");
 
         const resp = await fetch(urlTemplate);
         if (!resp.ok) throw new Error(`Template não encontrado na pasta: ${urlTemplate}`);
         
-        const blob = await resp.arrayBuffer();
-        const zip = new PizZip(blob);
+        const arrayBuffer = await resp.arrayBuffer();
+        
+        // MÁGICA DA LIMPEZA DO WORD (Mantida)
+        const zipIn = new PizZip(arrayBuffer);
+        let xml = zipIn.file("word/document.xml").asText();
+        xml = xml.replace(/(\{\{[\s\S]*?\}\})/g, function(match) {
+            return match.replace(/<[^>]+>/g, ''); 
+        });
+        zipIn.file("word/document.xml", xml);
+        const bufferLimpo = zipIn.generate({ type: "arraybuffer" });
+        
+        const zip = new PizZip(bufferLimpo);
         const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
         const hoje = new Date();
@@ -206,7 +279,6 @@ async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
             turma_label: labelTurma(aluno.turma || ''),
         };
 
-        // Adiciona versões MAIÚSCULAS de todos os campos de texto
         const camposTexto = [
             'nome', 'nacionalidade', 'cidade_nascimento', 'endereco', 'bairro', 'cidade', 'estado', 
             'nome_pai', 'profissao_pai', 'nome_mae', 'profissao_mae', 'responsavel', 'responsavel_outro',
@@ -237,10 +309,9 @@ async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
     }
 }
 
-// --- AVISOS (Solicitações de documentos) ---
+// --- AVISOS ---
 async function carregarAvisos() {
     if (!listaSolicitacoes) return;
-
     const { data, error } = await supabaseClient
         .from('solicitacoes_documentos')
         .select('id, documento, status, criado_em, aluno_id, alunos(nome, turma)')
@@ -273,7 +344,12 @@ async function carregarAvisos() {
     listaSolicitacoes.querySelectorAll('.btn-gerar').forEach(btn => {
         btn.addEventListener('click', async () => {
             btn.textContent = "Gerando...";
-            await gerarDocumento(btn.dataset.alunoId, btn.dataset.aluno, btn.dataset.doc);
+            const docName = btn.dataset.doc;
+            if (docName === 'Boletim' || docName === 'boletim') {
+                await gerarBoletimHTML(btn.dataset.alunoId);
+            } else {
+                await gerarDocumento(btn.dataset.alunoId, btn.dataset.aluno, docName);
+            }
             btn.textContent = "Gerar";
         });
     });
@@ -281,10 +357,7 @@ async function carregarAvisos() {
     listaSolicitacoes.querySelectorAll('.btn-marcar').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
-            const { error } = await supabaseClient
-                .from('solicitacoes_documentos')
-                .update({ status: 'Entregue' })
-                .eq('id', id);
+            const { error } = await supabaseClient.from('solicitacoes_documentos').update({ status: 'Entregue' }).eq('id', id);
             if (error) alert("Erro ao atualizar.");
             else carregarAvisos();
         });
@@ -294,7 +367,6 @@ async function carregarAvisos() {
 // --- PROFESSORES PENDENTES ---
 async function carregarProfessoresPendentes() {
     if (!listaProfsPend) return;
-
     const { data, error } = await supabaseClient
         .from('usuarios')
         .select('id, nome, cpf_senha, turmas, criado_em')
@@ -325,10 +397,7 @@ async function carregarProfessoresPendentes() {
     listaProfsPend.querySelectorAll('.btn-autorizar').forEach(btn => {
         btn.addEventListener('click', async () => {
             if (!confirm("Autorizar este professor?")) return;
-            const { error } = await supabaseClient
-                .from('usuarios')
-                .update({ autorizado: true })
-                .eq('id', btn.dataset.id);
+            const { error } = await supabaseClient.from('usuarios').update({ autorizado: true }).eq('id', btn.dataset.id);
             if (error) alert("Erro ao autorizar.");
             else carregarProfessoresPendentes();
         });
