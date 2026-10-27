@@ -29,7 +29,7 @@ const MATERIAS = ['portugues', 'matematica', 'historia', 'geografia', 'ciencias'
 
 function formatarNota(valor) {
     if (valor === null || valor === undefined || isNaN(valor) || valor === 0) return "--";
-    return Number(valor).toFixed(1);
+    return Number(valor).toFixed(1); // Força a exibição com .0
 }
 
 function formatarDataBR(iso) {
@@ -320,14 +320,28 @@ formNotas.addEventListener('submit', async function(event) {
     const colunasParaSalvar = { notas: notasObj };
     
     MATERIAS.forEach(materia => {
+        // Salva as médias bimestrais
         ['b1', 'b2', 'b3', 'b4'].forEach(b => {
             const valor = mediasBimestrais[b][materia];
-            // AQUI: Salva com o nome exato que está na imagem (b1_portugues)
-            colunasParaSalvar[`${b}_${materia}`] = valor > 0 ? valor : null;
+            // CORREÇÃO AQUI: Usa .toFixed(1) para salvar sempre com .0 ou .5
+            colunasParaSalvar[`${b}_${materia}`] = valor > 0 ? Number(valor).toFixed(1) : null;
         });
         
+        // Salva a MDF (Média Final)
         const mdf = mediasFinais[materia];
-        colunasParaSalvar[`mdf_${materia}`] = mdf > 0 ? mdf : null;
+        // CORREÇÃO AQUI: Usa .toFixed(1) para salvar sempre com .0 ou .5
+        colunasParaSalvar[`mdf_${materia}`] = mdf > 0 ? Number(mdf).toFixed(1) : null;
+
+        // NOVO: Regra de Aprovação (Aprovado se >= 6.0)
+        if (mdf > 0) {
+            if (mdf >= 6.0) {
+                colunasParaSalvar[`status_${materia}`] = "APROVADO";
+            } else {
+                colunasParaSalvar[`status_${materia}`] = "RECUPERAÇÃO";
+            }
+        } else {
+            colunasParaSalvar[`status_${materia}`] = null;
+        }
     });
 
     const { error } = await supabaseClient
@@ -341,7 +355,7 @@ formNotas.addEventListener('submit', async function(event) {
         return; 
     }
 
-    alert("Notas e médias salvas com sucesso!");
+    alert("Notas e status salvos com sucesso!");
     telaNotas.style.display = "none";
     selectTurma.dispatchEvent(new Event('change'));
 });

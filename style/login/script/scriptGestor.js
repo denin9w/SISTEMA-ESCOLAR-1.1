@@ -32,6 +32,7 @@ const TURMAS = [
 ];
 
 function labelTurma(t) {
+    if (!t) return '';
     const m = t.match(/^(\d)ano-([ab])$/i);
     if (m) return `${m[1]}º Ano ${m[2].toUpperCase()}`;
     const inf = t.match(/^infantil-([IVX]+)-([ab])$/i);
@@ -122,7 +123,7 @@ function abrirDocumentos(aluno) {
     });
 }
 
-// --- GERAÇÃO E DOWNLOAD DE DOCUMENTO (Corrigido para não travar) ---
+// --- GERAÇÃO E DOWNLOAD DE DOCUMENTO ---
 async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
     if (typeof PizZip === 'undefined' || typeof docxtemplater === 'undefined') {
         alert("Bibliotecas de DOCX não carregadas nesta página.");
@@ -132,20 +133,60 @@ async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
     const slug = nomeDoc.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase();
     const urlTemplate = `documentos/${slug}.docx`;
 
-    // Mostra um feedback na tela
-    const avisoOriginal = document.querySelector('.aviso-painel');
-    
     try {
-        // 1. Busca dados do aluno
+        // --- INÍCIO DA LÓGICA DO BOLETIM DA TURMA ---
+        if (slug === 'boletim-turma') {
+            const turmaSelecionada = selectTurma.value;
+            if (!turmaSelecionada) throw new Error("Selecione uma turma no painel antes de gerar o boletim da turma.");
+
+            const { data: alunos, error } = await supabaseClient
+                .from('alunos')
+                .select('*')
+                .eq('turma', turmaSelecionada)
+                .eq('status', 'Ativa')
+                .order('nome', { ascending: true });
+
+            if (error || !alunos || alunos.length === 0) throw new Error("Nenhum aluno encontrado nesta turma.");
+
+            const resp = await fetch(urlTemplate);
+            if (!resp.ok) throw new Error(`Template não encontrado na pasta: ${urlTemplate}`);
+            
+            const blob = await resp.arrayBuffer();
+            const zip = new PizZip(blob);
+            const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+            const hoje = new Date();
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const dataFormatada = `${dia} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+
+            // Prepara a lista de alunos para o template do Word (usando {{#alunos}} ... {{/alunos}})
+            const listaFormatada = alunos.map(a => {
+                return {
+                    ...a,
+                    turma_label: labelTurma(a.turma),
+                    data_nascimento_br: a.data_nascimento ? a.data_nascimento.split('-').reverse().join('/') : '',
+                    nome_maiusculo: a.nome.toUpperCase()
+                };
+            });
+
+            // Renderiza o documento com o loop da tabela
+            doc.render({
+                turma_label: labelTurma(turmaSelecionada),
+                data_hoje: dataFormatada,
+                alunos: listaFormatada
+            });
+
+            const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            saveAs(out, `boletim-turma-${turmaSelecionada}.docx`);
+            return; // Encerra a função aqui
+        }
+        // --- FIM DA LÓGICA DO BOLETIM DA TURMA ---
+
+        // Se não for boletim de turma, é documento individual
         const { data: aluno, error } = await supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
         if (error || !aluno) throw new Error("Aluno não encontrado.");
 
-        // 2. Busca notas (para boletins)
-        const { data: notasRows } = await supabaseClient.from('notas').select('bimestre, media').eq('aluno_id', alunoId);
-        const notasMap = {};
-        (notasRows || []).forEach(r => notasMap[r.bimestre] = r);
-
-        // 3. Busca o template
         const resp = await fetch(urlTemplate);
         if (!resp.ok) throw new Error(`Template não encontrado na pasta: ${urlTemplate}`);
         
@@ -153,21 +194,41 @@ async function gerarDocumento(alunoId, alunoNome, nomeDoc) {
         const zip = new PizZip(blob);
         const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const dataFormatada = `${dia} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+
         const contexto = {
             ...aluno,
+            data_hoje: dataFormatada,
             data_nascimento_br: aluno.data_nascimento ? aluno.data_nascimento.split('-').reverse().join('/') : '',
             turma_label: labelTurma(aluno.turma || ''),
-            media_b1: notasMap.b1?.media ?? aluno.media_b1 ?? '',
-            media_b2: notasMap.b2?.media ?? aluno.media_b2 ?? '',
-            media_b3: notasMap.b3?.media ?? aluno.media_b3 ?? '',
-            media_b4: notasMap.b4?.media ?? aluno.media_b4 ?? '',
-            media_anual: aluno.media_anual ?? ''
         };
+
+        // Adiciona versões MAIÚSCULAS de todos os campos de texto
+        const camposTexto = [
+            'nome', 'nacionalidade', 'cidade_nascimento', 'endereco', 'bairro', 'cidade', 'estado', 
+            'nome_pai', 'profissao_pai', 'nome_mae', 'profissao_mae', 'responsavel', 'responsavel_outro',
+            'turma_label', 'status'
+        ];
+        const camposNotas = ['portugues', 'matematica', 'historia', 'geografia', 'ciencias', 'ed_fisica', 'ingles', 'arte', 'etica'];
+
+        camposTexto.forEach(campo => {
+            if (contexto[campo]) {
+                contexto[`${campo}_maiusculo`] = String(contexto[campo]).toUpperCase();
+            }
+        });
+
+        camposNotas.forEach(mat => {
+            if (contexto[`status_${mat}`]) {
+                contexto[`status_${mat}`] = String(contexto[`status_${mat}`]).toUpperCase();
+            }
+        });
 
         doc.render(contexto);
         const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
         
-        // No Gestor, a regra é BAIXAR o arquivo
         saveAs(out, `${slug}-${alunoNome.replace(/\s+/g,'_')}.docx`);
 
     } catch (e) {
@@ -209,7 +270,6 @@ async function carregarAvisos() {
         listaSolicitacoes.appendChild(div);
     });
 
-    // Botão Gerar do Aviso
     listaSolicitacoes.querySelectorAll('.btn-gerar').forEach(btn => {
         btn.addEventListener('click', async () => {
             btn.textContent = "Gerando...";
@@ -218,7 +278,6 @@ async function carregarAvisos() {
         });
     });
 
-    // Botão Marcar Entregue do Aviso
     listaSolicitacoes.querySelectorAll('.btn-marcar').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = btn.dataset.id;

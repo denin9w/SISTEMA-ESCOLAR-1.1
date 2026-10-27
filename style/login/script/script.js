@@ -133,3 +133,10 @@ if(input) input.addEventListener("keydown", function (evento){
         entrar();
     }
 });
+
+// --- SEGURANÇA: LIMPAR SESSÃO AO ENTRAR NA TELA DE LOGIN ---
+// Isso garante que se alguém clicar em "Sair", a sessão é destruída.
+localStorage.removeItem("@alunoLogadoId");
+localStorage.removeItem("@alunoLogadoNome");
+localStorage.removeItem("@professorLogado");
+localStorage.removeItem("@gestorLogado");
