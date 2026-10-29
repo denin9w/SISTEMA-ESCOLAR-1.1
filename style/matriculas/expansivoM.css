@@ -4,23 +4,21 @@ body{
     display: grid;
     grid-template-columns: 500px auto;
     grid-template-rows: auto auto auto;
-   
 }
 
+/* CABEÇALHO NO DESKTOP: Azul, sem imagem, texto branco */
 header{
     display: flex;
     flex-direction: column;
     grid-column: 1 / span 1;
     grid-row: 2 / span 1;
     width: 500px;
-  
-    background:url(../../imagens/fundo.png) no-repeat;
-    background-attachment:fixed;
-    background-size: cover; 
+    
+   background: url(../../imagens/fundo.png) center center no-repeat;  /* Fundo azul */
     position: sticky;
     top: 0;
     height:100vh;
-
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
 header.text-fixo{
@@ -30,19 +28,40 @@ header.text-fixo{
     top: 0;
 }
 
+/* Força o texto do header a ficar branco no desktop */
+header h1, 
+header h2 {
+    color: var(--titlecor) !important;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+}
+
 .text-fixo h1{
     font-size: 2.4rem;
 }
+
+/* ÁREA DA FICHA/MAIN NO DESKTOP: Recebe a imagem de fundo */
 main#dados-container{
     display: flex;
     width: auto;
     grid-column: 2 / -1;
     grid-row: 2 / -2;
-
+    
+    background: url(../../imagens/fundo.png) center center no-repeat; /* Imagem transferida para cá */
+    background-size: cover;
+    background-attachment: fixed;
+    padding: 20px;
 }
+
 form#formulario{
     display: flex;
     flex-direction: column;
+    background: var(--fundo-card); /* Fundo branco para o formulário não ficar transparente */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin: 0 auto;
+    width: 100%;
+    max-width: 800px;
 }
 
 nav#MCL{
@@ -54,33 +73,34 @@ nav#MCL{
     grid-row: 1 / span 1;
 }
 
-
 label{
     margin: 0;
     font-size: 0.8rem;
     color: var(--texto);
     font-weight: bold;
 }
+
 .input-aluno{
     width:100%;
     padding: 0.6rem;
     color: var(--texto);
     font-size: 0.9rem;
-    border: 1px solid ;
+    border: 1px solid;
 }
+
 .input-responsavel{
     width: 100%;
     border: 1px solid;
 }
+
 #idata{
     width: 40%;
 }
 
-
-
 .legend{
     font-size: 0.8rem;
 }
+
 label.subtitulo{
     font-size: 0.8rem;
 }
@@ -91,14 +111,12 @@ label.subtitulo{
 
 textarea{
     width: 100%;
-    height: 20%px;
+    height: 200px;
 }
-
 
 footer{
     grid-column: 1 / -1;
     grid-row: 3 / span 1;
     z-index: 1;
-  
 }
 }

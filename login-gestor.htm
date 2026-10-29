@@ -10,27 +10,31 @@
 </head>
 
 <body>
-    <section id="header">
-        <header class="text-fixo">
+    <!-- HEADER -->
+    <header>
+        <div class="text-fixo">
             <h1>Centro Educacional Jardin do Éden</h1>
             <h2>Uma escola de Gerações</h2>
-        </header>
-    </section>
+        </div>
+    </header>
 
-    <section id="ficha">
-        <nav id="MCL">
-            <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
-            <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
-            <a href="login.htm" id="btnSair">Sair <i class="fa-solid fa-door-open"></i></a>
-        </nav>
+    <!-- NAVBAR -->
+    <nav id="MCL">
+        <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
+        <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
+        <a href="login.htm" id="btnSair">Sair <i class="fa-solid fa-door-open"></i></a>
+    </nav>
 
+    <!-- MAIN (Área do Gestor) -->
+    <main id="login-main">
+        <!-- Imagens de fundo decorativas -->
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
         <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
 
         <div class="gestor-container">
             <div class="text-baner">
                 <h1>Bem vindo à Área do Gestor</h1>
-                <p id="gestorNome" style="text-align:center;"></p>
+                <p id="gestorNome" style="text-align:center;">Carregando...</p>
             </div>
 
             <div id="painelAvisos">
@@ -51,7 +55,7 @@
                     </button>
                     <div id="barraBusca">
                         <input type="text" id="buscaAluno" placeholder="Pesquisar aluno pelo nome..." />
-                        <button id="btnPesquisarAluno" class="btn-primario" style="border-radius: 0 50px 50px 0; padding: 12px 20px;">
+                        <button id="btnPesquisarAluno" class="btn-primario">
                             <i class="fa-solid fa-magnifying-glass"></i> Pesquisar
                         </button>
                     </div>
@@ -77,7 +81,6 @@
                     <div id="idocumentos" class="lista-documentos"></div>
                 </div>
 
-                <!-- Nova Área Financeira Global -->
                 <div class="card-gestor" id="cardFinanceiroGlobal" style="display: none; margin-top: 20px;">
                     <h3><i class="fa-solid fa-chart-pie"></i> Relatórios Financeiros Globais</h3>
                     <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Gere relatórios de toda a escola referentes ao mês atual.</p>
@@ -91,16 +94,26 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </main>
 
-            
+    <!-- FOOTER PADRONIZADO -->
+    <footer>
+        <img src="imagens/logoceje.jpeg" alt="logo da escola">
+
+        <div class="text-footer">
+            <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN </h1>
+            <p>Rua Clementino Ricardo de Souza, 134 — Severiano Moraes Filho</p>
+            <p>Fone: (87) 98114-9883 — Cadastro Escolar P-459-058 — CNPJ 05.198.663/0001-86</p>
+            <p>Portaria nº 220 D.O.E. 22/01/2004 — Portaria nº 4160 D.O.E. 06/06/2011</p>
+            <p>CEP: 552900 — Garanhuns — Pernambuco</p>
         </div>
 
-        <footer>
-            <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
-        </footer>
-    </section>
+        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
+        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+    </footer>
 
-    <!-- MODAL DE ADICIONAR ALUNO (COMPLETO) -->
+    <!-- MODAL DE ADICIONAR ALUNO -->
     <div id="modalAddAlunoGestor" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
             <h2><i class="fa-solid fa-user-plus" style="color: var(--destaque);"></i> Matrícula Completa (Gestor)</h2>
@@ -206,6 +219,7 @@
         </div>
     </div>
 
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="documentos/html/templates-docs.js"></script>
     <script src="style/login/script/scriptGestor.js"></script>

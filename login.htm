@@ -7,82 +7,61 @@
     <link rel="stylesheet" href="style/login/login.css">
     <link rel="stylesheet" href="style/login/expansinvo-L.css">
     <title>CEJE - Login</title>
-    <style>
-        #linkCadastroProf {
-            display: none;
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.85rem;
-        }
-        #linkCadastroProf a {
-            color: var(--destaque);
-            font-weight: bold;
-            text-decoration: none;
-        }
-        #linkCadastroProf a:hover { text-decoration: underline; }
-    </style>
 </head>
 
 <body>
-    <header class="text-fixo">
-        <h1>Centro Educacional Jardin do Éden</h1>
-        <h2>Uma escola de Gerações</h2>
+    <header>
+        <div class="text-fixo">
+            <h1>Centro Educacional Jardin do Éden</h1>
+            <h2>Uma escola de Gerações</h2>
+        </div>
     </header>
 
-    <section id="ficha">
-        <nav id="MCL">
-            <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
-            <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
-        </nav>
+    <nav id="MCL">
+        <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
+        <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
+    </nav>
 
-        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-        <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
-
-        <!-- O CARD CENTRALIZADO -->
+    <main id="login-main">
         <div id="login-card">
             <div class="text-banerL">
                 <h1>Faça login</h1>
             </div>
 
             <div class="tabs">
-                <button id="responsavel" class="tab ativa" data-tipo="responsavel">
-                    <p>Responsável</p>
-                </button>
-                <button id="professor" class="tab" data-tipo="professor">
-                    <p>Professor</p>
-                </button>
-                <button id="gestor" class="tab" data-tipo="gestor">
-                    <p>Gestor</p>
-                </button>
+                <button id="responsavel" class="tab ativa" data-tipo="responsavel"><p>Responsável</p></button>
+                <button id="professor" class="tab" data-tipo="professor"><p>Professor</p></button>
+                <button id="gestor" class="tab" data-tipo="gestor"><p>Gestor</p></button>
             </div>
 
             <div id="loginForm">
                 <div class="input-one">
                     <label for="usuario">CPF</label>
-                    <input
-                        class="input-l"
-                        type="text"
-                        id="usuario"
-                        autocomplete="off"
-                        placeholder="Digite seu CPF"
-                    >
+                    <input class="input-l" type="text" id="usuario" autocomplete="off" placeholder="Digite seu CPF">
                 </div>
-
                 <button class="input-b" type="button">Entrar</button>
-
+                
                 <div id="linkCadastroProf">
-                    <a href="cadastro-professor.htm">
-                    <i class="fa-solid fa-user-plus"></i> Ainda não tem cadastro? Clique Aqui.
-                    </a>
+                    <a href="cadastro-professor.htm"><i class="fa-solid fa-user-plus"></i> Ainda não tem cadastro? Clique Aqui.</a>
                 </div>
             </div>
         </div>
+    </main>
 
+    <footer>
+        <img src="imagens/logoceje.jpeg" alt="logo da escola">
 
-        <footer>
-            <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
-        </footer>
-    </section>
+        <div class="text-footer">
+            <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN </h1>
+            <p>Rua Clementino Ricardo de Souza, 134 — Severiano Moraes Filho</p>
+            <p>Fone: (87) 98114-9883 — Cadastro Escolar P-459-058 — CNPJ 05.198.663/0001-86</p>
+            <p>Portaria nº 220 D.O.E. 22/01/2004 — Portaria nº 4160 D.O.E. 06/06/2011</p>
+            <p>CEP: 552900 — Garanhuns — Pernambuco</p>
+        </div>
+
+        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
+        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+    </footer>
 
     <script src="style/login/script/script.js"></script>
     <script>
@@ -92,7 +71,6 @@
             const abaResp = document.getElementById('responsavel');
             const abaGest = document.getElementById('gestor');
             if (!link) return;
-
             function atualizar() {
                 link.style.display = abaProf && abaProf.classList.contains('ativa') ? 'block' : 'none';
             }

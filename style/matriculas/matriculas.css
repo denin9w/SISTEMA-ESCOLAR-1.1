@@ -1,30 +1,43 @@
 @import url(../principal/style.css);
-@import url(../principal/style.css);
 
-
+/* ÁREA DA FICHA/MAIN (Mobile e Padrão): Recebe a imagem de fundo */
 main#dados-container{
     display: flex;
     flex-direction: column;
     width: 100vw;
+    min-height: 100vh;
     padding: 1rem;
     justify-content: center;
     align-items: center;
-   
+    
+    background: url(../../imagens/fundo.png) center center no-repeat; /* Imagem de fundo no mobile */
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 main#dados-container h1{
     font-size: 2.2rem;
     text-align: center;
     color: var(--titlecor);
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
+
 fieldset.dados-aluno{
     border: 2px dashed var(--destaque);
     border-radius: 10px;
     padding: 10px;
+    background: var(--fundo-card); /* Fundo branco para o fieldset */
 }
+
 form#formulario{
     display: flex;
     flex-direction: column;
+    background: var(--fundo-card); /* Fundo branco para o form no mobile */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 800px;
 }
 
 legend.titulo{
@@ -33,6 +46,7 @@ legend.titulo{
     padding: 0 10px;
     color: var(--destaque);
 }
+
 .etapa2 legend{
     font-size: 1.1rem;
 }
@@ -49,6 +63,7 @@ label{
     color: var(--texto);
     font-weight: bold;
 }
+
 .input-aluno{
     width: 100%;
     padding: 0.6rem;
@@ -63,7 +78,6 @@ div.linha-dupla{
     display: flex;
     gap: 5px;
     margin-top: 20px;
-
 }
 
 .input-responsavel{
@@ -74,7 +88,6 @@ div.linha-dupla{
     font-size: 1rem;
     border-radius: 20px;
     border:0.2rem solid var(--texto);
-  
 }
 
 select#iresponsavel{
@@ -83,12 +96,12 @@ select#iresponsavel{
     font-size: 1rem;
     border-radius: 4px;
 } 
+
 input#iresponsavelO{
     width: 100%;
     padding: 10px;
     border-radius: 4px;
     border: 1px solid var(--texto);
-
 }
 
 legend{
@@ -101,19 +114,23 @@ legend{
     justify-self: start;
     padding: 0;
 }
+
 div.sexo{
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
+
 div.sexo-m{
     display: flex;
     align-items: center;
 }
+
 div.sexo-f{
     display: flex;
     align-items: center;
 }
+
 label.subtitulo{
     margin: 0;
     font-size: 1.2rem;
@@ -139,49 +156,67 @@ textarea{
     height: 200px;
 }
 
-
 div.botoes{
+    
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-self: center;
+    margin-top: 10px;
+    gap: 10px;
+  
+
+  
 }
+
+div.botoes button{
+    background-color: none;
+    color: var(--texto);
+    padding: 10px;
+    background-color: var(--fundo-card);
+    border-radius: 25px;
+}
+
 button#btnProximo{
- 
     font-size: 1.2rem;
-    margin-top: 2rem;
     border: none;
+   
     cursor: pointer;
     text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
-
+    
+  
 }
+
 button#btnProximo:hover{
     color: var(--destaque);
+    scale: 1.05;
 }
+
 button#btnVoltar{
-   font-size: 1.2rem;
-    margin-top: 2rem;
+    font-size: 1.2rem;
     border: none;
     cursor: pointer;
     text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
-    display:none;
-
+    display: none;
 }
+
 button#btnVoltar:hover{
     color: var(--destaque);
+   scale: 1.05;
 }
+
 button#btnFinalizar{
     font-size: 1.2rem;
-    margin-top: 2rem;
     border: none;
     cursor: pointer;
     text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
-    display:none;
-
+    display: none;
 }
+
 button#btnFinalizar:hover{
-    color: var(--destaque);
+   color: var(--destaque);
+    scale: 1.05;
 }
 
 div.etapa2{
-    display:none;
+    display: none;
 }

@@ -8,95 +8,152 @@
     <link rel="stylesheet" href="style/login/expansinvo-L.css">
     <title>CEJE - Cadastro de Professor</title>
     <style>
-        /* Ajustes só desta página — não alteram o CSS global */
-        #cadastroBox {
+        /* Ajustes específicos para o formulário de cadastro dentro do card */
+        #login-card {
+            max-width: 500px; /* Um pouco mais largo para caber o formulário */
+        }
+
+        #formCadastroProf {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            width: 90%;
-            max-width: 520px;
-            margin: 20px auto;
-            padding: 20px;
-            background: var(--titlecor);
-            border-radius: 8px;
-            color: var(--texto-inverso);
+            width: 100%;
         }
-        #cadastroBox label {
+
+        #formCadastroProf label {
             font-weight: bold;
             font-size: 0.95rem;
-            margin-top: 6px;
+            color: var(--titlecor);
+            margin-left: 5px;
         }
-        #cadastroBox input[type="text"],
-        #cadastroBox input[type="email"],
-        #cadastroBox input[type="tel"] {
+
+        #formCadastroProf input[type="text"],
+        #formCadastroProf input[type="email"],
+        #formCadastroProf input[type="tel"] {
             width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: none;
-            font-size: 1rem;
+            padding: 12px 15px;
+            border-radius: 50px;
+            border: 1px solid #ccc;
+            font-size: 0.95rem;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
         }
-        #cadastroBox fieldset {
-            border: 1px dashed var(--destaque-inverso);
-            border-radius: 6px;
-            padding: 10px;
+
+        #formCadastroProf input:focus {
+            outline: none;
+            border-color: var(--destaque);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 119, 255, 0.1);
         }
-        #cadastroBox legend {
+
+        #formCadastroProf fieldset {
+            border: 1px dashed var(--destaque);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        #formCadastroProf legend {
             font-weight: bold;
-            color: var(--texto-inverso);
+            color: var(--titlecor);
             padding: 0 6px;
+            font-size: 0.95rem;
         }
+
         .turmas-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 6px 12px;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 6px 10px;
             margin-top: 8px;
         }
+
         .turmas-grid label {
             font-weight: normal;
             display: flex;
             align-items: center;
             gap: 6px;
+            font-size: 0.85rem;
+            margin-left: 0;
+            color: var(--texto);
+        }
+
+        .turmas-grid input[type="checkbox"] {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--destaque);
+        }
+
+        #btnCadastrar {
+            margin-top: 15px;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            background: var(--titlecor);
+            color: var(--texto-inverso);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #btnCadastrar:hover { 
+            background: var(--destaque); 
+        }
+        
+        #btnCadastrar:disabled { 
+            opacity: 0.6; 
+            cursor: wait; 
+        }
+
+        .msg-erro { 
+            color: #dc3545; 
+            font-weight: bold; 
+            margin-top: 8px; 
+            text-align: center;
             font-size: 0.9rem;
         }
-        #btnCadastrar {
-            margin-top: 14px;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            background: var(--fundo-card);
-            color: var(--texto);
-            font-size: 1.1rem;
-            cursor: pointer;
+
+        #linkVoltar {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
         }
-        #btnCadastrar:hover { background: var(--destaque-inverso); }
-        #btnCadastrar:disabled { opacity: 0.6; cursor: wait; }
-        .msg-erro { color: #ffb3b3; font-weight: bold; margin-top: 8px; }
+
+        #linkVoltar a {
+            color: var(--destaque);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        #linkVoltar a:hover {
+            color: var(--titlecor);
+        }
     </style>
 </head>
+
 <body>
-    <header class="text-fixo">
-        <h1>Centro Educacional Jardin do Éden</h1>
-        <h2>Uma escola de Gerações</h2>
+    <header>
+        <div class="text-fixo">
+            <h1>Centro Educacional Jardin do Éden</h1>
+            <h2>Uma escola de Gerações</h2>
+        </div>
     </header>
 
-    <section id="ficha">
-        <nav id="MCL">
-            <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
-            <a href="login.htm">Login <i class="fa-solid fa-key"></i></a>
-        </nav>
+    <nav id="MCL">
+        <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
+        <a href="login.htm">Login <i class="fa-solid fa-key"></i></a>
+    </nav>
 
-        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+    <main id="login-main">
+        <div id="login-card">
+            <div class="text-banerL">
+                <h1>Cadastro de Professor</h1>
+                <p style="text-align:center; color:var(--texto); margin-top:8px; font-size: 0.9rem; line-height: 1.2;">
+                    Preencha seus dados. O gestor irá autorizar seu acesso.
+                </p>
+            </div>
 
-        <div class="text-banerL">
-            <h1>Cadastro de Professor</h1>
-            <p style="text-align:center; color:var(--texto); margin-top:8px;">
-                Preencha seus dados. O gestor irá autorizar seu acesso.
-            </p>
-        </div>
-
-        <form id="formCadastroProf" autocomplete="off">
-            <div id="cadastroBox">
+            <form id="formCadastroProf" autocomplete="off">
                 <label for="nomeProf">Nome completo:</label>
                 <input type="text" id="nomeProf" required placeholder="Seu nome completo">
 
@@ -117,16 +174,27 @@
                 <button type="submit" id="btnCadastrar">Cadastrar</button>
                 <div class="msg-erro" id="msgErro" style="display:none;"></div>
 
-                <a class="back" href="login.htm" style="color:var(--texto-inverso); text-align:center; margin-top:10px;">
-                    Já tem cadastro? Voltar ao login
-                </a>
-            </div>
-        </form>
+                <div id="linkVoltar">
+                    <a href="login.htm">Já tem cadastro? Voltar ao login</a>
+                </div>
+            </form>
+        </div>
+    </main>
 
-        <footer>
-            <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
-        </footer>
-    </section>
+    <footer>
+        <img src="imagens/logoceje.jpeg" alt="logo da escola">
+
+        <div class="text-footer">
+            <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN </h1>
+            <p>Rua Clementino Ricardo de Souza, 134 — Severiano Moraes Filho</p>
+            <p>Fone: (87) 98114-9883 — Cadastro Escolar P-459-058 — CNPJ 05.198.663/0001-86</p>
+            <p>Portaria nº 220 D.O.E. 22/01/2004 — Portaria nº 4160 D.O.E. 06/06/2011</p>
+            <p>CEP: 552900 — Garanhuns — Pernambuco</p>
+        </div>
+
+        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
+        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+    </footer>
 
     <script src="style/login/script/cadastro-professor.js"></script>
 </body>

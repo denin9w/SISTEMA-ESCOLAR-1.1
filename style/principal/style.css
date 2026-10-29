@@ -172,11 +172,67 @@ nav#MCL a:hover{
   color: var(--destaque-inverso);
 }
 
-footer{
-  text-align: center;
-  background-color: var(--titlecor);
-  color: white;
-  font-family: var(--font-subtitulo);
-  margin-top: 20px;
-  
+footer {
+    width: 100%;
+    max-height: 220px; /* Mantém o limite */
+    box-sizing: border-box;
+    background-color: var(--fundo-card);
+    color: var(--titlecor);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    
+    gap: 20px;
+    padding: 15px 30px;
+    margin-top: auto;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Mantém a logo da escola, mas com um tamanho menor */
+footer > img:first-child {
+    width: 90px; /* Reduzido para sobrar mais espaço para o texto */
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Container do Texto */
+footer div.text-footer {
+    color: var(--titlecor);
+    flex: 1; 
+    min-width: 0; /* Permite encolher no flexbox */
+             
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px; /* Menos espaço entre as linhas */
+}
+
+footer div.text-footer h1 {
+    margin: 0;
+    font-size: 1rem; /* Fonte do título um pouco menor */
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Texto do endereço e CNPJ - Fonte bem pequena para caber tudo */
+footer div.text-footer p {
+    margin: 0;
+    font-size: 0.68rem; /* Fonte reduzida */
+    line-height: 1.2;
+    color: rgba(0, 0, 0, 0.7);
+    white-space: pre-line;
+    overflow-wrap: break-word;
+}
+
+/* ============================================================
+   ESCONDE OS BONECOS DO FOOTER (Conforme sua solicitação)
+   ============================================================ */
+footer img.boneco,
+footer img.moeda {
+    display: none !important;
 }

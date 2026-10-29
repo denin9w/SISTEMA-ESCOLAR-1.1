@@ -1,88 +1,122 @@
-@media screen and (min-width: 764px){
-    body{
+@media screen and (min-width: 764px) {
+    body {
         display: grid;
         width: 100vw;
         min-height: 100vh;
         grid-template-columns: 400px auto;
-        grid-template-rows: auto auto;
+        grid-template-rows: auto auto auto;
     }
 
-    header{
+    /* NAV na linha 1, span 2 colunas (igual matrícula) */
+    nav#MCL {
+        grid-column: 1 / span 2;
+        grid-row: 1 / span 1;
+        position: sticky;
+        top: 0;
+        width: auto;
+        justify-content: space-evenly;
+    }
+
+    /* HEADER na coluna 1, abaixo do nav */
+    header {
         width: 400px;
-        height: 100%;
-        grid-row: 1 / -1;
-        grid-column: 1 / 2;
-        background: url(../../imagens/fundo.png);
+        grid-column: 1 / span 1;
+        grid-row: 2 / span 1;
+        background: url(../../imagens/fundo.png) center center no-repeat;
+        background-size: cover;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     }
 
-    .text-fixo h1{
+    .text-fixo h1 {
         font-size: 3rem;
         margin-bottom: 20px;
     }
 
-    .text-fixo h2{
+    .text-fixo h2 {
         font-size: 1.5rem;
     }
 
-    section#ficha{
-        display: flex;
+    /* MAIN na coluna 2: fundo + card centralizado */
+    main#login-main {
+        grid-column: 2 / -1;
+        grid-row: 2 / span 1;
         width: auto;
-        height: 100%;
-        grid-row: 1 / -1;
-        grid-column: 2 / 3;
-        background: var(--fundo);
-        position: relative;
-        justify-content: space-between;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        background: url(../../imagens/fundo.png) center center no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
     }
 
-    img.moeda{
+    /* Card centralizado sem perder a estrutura interna */
+    #login-card {
+        margin: 0 auto;
+    }
+
+    /* Imagens decorativas do main (não do footer) */
+    main#login-main img.moeda {
         position: absolute;
         bottom: 60px;
         right: 20px;
         width: 4rem;
     }
 
-    img.boneco{
+    main#login-main img.boneco {
         position: absolute;
         top: 100px;
+        left: 5%;
         width: 6rem;
     }
 
-    div.text-baner h1{
-        color: var(--texto-inverso);
-        font-size: 3.5rem;
-    }
-
-    div#login{
-        width: 350px;
-        height: 219px;
-        justify-self: center;
-    }
-
-    div.tabs{
+    /* Botões das abas no desktop */
+    div.tabs {
         gap: 10px;
-        margin: 30px 0px 30px 0px;
+        margin: 30px 0;
         justify-self: center;
     }
 
-    button.tab{
-        background-color: transparent;
+    button.tab {
         flex: 1;
         font-size: 0.8rem;
-        background-color: var(--fundo-card);
+        background-color: var(--fundo-principal);
         color: var(--texto);
         padding: 14px;
-        border-radius: 8px;
-        border: 1px solid;
+        border-radius: 25px;
+
+   
     }
 
-    footer p{
+    /* FOOTER span 2 colunas, igual matrícula */
+    footer {
+        grid-column: 1 / -1;
+        grid-row: 3 / span 1;
+        z-index: 1;
+        position: static;
+        width: 100%;
+        text-align: left;
+        background: var(--fundo-card);
+        color: var(--titlecor);
+        padding: 20px;
+    }
+
+    footer p {
         font-size: 0.8rem;
     }
 }
 
-@media (min-width: 764px) and (max-width: 887px){
-    img.moeda{
+@media (min-width: 764px) and (max-width: 887px) {
+    main#login-main img.moeda {
         position: absolute;
         right: -1%;
         bottom: 60px;
@@ -90,9 +124,8 @@
     }
 }
 
-/* >>> CORRIGIDO: max-width sem unidade era ignorado pelo navegador */
-@media screen and (min-width: 888px) and (max-width: 949px){
-    img.moeda{
+@media screen and (min-width: 888px) and (max-width: 949px) {
+    main#login-main img.moeda {
         position: absolute;
         right: 6%;
         bottom: 70px;
@@ -100,15 +133,14 @@
     }
 }
 
-/* >>> CORRIGIDO: max-width sem unidade era ignorado pelo navegador */
-@media screen and (min-width: 950px) and (max-width: 1110px){
-    img.boneco{
+@media screen and (min-width: 950px) and (max-width: 1110px) {
+    main#login-main img.boneco {
         position: absolute;
         width: 7rem;
         top: 110px;
         left: 10%;
     }
-    img.moeda{
+    main#login-main img.moeda {
         position: absolute;
         right: 6%;
         bottom: 70px;
@@ -116,15 +148,15 @@
     }
 }
 
-@media screen and (min-width: 1111px){
-    img.boneco{
+@media screen and (min-width: 1111px) {
+    main#login-main img.boneco {
         position: absolute;
         width: 7rem;
         top: 110px;
         left: 10%;
     }
 
-    img.moeda{
+    main#login-main img.moeda {
         position: absolute;
         left: 80%;
         bottom: 40px;

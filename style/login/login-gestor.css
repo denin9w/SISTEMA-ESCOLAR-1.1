@@ -1,45 +1,43 @@
 @import url(../login/login-responsavel.css);
 
 /* ============================================================
-   LAYOUT PRINCIPAL
+   TRAVA DO MENU NO TOPO (O que você pediu)
    ============================================================ */
-section#ficha {
-    display: flex;
-    flex-direction: column; /* Importante para empilhar e empurrar o footer */
-    width: auto;
-    min-height: 100vh;
-    position: relative;
-    background: url(../../imagens/fundo.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    
-    /* Removemos o padding-bottom daqui, pois o footer cuidará disso */
-    padding-bottom: 0;
-}
-
-/* CORREÇÃO DO MENU: Garante que ele fique sempre acima de tudo */
 nav#MCL {
-    position: sticky;
-    top: 0;
-    z-index: 9999 !important; 
-    background-color: var(--titlecor); 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: sticky !important;  /* Faz o menu colar no topo ao rolar */
+    top: 0 !important;            /* Cola no topo da tela */
+    z-index: 9999 !important;     /* Garante que ele fique por cima de TUDO */
     width: 100%;
 }
 
-/* Container que empurra o conteúdo para baixo do menu azul */
+/* ============================================================
+   LAYOUT PRINCIPAL (Blindado)
+   ============================================================ */
+main#login-main {
+    display: block; 
+    width: 100%;
+    min-height: calc(100vh - 100px); 
+    position: relative;
+    background: url(../../imagens/fundo.png) center center no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    margin: 0 !important; 
+    padding: 0 !important;
+    z-index: 1;
+}
+
+/* Container do gestor */
 .gestor-container {
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
-    padding: 30px 20px;
-    z-index: 1;
+    padding: 40px 20px; 
+    z-index: 2;
     position: relative;
-    flex: 1; /* Faz esse container ocupar todo o espaço disponível */
 }
 
-img.boneco {
+/* Imagens decorativas soltas no fundo (Desktop) */
+main#login-main > img.boneco {
     position: absolute;
     width: 6rem;
     top: 150px; 
@@ -48,7 +46,7 @@ img.boneco {
     opacity: 0.3;
 }
 
-img.moeda {
+main#login-main > img.moeda {
     position: absolute;
     z-index: 0;
     right: -2px;
@@ -80,10 +78,6 @@ div.text-baner h1 {
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin-bottom: 30px;
-}
-
-@media (max-width: 780px) {
-    #painelAvisos { grid-template-columns: 1fr; }
 }
 
 .aviso-painel {
@@ -141,12 +135,14 @@ div.text-baner h1 {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    overflow: hidden;
 }
 
 .toolbar-row {
     display: flex;
     gap: 15px;
     align-items: center;
+    width: 100%;
 }
 
 .btn-primario {
@@ -160,6 +156,7 @@ div.text-baner h1 {
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     transition: background 0.2s;
     white-space: nowrap;
@@ -169,19 +166,29 @@ div.text-baner h1 {
 #barraBusca {
     display: flex;
     flex: 1;
+    min-width: 0;
+    border: 1px solid var(--titlecor);
+    border-radius: 50px;
+    overflow: hidden;
+    background: #fff;
 }
 
 #buscaAluno {
     flex: 1;
     padding: 12px 20px;
-    border-radius: 50px 0 0 50px;
-    border: 1px solid var(--titlecor);
-    border-right: none;
+    border: none;
     font-size: 1rem;
     outline: none;
+    min-width: 0;
 }
 #buscaAluno:focus {
-    border-color: var(--destaque);
+    box-shadow: inset 0 0 0 1px var(--destaque);
+}
+
+#btnPesquisarAluno {
+    border-radius: 0;
+    border: none;
+    padding: 12px 25px;
 }
 
 .filtro-turma {
@@ -289,25 +296,71 @@ div.text-baner h1 {
 }
 
 /* ============================================================
-   LINK VOLTAR E FOOTER
+   FOOTER PADRONIZADO (AJUSTADO PARA NÃO CORTAR)
    ============================================================ */
-a.back {
-    display: block;
-    margin: 40px auto 20px auto;
-    text-align: center;
-    color: var(--titlecor);
-    font-weight: bold;
-    text-decoration: none;
-}
-
 footer {
     width: 100%;
-    background-color: var(--titlecor);
-    color: white;
-    text-align: center;
-    padding: 15px 0;
-    margin-top: auto; /* A MÁGICA ACONTECE AQUI: Empurra o footer pro final da tela */
+    max-height: 220px; /* Mantém o limite */
+    box-sizing: border-box;
+    background-color: var(--fundo-card);
+    color: var(--titlecor);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    
+    gap: 20px;
+    padding: 15px 30px;
+    margin-top: auto;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Mantém a logo da escola, mas com um tamanho menor */
+footer > img:first-child {
+    width: 90px; /* Reduzido para sobrar mais espaço para o texto */
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Container do Texto */
+footer div.text-footer {
+    color: var(--titlecor);
+    flex: 1; 
+    min-width: 0; /* Permite encolher no flexbox */
+             
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px; /* Menos espaço entre as linhas */
+}
+
+footer div.text-footer h1 {
+    margin: 0;
+    font-size: 1rem; /* Fonte do título um pouco menor */
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Texto do endereço e CNPJ - Fonte bem pequena para caber tudo */
+footer div.text-footer p {
+    margin: 0;
+    font-size: 0.68rem; /* Fonte reduzida */
+    line-height: 1.2;
+    color: rgba(0, 0, 0, 0.7);
+    white-space: pre-line;
+    overflow-wrap: break-word;
+}
+
+/* ============================================================
+   ESCONDE OS BONECOS DO FOOTER (Conforme sua solicitação)
+   ============================================================ */
+footer img.boneco,
+footer img.moeda {
+    display: none !important;
 }
 
 /* ============================================================
@@ -425,11 +478,70 @@ footer {
    RESPONSIVO (Mobile)
    ============================================================ */
 @media (max-width: 780px) {
-    .gestor-container { padding: 15px; margin-top: 10px; }
+    #painelAvisos { grid-template-columns: 1fr; }
+    
+    main#login-main {
+        min-height: calc(100vh - 60px); 
+    }
+
+    .gestor-container { 
+        padding: 20px 15px; 
+    }
+    
     .toolbar-row { flex-direction: column; align-items: stretch; }
-    #barraBusca { flex-direction: column; gap: 10px; }
-    #buscaAluno { border-radius: 50px; border-right: 1px solid var(--titlecor); }
-    #btnPesquisarAluno { border-radius: 50px !important; justify-content: center; }
+    
+    #barraBusca { 
+        flex-direction: column; 
+        gap: 10px; 
+        border: none;
+        overflow: visible;
+        background: transparent;
+    }
+    
+    #buscaAluno { 
+        border-radius: 50px; 
+        border: 1px solid var(--titlecor);
+        width: 100%;
+    }
+    
+    #btnPesquisarAluno { 
+        border-radius: 50px !important; 
+        justify-content: center; 
+        width: 100%;
+    }
+    
     .grid-2col { grid-template-columns: 1fr; }
-    img.boneco, img.moeda { display: none; }
+    
+    main#login-main > img.boneco, 
+    main#login-main > img.moeda { 
+        display: none; 
+    }
+
+    footer {
+        flex-direction: column; /* No celular empilha logo e texto */
+        max-height: none; /* No celular pode crescer para não cortar */
+        padding: 20px 15px;
+        gap: 10px;
+        text-align: center;
+    }
+
+    footer > img:first-child {
+        width: 80px;
+    }
+
+    footer div.text-footer {
+        width: 100%;
+        min-width: 0;
+    }
+
+    footer div.text-footer h1 {
+        font-size: 0.95rem;
+        white-space: normal;        
+    }
+
+    footer div.text-footer p {
+        font-size: 0.7rem;
+        white-space: normal;
+        line-height: 1.3;
+    }
 }
