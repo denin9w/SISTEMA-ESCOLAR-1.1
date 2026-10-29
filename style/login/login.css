@@ -1,182 +1,313 @@
 @import url(../principal/style.css);
-:root{
 
+:root {
   --fundo-principal: #f5f5f5;
-  --texto:#222222;
-  --texto-inverso:#ffffff;
-  --titlecor:#003869;
-  --btncor:#fd269c;
-  --destaque:#0077ff;
-  --destaque-inverso:#66bbff;
-  --fundo-card:#ffffff;
+  --texto: #222222;
+  --texto-inverso: #ffffff;
+  --titlecor: #003869;
+  --btncor: #fd269c;
+  --destaque: #0077ff;
+  --destaque-inverso: #66bbff;
+  --fundo-card: #ffffff;
 
-  --font-titulos:"Sacramento", cursive, sans-serif;
-  --font-subtitulo:"Teachers", sans-serif;
-  --font-botoes:"Roboto", sans-serif;
-
+  --font-titulos: "Sacramento", cursive, sans-serif;
+  --font-subtitulo: "Teachers", sans-serif;
+  --font-botoes: "Roboto", sans-serif;
 }
 
-
-section#ficha{
-    display: flex;
-    flex-direction: column;
-    width: auto;
-    min-height: 100vh;
-    justify-content: space-between;
-    position: relative;
-    background: url(../../imagens/fundo.png);
-    background-size:auto;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    border: 1px dashed rebeccapurple;
-
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-
-nav#MCL{
+body {
     width: 100%;
+    min-height: 100vh;
+    background-color: var(--fundo-principal);
+    font-family: var(--font-subtitulo);
+    display: flex;
+    flex-direction: column;
 }
 
-img.boneco{
-    position: absolute;
-    width: 6rem;
-    top: 60px;
-    left: -5px;
-  
-
-}
-img.moeda{
-  position: absolute;
-  width: 4rem;
-  bottom: 60px;
-  right: -2px;
-  padding: 0px;
-}
-
-
-
-
-div.text-banerL h1{
-    margin-top: 40px;
-    font-size: 2.2rem;
-    color: var(--titlecor);
+section#ficha {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    background: url(../../imagens/fundo.png) center center no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
     
-}
-
-
-div.tabs{
-    gap:10px;
-    margin:40px 0px 40px 0px;
-    justify-self: center;
-}
-
-.tab{
-    background-color:transparent;
-    flex:1;
-    font-size:0.9rem;
-    background-color:var(--titlecor);
-    color:var(--texto-inverso);
-    padding:20px;
-    border-radius:8px;
-    border: none;
-    cursor: pointer;
-}
-.tab:hover{
-    background-color: var(--titlecor);
-    color: var(--texto-inverso);
-}
-
-#loginForm{
-    display: flex;
-    flex-direction: column;
-    justify-self: center;
+    /* Centraliza o card no meio da tela */
     align-items: center;
-    padding: 20px 0px 20px 0px;
-    width: 90%;
-    gap: 20px;
-    border-radius: 6px;
-    background-color: var(--titlecor);
-
+    justify-content: center;
+    
+    /* Padding para não cobrir o menu superior e o footer */
+    padding: 80px 20px 60px 20px; 
 }
-.input-one,
-.input-two{
-    width: 90%;
+
+/* Overlay para escurecer um pouco o fundo e destacar o card */
+section#ficha::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+}
+
+/* Imagens do fundo */
+img.boneco {
+    position: absolute;
+    width: 7rem;
+    top: 15%;
+    left: 5%;
+    z-index: 10;
+}
+img.moeda {
+    position: absolute;
+    width: 5rem;
+    bottom: 15%;
+    right: 5%;
+    z-index: 15;
+}
+
+/* NAVBAR */
+nav#MCL {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    text-align: start;
-}
-.input-one label,
-.input-two label{
-    margin-bottom: 0px;
-    color: white;
-    font-size: 1.3em;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.157);
-}
-input.input-l{
-    border-radius: 4px;
-    width: 100% ;
-    height: 50px;
-    font-size: 1.5em;
-    background-color:transparent;
-    border:none;
-    box-shadow: rgba(243, 242, 242, 0.039) 0px 1px 3px;
+    justify-content: center;
+    gap: 30px;
+    background-color: var(--titlecor);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    height: 60px;
+    align-items: center;
+    z-index: 10;
 }
 
-.input-l:hover{
-    outline: none;
-    box-shadow: none;
-    border-bottom: 1px solid white;
-}
-.input-l:focus{
-    outline: none;
-    box-shadow: none;
-    color: white;
-}
-
-.input-b{
-    border-radius: 10px;
-    width: 80% ;
-    padding: 15px;
-    font-size: 1.2em;
-    margin-top: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.21);
-    background-color:var(--fundo-card);
-    color:var(--texto);
-}
-
-button.input-b:hover{
-    background-color:var(--destaque-inverso);
-    transition: 0.3s;
-}
-
-
-
-a.back{
-
+nav#MCL a {
+    color: var(--texto-inverso);
     text-decoration: none;
+    font-size: 1rem;
     font-weight: bold;
-    color:var(--texto);
-    font-size: 1.1rem;
-    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-a.back:hover{
+nav#MCL a:hover {
     color: var(--destaque-inverso);
 }
 
-#responsavel, #professor, #gestor{
-    cursor: pointer;
+/* ============================================================
+   CARD CENTRALIZADO (Abas + Inputs)
+   ============================================================ */
+#login-card {
+    position: relative;
+    z-index: 5;
+    background: var(--fundo-card);
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    
+    /* Margem de segurança caso a tela seja muito pequena */
+    margin: auto 0; 
 }
 
-.ativa{
+.text-banerL {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.text-banerL h1 {
+    font-size: 3rem;
+    color: var(--titlecor);
+    font-family: var(--font-titulos);
+    line-height: 1.2;
+    font-weight:lighter;
+}
+
+/* ABAS */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    justify-content: center;
+    width: 100%;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px 5px;
+    border: none;
+    border-radius: 25px;
+    background-color:var(--fundo-principal);
+    color: #555;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    background-color: #e1eaf5;
+}
+
+.tab.ativa {
     background-color: var(--destaque);
     color: var(--texto-inverso);
+    box-shadow: 0 4px 10px rgba(0, 119, 255, 0.3);
 }
 
-
-
-footer{
+/* FORMULÁRIO */
+#loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     width: 100%;
-    margin:0px;
 }
 
+.input-one {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-one label {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: var(--titlecor);
+    margin-left: 5px;
+}
+
+.input-l {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: all 0.3s;
+}
+
+.input-l:focus {
+    outline: none;
+    border-color: var(--destaque);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(0, 119, 255, 0.1);
+}
+
+/* BOTÃO ENTRAR */
+button.input-b {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 50px;
+    background-color: var(--titlecor);
+    color: var(--texto-inverso);
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+button.input-b:hover {
+    background-color: var(--destaque);
+}
+
+button.input-b:disabled {
+    background-color: #ccc;
+    cursor: wait;
+}
+
+/* Links e Footer */
+a.back {
+    position: relative;
+    z-index: 5;
+    margin-top: 25px;
+    color: var(--titlecor);
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+a.back:hover {
+    color: var(--destaque);
+}
+
+#linkCadastroProf {
+    text-align: center;
+    margin-top: 15px; /* Dá um pequeno respiro do botão Entrar */
+    font-size: 0.85rem;
+    line-height: 1.2; /* Deixa a linha mais compacta se precisar quebrar no celular */
+}
+
+#linkCadastroProf a {
+    color: var(--destaque);
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; /* Espaço entre o ícone e a palavra */
+    flex-wrap: wrap; /* Permite quebrar linha apenas se a tela for minúscula */
+    justify-content: center;
+}
+
+#linkCadastroProf a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    background: var(--titlecor);
+    color: #fff;
+    padding: 10px 0;
+    z-index: 10;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   RESPONSIVIDADE (CELULARES)
+   ============================================================ */
+@media (max-width: 600px) {
+    img.boneco, img.moeda {
+        display: block; /* Esconde imagens de fundo */
+    }
+
+    #login-card {
+        padding: 30px 20px;
+    }
+
+    .text-banerL h1 {
+        font-size: 1.8rem;
+    }
+
+    .tab {
+        font-size: 0.75rem;
+        padding: 10px 2px;
+    }
+
+    .input-l {
+        padding: 12px 15px;
+        font-size: 0.95rem;
+    }
+}

@@ -9,10 +9,10 @@
     <title>CEJE - Login</title>
     <style>
         #linkCadastroProf {
-            display: none;                /* JS mostra quando aba Professor ativa */
+            display: none;
             text-align: center;
-            margin-top: 12px;
-            font-size: 0.95rem;
+            margin-top: 15px;
+            font-size: 0.85rem;
         }
         #linkCadastroProf a {
             color: var(--destaque);
@@ -30,7 +30,6 @@
     </header>
 
     <section id="ficha">
-
         <nav id="MCL">
             <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
             <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
@@ -39,23 +38,24 @@
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
         <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
 
-        <div class="text-banerL">
-            <h1>Faça login</h1>
-        </div>
+        <!-- O CARD CENTRALIZADO -->
+        <div id="login-card">
+            <div class="text-banerL">
+                <h1>Faça login</h1>
+            </div>
 
-        <div class="tabs">
-            <button id="responsavel" class="tab ativa" data-tipo="responsavel">
-                <p>Responsável</p>
-            </button>
-            <button id="professor" class="tab" data-tipo="professor">
-                <p>Professor</p>
-            </button>
-            <button id="gestor" class="tab" data-tipo="gestor">
-                <p>Gestor</p>
-            </button>
-        </div>
+            <div class="tabs">
+                <button id="responsavel" class="tab ativa" data-tipo="responsavel">
+                    <p>Responsável</p>
+                </button>
+                <button id="professor" class="tab" data-tipo="professor">
+                    <p>Professor</p>
+                </button>
+                <button id="gestor" class="tab" data-tipo="gestor">
+                    <p>Gestor</p>
+                </button>
+            </div>
 
-        <div id="login">
             <div id="loginForm">
                 <div class="input-one">
                     <label for="usuario">CPF</label>
@@ -64,6 +64,7 @@
                         type="text"
                         id="usuario"
                         autocomplete="off"
+                        placeholder="Digite seu CPF"
                     >
                 </div>
 
@@ -71,13 +72,12 @@
 
                 <div id="linkCadastroProf">
                     <a href="cadastro-professor.htm">
-                        <i class="fa-solid fa-user-plus"></i> Ainda não tem cadastro? Cadastre-se como professor
+                    <i class="fa-solid fa-user-plus"></i> Ainda não tem cadastro? Clique Aqui.
                     </a>
                 </div>
             </div>
         </div>
 
-        <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
 
         <footer>
             <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
@@ -86,8 +86,6 @@
 
     <script src="style/login/script/script.js"></script>
     <script>
-        // Mostra o link "Cadastrar-se" apenas quando a aba Professor está ativa.
-        // Não mexe no script.js principal (que cuida da seleção das abas).
         (function () {
             const link = document.getElementById('linkCadastroProf');
             const abaProf = document.getElementById('professor');
@@ -98,7 +96,6 @@
             function atualizar() {
                 link.style.display = abaProf && abaProf.classList.contains('ativa') ? 'block' : 'none';
             }
-            // Observa cliques nas abas
             [abaProf, abaResp, abaGest].forEach(b => {
                 if (b) b.addEventListener('click', () => setTimeout(atualizar, 10));
             });
