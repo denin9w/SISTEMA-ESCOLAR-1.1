@@ -1,5 +1,5 @@
 // ============================================================
-// scriptGestor.js — Área do Gestor (Pesquisa Global + Modal Completo)
+// scriptGestor.js — Área do Gestor (Com Carnê e Financeiro)
 // ============================================================
 
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
@@ -81,7 +81,7 @@ async function iniciarGestor() {
 if (selectTurma) {
     selectTurma.addEventListener('change', () => {
         if (selectTurma.value) {
-            inputBusca.value = ''; // Limpa a busca se filtrar por turma
+            inputBusca.value = ''; 
             carregarAlunosPorTurma(selectTurma.value);
         }
     });
@@ -94,7 +94,7 @@ if (btnPesquisar) {
             alert("Digite o nome do aluno para pesquisar.");
             return;
         }
-        selectTurma.value = ""; // Limpa o filtro de turma
+        selectTurma.value = ""; 
         pesquisarGlobal(termo);
     });
 }
@@ -115,7 +115,7 @@ async function carregarAlunosPorTurma(turma) {
 
     const { data, error } = await supabaseClient
         .from('alunos')
-        .select('id, nome, status, turma')
+        .select('id, nome, status, turma, pagamentos')
         .eq('turma', turma)
         .order('nome', { ascending: true });
 
@@ -128,7 +128,7 @@ async function pesquisarGlobal(termo) {
 
     const { data, error } = await supabaseClient
         .from('alunos')
-        .select('id, nome, status, turma')
+        .select('id, nome, status, turma, pagamentos')
         .ilike('nome', `%${termo}%`)
         .order('nome', { ascending: true });
 
@@ -189,7 +189,6 @@ if (formAddAluno) {
         btnSalvar.disabled = true;
         btnSalvar.textContent = "Salvando...";
 
-        // Capturando todos os campos do modal
         const matricula = {
             nome: document.querySelector('#addNomeGestor').value.trim(),
             data_nascimento: document.querySelector('#addDataGestor').value,
@@ -213,10 +212,10 @@ if (formAddAluno) {
             cpf_mae: document.querySelector('#addCpfMaeGestor').value.trim() || null,
             
             status: 'Ativa',
-            notas: {}
+            notas: {},
+            pagamentos: []
         };
 
-        // Gerando matrícula automática
         const anoAtual = new Date().getFullYear();
         const { data: ultimo } = await supabaseClient.from('alunos').select('numero_matricula').like('numero_matricula', `${anoAtual}%`).order('numero_matricula', { ascending: false }).limit(1);
         let numMatricula = `${anoAtual}0001`;
@@ -226,7 +225,6 @@ if (formAddAluno) {
         }
         matricula.numero_matricula = numMatricula;
 
-        // Inserindo no banco
         const { error } = await supabaseClient.from('alunos').insert([matricula]);
 
         btnSalvar.disabled = false;
@@ -242,7 +240,6 @@ if (formAddAluno) {
         modalAddAluno.style.display = 'none';
         formAddAluno.reset();
         
-        // Atualiza a busca para mostrar o aluno novo
         if (selectTurma.value === matricula.turma) {
             carregarAlunosPorTurma(matricula.turma);
         } else {
@@ -272,8 +269,27 @@ function abrirDocumentos(aluno) {
     documentoporAluno.innerHTML = '';
     
     const title = document.createElement('div');
-    title.style.cssText = 'grid-column: 1 / -1; font-size: 0.85rem; color: #666; margin-bottom: 10px; font-style: italic;';
-    title.textContent = `Aluno: ${aluno.nome}`;
+    title.style.cssText = 'grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;';
+    title.innerHTML = `<span style="font-size: 0.85rem; color: #666; font-style: italic;">Aluno: ${aluno.nome}</span>`;
+    
+    const btnGroup = document.createElement('div');
+    btnGroup.style.cssText = 'display: flex; gap: 10px;';
+    
+    const btnCarne = document.createElement('button');
+    btnCarne.className = 'btn-primario';
+    btnCarne.innerHTML = '<i class="fa-solid fa-barcode"></i> Emitir Carnê';
+    btnCarne.style.cssText = 'padding: 8px 15px; font-size: 0.8rem;';
+    btnCarne.onclick = () => abrirModalCarne(aluno);
+
+    const btnFinanceiro = document.createElement('button');
+    btnFinanceiro.className = 'btn-primario';
+    btnFinanceiro.innerHTML = '<i class="fa-solid fa-chart-line"></i> Financeiro';
+    btnFinanceiro.style.cssText = 'padding: 8px 15px; font-size: 0.8rem; background: #28a745;';
+    btnFinanceiro.onclick = () => abrirModalFinanceiro(aluno);
+    
+    btnGroup.appendChild(btnCarne);
+    btnGroup.appendChild(btnFinanceiro);
+    title.appendChild(btnGroup);
     documentoporAluno.appendChild(title);
 
     docs.forEach(d => {
@@ -292,6 +308,234 @@ function abrirDocumentos(aluno) {
     });
 }
 
+// --- MODAL EMITIR CARNÊ ---
+function abrirModalCarne(aluno) {
+    let modalCarne = document.getElementById('modalCarne');
+    if (!modalCarne) {
+        modalCarne = document.createElement('div');
+        modalCarne.id = 'modalCarne';
+        modalCarne.className = 'modal-overlay';
+        modalCarne.style.display = 'none';
+        modalCarne.innerHTML = `
+            <div class="modal-content" style="max-width: 500px;">
+                <h2><i class="fa-solid fa-barcode" style="color: var(--destaque);"></i> Emitir Carnê</h2>
+                <form id="formCarne">
+                    
+                    <div style="background: #e6f2ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; border: 1px solid #cce5ff;">
+                        <strong>Aluno Principal (1º Irmão):</strong> <span id="nomeAlunoPrincipalCarne"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Valor da Parcela (R$):</label>
+                        <input type="text" id="valorCarne" value="300,00" required>
+                    </div>
+                    
+                    <div class="input-group" style="margin-top: 15px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="temIrmaoCarne" style="width: auto;"> 
+                            Adicionar mais irmão(s) neste carnê?
+                        </label>
+                    </div>
+
+                    <div id="areaIrmaos" style="display: none; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-top: 10px;">
+                        <div class="input-group">
+                            <label>Nome do 2º Irmão:</label>
+                            <input type="text" id="nomeIrmao1" placeholder="Nome do 2º irmão">
+                        </div>
+                        <div class="input-group">
+                            <label>Série do 2º Irmão:</label>
+                            <select id="turmaIrmao1" class="select-turma"></select>
+                        </div>
+                        <hr style="margin: 10px 0; border: none; border-top: 1px dashed #ccc;">
+                        <div class="input-group">
+                            <label>Nome do 3º Irmão (Opcional):</label>
+                            <input type="text" id="nomeIrmao2" placeholder="Nome do 3º irmão">
+                        </div>
+                        <div class="input-group">
+                            <label>Série do 3º Irmão (Opcional):</label>
+                            <select id="turmaIrmao2" class="select-turma"></select>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-botoes">
+                        <button type="button" class="btn-cancelar" id="btnFecharCarne">Cancelar</button>
+                        <button type="submit" class="btn-salvar">Gerar Carnê</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modalCarne);
+
+        document.getElementById('btnFecharCarne').onclick = () => modalCarne.style.display = 'none';
+        document.getElementById('temIrmaoCarne').onchange = (e) => {
+            document.getElementById('areaIrmaos').style.display = e.target.checked ? 'block' : 'none';
+        };
+
+        const options = TURMAS.map(t => `<option value="${t}">${labelTurma(t)}</option>`).join('');
+        document.querySelectorAll('.select-turma').forEach(sel => {
+            sel.innerHTML = '<option value="">Selecione...</option>' + options;
+        });
+    }
+
+    document.getElementById('nomeAlunoPrincipalCarne').textContent = aluno.nome;
+    
+    document.getElementById('formCarne').reset();
+    document.getElementById('areaIrmaos').style.display = 'none';
+    modalCarne.style.display = 'flex';
+    document.getElementById('valorCarne').focus();
+
+    document.getElementById('formCarne').onsubmit = (e) => {
+        e.preventDefault();
+        const valor = document.getElementById('valorCarne').value;
+        const temIrmao = document.getElementById('temIrmaoCarne').checked;
+        
+        const opcoes = {
+            valor: valor,
+            temIrmao: temIrmao,
+            irmao1: temIrmao ? { nome: document.getElementById('nomeIrmao1').value, turma: document.getElementById('turmaIrmao1').value } : null,
+            irmao2: temIrmao ? { nome: document.getElementById('nomeIrmao2').value, turma: document.getElementById('turmaIrmao2').value } : null
+        };
+
+        supabaseClient.from('alunos').select('*').eq('id', aluno.id).single()
+            .then(({ data: alunoCompleto, error }) => {
+                if (error || !alunoCompleto) return alert("Erro ao buscar dados.");
+                
+                const html = docCarne(alunoCompleto, opcoes);
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML = `
+                    <div class="modal-content" style="text-align: center; max-width: 400px;">
+                        <h2 style="justify-content: center; margin-bottom: 10px;">Carnê Pronto</h2>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                            <button id="btnImprimir" class="btn-primario" style="background: var(--destaque);">Imprimir</button>
+                            <button id="btnWord" class="btn-primario" style="background: #28a745;">Baixar Word</button>
+                        </div>
+                        <button id="btnFecharDoc" class="btn-cancelar" style="width: 100%; margin-top: 15px;">Fechar</button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                overlay.querySelector('#btnImprimir').onclick = () => {
+                    const win = window.open('', '_blank');
+                    win.document.write(html);
+                    win.document.close();
+                    win.onload = () => { win.print(); };
+                };
+
+                overlay.querySelector('#btnWord').onclick = () => {
+                    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Carne-${aluno.nome.replace(/\s+/g,'_')}.doc`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                overlay.querySelector('#btnFecharDoc').onclick = () => { overlay.remove(); modalCarne.style.display = 'none'; };
+            });
+    };
+}
+
+// --- MODAL FINANCEIRO (CONTABILIDADE INDIVIDUAL) ---
+function abrirModalFinanceiro(aluno) {
+    let modalFin = document.getElementById('modalFinanceiro');
+    if (!modalFin) {
+        modalFin = document.createElement('div');
+        modalFin.id = 'modalFinanceiro';
+        modalFin.className = 'modal-overlay';
+        modalFin.style.display = 'none';
+        modalFin.innerHTML = `
+            <div class="modal-content" style="max-width: 600px;">
+                <h2><i class="fa-solid fa-chart-line" style="color: #28a745;"></i> Contabilidade Financeira</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Selecione os meses pagos pelo aluno. O relatório será gerado automaticamente.</p>
+                <form id="formFinanceiro">
+                    <div id="listaMesesFin" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                        <!-- Preenchido via JS -->
+                    </div>
+                    <div class="modal-botoes">
+                        <button type="button" class="btn-cancelar" id="btnFecharFin">Cancelar</button>
+                        <button type="submit" class="btn-salvar" style="background: #28a745;">Salvar e Gerar Relatório</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modalFin);
+        document.getElementById('btnFecharFin').onclick = () => modalFin.style.display = 'none';
+    }
+
+    const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const pagamentos = aluno.pagamentos || [];
+    const containerMeses = document.getElementById('listaMesesFin');
+    
+    containerMeses.innerHTML = mesesNomes.map((m, i) => {
+        const numMes = i + 1;
+        const isPago = pagamentos.includes(numMes);
+        return `
+            <label style="display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #eee; cursor: pointer;">
+                <input type="checkbox" class="check-mes" value="${numMes}" ${isPago ? 'checked' : ''}>
+                ${m}
+            </label>
+        `;
+    }).join('');
+
+    modalFin.style.display = 'flex';
+
+    document.getElementById('formFinanceiro').onsubmit = async (e) => {
+        e.preventDefault();
+        const novosPagamentos = [];
+        document.querySelectorAll('.check-mes:checked').forEach(cb => {
+            novosPagamentos.push(parseInt(cb.value));
+        });
+
+        // SALVA AUTOMATICAMENTE NO SUPABASE
+        const { error } = await supabaseClient.from('alunos').update({ pagamentos: novosPagamentos }).eq('id', aluno.id);
+        if (error) return alert("Erro ao salvar financeiro.");
+
+        // Gera o relatório
+        supabaseClient.from('alunos').select('*').eq('id', aluno.id).single()
+            .then(({ data: alunoCompleto }) => {
+                const html = docContabilidade(alunoCompleto, novosPagamentos);
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML = `
+                    <div class="modal-content" style="text-align: center; max-width: 400px;">
+                        <h2 style="justify-content: center; margin-bottom: 10px;">Dados Salvos!</h2>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">O relatório já está pronto para ser impresso ou baixado.</p>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                            <button id="btnImprimirFin" class="btn-primario" style="background: var(--destaque);">Imprimir</button>
+                            <button id="btnWordFin" class="btn-primario" style="background: #28a745;">Baixar Word</button>
+                        </div>
+                        <button id="btnFecharFinDoc" class="btn-cancelar" style="width: 100%; margin-top: 15px;">Fechar</button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                overlay.querySelector('#btnImprimirFin').onclick = () => {
+                    const win = window.open('', '_blank');
+                    win.document.write(html);
+                    win.document.close();
+                    win.onload = () => { win.print(); };
+                };
+
+                overlay.querySelector('#btnWordFin').onclick = () => {
+                    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Relatorio-${aluno.nome.replace(/\s+/g,'_')}.doc`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                overlay.querySelector('#btnFecharFinDoc').onclick = () => { overlay.remove(); modalFin.style.display = 'none'; };
+            });
+    };
+}
+
+// --- GERAR DOCUMENTOS PADRÃO ---
 function mostrarAcoesDocumento(alunoId, nomeDoc) {
     supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
         .then(({ data: aluno, error }) => {
@@ -423,3 +667,74 @@ async function carregarProfessoresPendentes() {
         });
     });
 }
+
+// ============================================================
+// LÓGICA DA ÁREA FINANCEIRA GLOBAL
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const btnPagos = document.getElementById('btnRelatorioPagos');
+    const btnPendentes = document.getElementById('btnRelatorioPendentes');
+    const cardFinGlobal = document.getElementById('cardFinanceiroGlobal');
+
+    if(cardFinGlobal) cardFinGlobal.style.display = 'block';
+
+    async function gerarRelatorioGlobal(tipo) {
+        const originalText = tipo === 'pagos' ? btnPagos.innerHTML : btnPendentes.innerHTML;
+        if (tipo === 'pagos') { btnPagos.innerHTML = "Gerando..."; btnPagos.disabled = true; }
+        else { btnPendentes.innerHTML = "Gerando..."; btnPendentes.disabled = true; }
+
+        const { data: alunos, error } = await supabaseClient
+            .from('alunos')
+            .select('nome, turma, pagamentos')
+            .eq('status', 'Ativa')
+            .order('turma', { ascending: true })
+            .order('nome', { ascending: true });
+
+        if (tipo === 'pagos') { btnPagos.innerHTML = originalText; btnPagos.disabled = false; }
+        else { btnPendentes.innerHTML = originalText; btnPendentes.disabled = false; }
+
+        if (error) {
+            console.error(error);
+            return alert("Erro ao buscar dados financeiros.");
+        }
+
+        const html = docRelatorioGlobal(alunos, tipo);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+            <div class="modal-content" style="text-align: center; max-width: 400px;">
+                <h2 style="justify-content: center; margin-bottom: 10px;">Relatório Gerado</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">${tipo === 'pagos' ? 'Extrato de Pagos' : 'Relatório de Pendências'}</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="btnImprimirGlobal" class="btn-primario" style="background: var(--destaque);">Imprimir</button>
+                    <button id="btnWordGlobal" class="btn-primario" style="background: #28a745;">Baixar Word</button>
+                </div>
+                <button id="btnFecharGlobal" class="btn-cancelar" style="width: 100%; margin-top: 15px;">Fechar</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        overlay.querySelector('#btnImprimirGlobal').onclick = () => {
+            const win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
+            win.onload = () => { win.print(); };
+        };
+
+        overlay.querySelector('#btnWordGlobal').onclick = () => {
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Relatorio-${tipo}-${new Date().getTime()}.doc`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        overlay.querySelector('#btnFecharGlobal').onclick = () => overlay.remove();
+    }
+
+    if (btnPagos) btnPagos.onclick = () => gerarRelatorioGlobal('pagos');
+    if (btnPendentes) btnPendentes.onclick = () => gerarRelatorioGlobal('pendentes');
+});

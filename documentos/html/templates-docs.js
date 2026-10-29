@@ -33,7 +33,7 @@ function dadosPais(a) {
     return { pai, mae };
 }
 
-// --- CSS GLOBAL (Com regras para Celular e para Word) ---
+// --- CSS GLOBAL ---
 const CSS_GLOBAL = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -97,7 +97,6 @@ function linhaAssinatura(nome, cargo) {
     </table>`;
 }
 
-// --- WRAPPER BASE (Tabela Mestra para não quebrar no Word) ---
 function getWordHead(title) {
     return `
     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
@@ -124,8 +123,9 @@ function footerPadrao() {
 }
 
 // ============================================================
-// 1) DECLARAÇÃO (BOLSA FAMÍLIA)
+// DOCUMENTOS
 // ============================================================
+
 function docBolsaFamilia(a) {
     const p = dadosPais(a);
     return `<!DOCTYPE html>
@@ -189,9 +189,6 @@ function docBolsaFamilia(a) {
     </html>`;
 }
 
-// ============================================================
-// 2) BOLETIM
-// ============================================================
 function docBoletim(a) {
     const materias = [
         { nome: 'Português', id: 'portugues' }, { nome: 'História', id: 'historia' },
@@ -274,9 +271,6 @@ function docBoletim(a) {
     </html>`;
 }
 
-// ============================================================
-// 3) HISTÓRICO / TRANSFERÊNCIA
-// ============================================================
 function docTransferencia(a) {
     const materias = ['Língua Portuguesa','História','Geografia','Arte','Ciências','Matemática','Educação Física','Ensino Religioso','Gramática','Leitura','Língua Estrangeira','Cidadania','Redação'];
     
@@ -421,9 +415,6 @@ function docTransferencia(a) {
     </html>`;
 }
 
-// ============================================================
-// 4) DECLARAÇÃO DE MATRÍCULA
-// ============================================================
 function docDeclaracaoMatricula(a) {
     const p = dadosPais(a);
     return `${getWordHead('Declaração de Matrícula')}
@@ -436,9 +427,6 @@ function docDeclaracaoMatricula(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 5) DECLARAÇÃO PROVISÓRIA
-// ============================================================
 function docProvissoria(a) {
     const p = dadosPais(a);
     return `${getWordHead('Provisória')}
@@ -453,9 +441,6 @@ function docProvissoria(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 6) RECIBO DE PAGAMENTO
-// ============================================================
 function docReciboPagamento(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Recibo de Pagamento')}
@@ -471,9 +456,6 @@ function docReciboPagamento(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 7) FICHA INDIVIDUAL
-// ============================================================
 function docFichaIndividual(a) {
     const materias = ['Língua Portuguesa e Literatura','História','Geografia','Ciências','Matemática','Educação Física','Inglês','Arte','Cidadania'];
     let linhas = '';
@@ -511,9 +493,6 @@ function docFichaIndividual(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 8) RECIBO
-// ============================================================
 function docRecibo(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Recibo')}
@@ -527,9 +506,6 @@ function docRecibo(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 9) QUITAÇÃO SIMPLES
-// ============================================================
 function docQuitacaoSimples(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Quitação')}
@@ -543,9 +519,6 @@ function docQuitacaoSimples(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 10) QUITAÇÃO TABELA
-// ============================================================
 function docQuitacaoTabela(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     const ano = new Date().getFullYear();
@@ -568,9 +541,6 @@ function docQuitacaoTabela(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 11) DECLARAÇÃO NORMAL
-// ============================================================
 function docDeclaracaoNormal(a) {
     return `${getWordHead('Declaração')}
         ${headerPadraoBordado()}
@@ -582,9 +552,6 @@ function docDeclaracaoNormal(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 12) DECLARAÇÃO NORMAL PAI E MÃE
-// ============================================================
 function docDeclaracaoNormalPaiMae(a) {
     const p = dadosPais(a);
     return `${getWordHead('Declaração Pai Mãe')}
@@ -597,9 +564,6 @@ function docDeclaracaoNormalPaiMae(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 13) DECLARAÇÃO DE PROFESSOR QUE SAIU
-// ============================================================
 function docProfessorSaiu(a) {
     return `${getWordHead('Professor Saiu')}
         ${headerPadraoBordado()}
@@ -611,9 +575,6 @@ function docProfessorSaiu(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 14) PAGAMENTO ESCOLAR
-// ============================================================
 function docPagamentoEscolar(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Pagamento Escolar')}
@@ -626,17 +587,33 @@ function docPagamentoEscolar(a) {
     ${footerPadrao()}`;
 }
 
-// ============================================================
-// 15) CARNÊ DE PAGAMENTO
-// ============================================================
-function docCarne(a) {
+function docCarne(a, opcoes) {
+    const { valor, temIrmao, irmao1, irmao2 } = opcoes || { valor: '300,00', temIrmao: false };
+    
     const nomeResponsavel = a.nome_pai || a.nome_mae || a.responsavel_outro || 'NÃO INFORMADO';
     const endereco = a.endereco ? `${a.endereco}, Nº ${a.numero_endereco || 'S/N'}` : 'Endereço não informado';
     const cidadeEstado = a.cidade ? `${a.cidade}/${a.estado || ''}` : '';
     const cpfResp = a.cpf_pai || a.cpf_mae || 'NÃO INFORMADO';
-    const serie = labelTurma(a.turma);
-    const letraTurma = (a.turma || '').slice(-1).toUpperCase();
     const anoAtual = new Date().getFullYear();
+    
+    const primeiroNome = (nome) => nome ? nome.trim().split(' ').slice(0, 2).join(' ') : '';
+    
+    let nomesExibir = [up(primeiroNome(a.nome))];
+    let seriesExibir = [labelTurma(a.turma)];
+    
+    if (temIrmao) {
+        if (irmao1?.nome && irmao1.nome.trim() !== '') {
+            nomesExibir.push(up(primeiroNome(irmao1.nome)));
+            seriesExibir.push(labelTurma(irmao1.turma));
+        }
+        if (irmao2?.nome && irmao2.nome.trim() !== '') {
+            nomesExibir.push(up(primeiroNome(irmao2.nome)));
+            seriesExibir.push(labelTurma(irmao2.turma));
+        }
+    }
+    
+    const nomeFinal = nomesExibir.join(' e ');
+    const serieFinal = seriesExibir.join(' e ');
     
     let parcelasHTML = '';
     for (let mes = 1; mes <= 12; mes++) {
@@ -644,71 +621,70 @@ function docCarne(a) {
         const dataVencimento = `${String(diaVencimento).padStart(2,'0')}/${String(mes).padStart(2,'0')}/${anoAtual}`;
         
         parcelasHTML += `
-            <td style="border: 1px solid #000; padding: 2px; vertical-align: top; width: 50%;">
-                <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 8pt;">
-                    <tr><td style="border-bottom: 1px solid #000; padding: 2px; font-size: 6pt; color: #555;">NOME</td></tr>
-                    <tr><td style="border-bottom: 1px solid #000; padding: 4px; font-weight: bold;">${up(a.nome)}</td></tr>
-                    <tr>
-                        <td style="border-bottom: 1px solid #000; padding: 0;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <tr>
-                                    <td style="border-right: 1px solid #000; width: 50%;">
-                                        <div style="font-size: 6pt; color: #555; padding: 2px;">TURMA</div>
-                                        <div style="padding: 2px 4px; font-weight: bold; text-transform: uppercase;">${letraTurma}</div>
-                                    </td>
-                                    <td style="width: 50%;">
-                                        <div style="font-size: 6pt; color: #555; padding: 2px;">SÉRIE</div>
-                                        <div style="padding: 2px 4px; font-weight: bold;">${serie}</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="border-bottom: 1px solid #000; padding: 0;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <tr>
-                                    <td style="border-right: 1px solid #000; width: 33%;">
-                                        <div style="font-size: 6pt; color: #555; padding: 2px;">TURNO</div>
-                                        <div style="padding: 2px 4px; font-weight: bold;">DIURNO</div>
-                                    </td>
-                                    <td style="border-right: 1px solid #000; width: 33%;">
-                                        <div style="font-size: 6pt; color: #555; padding: 2px;">PARCELA</div>
-                                        <div style="padding: 2px 4px; font-weight: bold;">${mes}/12</div>
-                                    </td>
-                                    <td style="width: 34%;">
-                                        <div style="font-size: 6pt; color: #555; padding: 2px;">VENCIMENTO</div>
-                                        <div style="padding: 2px 4px; font-weight: bold;">${dataVencimento}</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr><td style="border-bottom: 1px solid #000; padding: 2px; font-size: 6pt; color: #555;">RESPONSÁVEL</td></tr>
-                    <tr>
-                        <td style="border-bottom: 1px solid #000; padding: 4px; font-weight: bold; line-height: 1.3;">
-                            ${up(nomeResponsavel)}<br>${up(endereco)}<br>${up(cidadeEstado)}<br>C.P.F: ${cpfResp}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 0;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <tr>
-                                    <td style="border-right: 1px solid #000; width: 50%;">
-                                        <div style="font-size: 6pt; color: #555; padding: 2px;">VR. NORMAL</div>
-                                        <div style="padding: 2px 4px; font-weight: bold;">R$300,00</div>
-                                    </td>
-                                    <td style="width: 50%;">
-                                        <div style="font-size: 6pt; color: #555; padding: 2px;">VR. PAGO</div>
-                                        <div style="padding: 2px 4px; height: 15px;"></div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>`;
-        if (mes % 2 === 0) { parcelasHTML += `</tr><tr>`; }
+        <div style="width: 100%; margin-bottom: 15px; page-break-inside: avoid;">
+            <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 8pt; border: 1px solid #000;">
+                <tr><td style="border-bottom: 1px solid #000; padding: 2px; font-size: 6pt; color: #555;">NOME</td></tr>
+                <tr><td style="border-bottom: 1px solid #000; padding: 4px; font-weight: bold;">${nomeFinal}</td></tr>
+                <tr>
+                    <td style="border-bottom: 1px solid #000; padding: 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="border-right: 1px solid #000; width: 50%;">
+                                    <div style="font-size: 6pt; color: #555; padding: 2px;">TURMA</div>
+                                    <div style="padding: 2px 4px; font-weight: bold; text-transform: uppercase;">${(a.turma || '').slice(-1).toUpperCase()}</div>
+                                </td>
+                                <td style="width: 50%;">
+                                    <div style="font-size: 6pt; color: #555; padding: 2px;">SÉRIE</div>
+                                    <div style="padding: 2px 4px; font-weight: bold;">${serieFinal}</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-bottom: 1px solid #000; padding: 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="border-right: 1px solid #000; width: 33%;">
+                                    <div style="font-size: 6pt; color: #555; padding: 2px;">TURNO</div>
+                                    <div style="padding: 2px 4px; font-weight: bold;">DIURNO</div>
+                                </td>
+                                <td style="border-right: 1px solid #000; width: 33%;">
+                                    <div style="font-size: 6pt; color: #555; padding: 2px;">PARCELA</div>
+                                    <div style="padding: 2px 4px; font-weight: bold;">${mes}/12</div>
+                                </td>
+                                <td style="width: 34%;">
+                                    <div style="font-size: 6pt; color: #555; padding: 2px;">VENCIMENTO</div>
+                                    <div style="padding: 2px 4px; font-weight: bold;">${dataVencimento}</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr><td style="border-bottom: 1px solid #000; padding: 2px; font-size: 6pt; color: #555;">RESPONSÁVEL</td></tr>
+                <tr>
+                    <td style="border-bottom: 1px solid #000; padding: 4px; font-weight: bold; line-height: 1.3;">
+                        ${up(nomeResponsavel)}<br>${up(endereco)}<br>${up(cidadeEstado)}<br>C.P.F: ${cpfResp}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="border-right: 1px solid #000; width: 50%;">
+                                    <div style="font-size: 6pt; color: #555; padding: 2px;">VR. NORMAL</div>
+                                    <div style="padding: 2px 4px; font-weight: bold;">R$ ${valor}</div>
+                                </td>
+                                <td style="width: 50%;">
+                                    <div style="font-size: 6pt; color: #555; padding: 2px;">VR. PAGO</div>
+                                    <div style="padding: 2px 4px; height: 15px;"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>`;
     }
 
     return `<!DOCTYPE html>
@@ -721,31 +697,193 @@ function docCarne(a) {
             @page { size: A4 portrait; margin: 1cm; }
             body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; justify-content: center; }
             .doc-container { width: 100%; max-width: 800px; background: #fff; padding: 20px; box-sizing: border-box; }
-            .tabela-parcelas { width: 100%; border-collapse: collapse; }
-            .tabela-parcelas > tbody > tr > td { border: 1px solid #000; padding: 2px; vertical-align: top; width: 50%; }
+            .grid-carnes { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
             @media print {
                 body { background: #fff; }
                 .doc-container { box-shadow: none; padding: 0; max-width: 100%; }
-                .tabela-parcelas { page-break-inside: auto; }
-                .tabela-parcelas tr { page-break-inside: avoid; page-break-after: auto; }
+                .grid-carnes { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
             }
         </style>
     </head>
     <body>
         <div class="doc-container">
-            <table class="tabela-parcelas">
-                <tr>${parcelasHTML}</tr>
-            </table>
+            <div class="grid-carnes">
+                ${parcelasHTML}
+            </div>
         </div>
     </body>
     </html>`;
 }
+
+function docContabilidade(a, pagamentos) {
+    const anoAtual = new Date().getFullYear();
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    let linhas = '';
+    let totalPago = 0;
+    let totalPendente = 0;
+
+    meses.forEach((m, i) => {
+        const numMes = i + 1;
+        const pago = pagamentos.includes(numMes);
+        const valorMes = 300; 
+        const status = pago ? '<span style="color: green; font-weight: bold;">PAGO</span>' : '<span style="color: red; font-weight: bold;">PENDENTE</span>';
+        
+        if (pago) totalPago += valorMes;
+        else totalPendente += valorMes;
+
+        linhas += `<tr>
+            <td style="border: 1px solid #000; padding: 4px;">${m}</td>
+            <td style="border: 1px solid #000; padding: 4px;">${valorMes.toFixed(2).replace('.',',')} R$</td>
+            <td style="border: 1px solid #000; padding: 4px;">${status}</td>
+        </tr>`;
+    });
+
+    return `${getWordHead('Relatório Financeiro')}
+        ${headerPadraoBordado()}
+        <div class="doc-title">RELATÓRIO FINANCEIRO (${anoAtual})</div>
+        
+        <table style="width:100%; border:none; margin-bottom: 15px; font-size: 14px;">
+            <tr><td style="border:none; padding:2px;"><strong>Aluno (a):</strong> ${up(a.nome)}</td></tr>
+            <tr><td style="border:none; padding:2px;"><strong>Responsável:</strong> ${up(a.nome_pai || a.nome_mae || a.responsavel_outro || '—')}</td></tr>
+            <tr><td style="border:none; padding:2px;"><strong>Turma:</strong> ${labelTurma(a.turma)}</td></tr>
+        </table>
+
+        <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; text-align: center; font-size: 12px; margin-bottom: 20px;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid #000; padding: 5px; background: #f0f0f0;">Mês de Referência</th>
+                    <th style="border: 1px solid #000; padding: 5px; background: #f0f0f0;">Valor</th>
+                    <th style="border: 1px solid #000; padding: 5px; background: #f0f0f0;">Status</th>
+                </tr>
+            </thead>
+            <tbody>${linhas}</tbody>
+        </table>
+
+        <div style="background: #eef3f8; padding: 15px; border-radius: 8px; font-size: 14px;">
+            <p style="margin: 5px 0;"><strong>Total Pago:</strong> <span style="color: green;">${totalPago.toFixed(2).replace('.',',')} R$</span></p>
+            <p style="margin: 5px 0;"><strong>Total Pendente:</strong> <span style="color: red;">${totalPendente.toFixed(2).replace('.',',')} R$</span></p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
+        ${linhaAssinatura('', 'Direção')}
+    ${footerPadrao()}`;
+}
+
+function docRelatorioGlobal(alunos, tipo) {
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth() + 1; 
+    const anoAtual = hoje.getFullYear();
+    const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const nomeMesAtual = mesesNomes[mesAtual - 1];
+
+    const alunosPorTurma = {};
+    alunos.forEach(aluno => {
+        if (!alunosPorTurma[aluno.turma]) alunosPorTurma[aluno.turma] = [];
+        alunosPorTurma[aluno.turma].push(aluno);
+    });
+
+    let htmlTurmas = '';
+    let temAlguemNoRelatorio = false;
+    const turmasOrdenadas = Object.keys(alunosPorTurma).sort();
+
+    turmasOrdenadas.forEach(turma => {
+        let linhasAlunos = '';
+        let contagem = 0;
+
+        alunosPorTurma[turma].forEach(aluno => {
+            const pagamentos = aluno.pagamentos || [];
+            const isPagoAteMesAtual = pagamentos.includes(mesAtual);
+
+            if (tipo === 'pagos' && !isPagoAteMesAtual) return;
+            if (tipo === 'pendentes' && isPagoAteMesAtual) return;
+
+            contagem++;
+            temAlguemNoRelatorio = true;
+
+            let detalhes = '';
+            if (tipo === 'pendentes') {
+                const faltantes = [];
+                for (let i = 1; i <= mesAtual; i++) {
+                    if (!pagamentos.includes(i)) faltantes.push(mesesNomes[i-1]);
+                }
+                detalhes = `<span style="color: #dc3545; font-size: 10pt;">Meses em falta: ${faltantes.join(', ')}</span>`;
+            } else {
+                detalhes = `<span style="color: #28a745; font-size: 10pt;">Pago até ${nomeMesAtual}</span>`;
+            }
+
+            linhasAlunos += `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: left;">${up(aluno.nome)}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: left;">${detalhes}</td>
+                </tr>
+            `;
+        });
+
+        if (contagem > 0) {
+            htmlTurmas += `
+                <div style="margin-bottom: 20px; page-break-inside: avoid;">
+                    <h3 style="background: #eef3f8; color: #003869; padding: 5px 10px; margin: 0; font-size: 12pt; border: 1px solid #000; border-bottom: none;">
+                        Turma: ${labelTurma(turma)}
+                    </h3>
+                    <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11pt;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="border: 1px solid #000; padding: 5px; width: 40%;">Nome do Aluno</th>
+                                <th style="border: 1px solid #000; padding: 5px; text-align: left;">Status Financeiro</th>
+                            </tr>
+                        </thead>
+                        <tbody>${linhasAlunos}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+    });
+
+    if (!temAlguemNoRelatorio) {
+        htmlTurmas = `<p style="text-align: center; font-size: 14pt; margin-top: 50px;">Nenhum aluno encontrado para este filtro (Mês de referência: ${nomeMesAtual}).</p>`;
+    }
+
+    const titulo = tipo === 'pagos' ? 'EXTRATO DE ALUNOS COM PAGAMENTO EM DIA' : 'RELATÓRIO DE PENDÊNCIAS FINANCEIRAS';
+
+    return `<!DOCTYPE html>
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório Financeiro Global</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            @page { size: A4 portrait; margin: 1.5cm; }
+            body { font-family: 'Times New Roman', Times, serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; justify-content: center; }
+            .doc-container { width: 100%; max-width: 800px; background: #fff; padding: 40px; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+            @media print {
+                body { background: #fff; }
+                .doc-container { box-shadow: none; padding: 0; max-width: 100%; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="doc-container">
+            ${headerPadraoBordado()}
+            <div class="doc-title">${titulo}</div>
+            <div style="text-align: right; font-size: 10pt; margin-bottom: 15px;">
+                Referência: Até ${nomeMesAtual} de ${anoAtual}<br>
+                Emitido em: ${dataHojeExtenso()}
+            </div>
+            ${htmlTurmas}
+            <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
+            ${linhaAssinatura('', 'Direção')}
+        </div>
+    </body>
+    </html>`;
+}
+
 
 // ============================================================
 // ALIAS
 // ============================================================
 function docDeclaracaoQuitacaoDebito(a) { return docQuitacaoSimples(a); }
 function docDeclaracaoQuitacaoDebitoTabela(a) { return docQuitacaoTabela(a); }
+
 
 // ============================================================
 // MAPA DE DOCUMENTOS
@@ -778,5 +916,6 @@ const DOCUMENTOS_HTML = {
     'Boletim':                             docBoletim,
     'boletim':                             docBoletim,
     'Carnê':                               docCarne,
-    'Carne':                               docCarne
+    'Carne':                               docCarne,
+    'Contabilidade':                       docContabilidade
 };

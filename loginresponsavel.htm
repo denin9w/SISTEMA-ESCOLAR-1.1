@@ -131,6 +131,15 @@
                     </div>
                 </label>
 
+                <label class="opçao-card">
+                    <input type="checkbox" name="Carnê" id="icarne">
+                    <div class="conteudo-card">
+                        <span class="icone"><i class="fa-solid fa-barcode"></i></span>
+                        <span class="texto-icone">Carnê</span>
+                        <button class="btn-visualizar" type="button" data-doc="Carnê">Visualizar</button>
+                    </div>
+                </label>
+
             </div>
 
             <button class="input-br" id="btnSolicitar" type="button">Solicitar</button>
@@ -153,7 +162,6 @@
             const alunoId = localStorage.getItem("@alunoLogadoId");
             if (!alunoId) { alert("Sessão expirada."); return; }
 
-            // Busca os dados do aluno no Supabase (o cliente do scriptResponsavel.js)
             if (!window.supabaseClient) {
                 alert("Aguarde, conectando ao banco...");
                 return;
@@ -180,7 +188,6 @@
                     const fn = DOCUMENTOS_HTML[nomeDoc];
                     if (!fn) return alert("Modelo não encontrado.");
                     const html = fn(data);
-                    // Baixa como .doc (Word abre HTML nativamente)
                     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
