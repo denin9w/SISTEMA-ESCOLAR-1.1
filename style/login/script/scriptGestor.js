@@ -1,5 +1,5 @@
 // ============================================================
-// scriptGestor.js — Área do Gestor
+// scriptGestor.js — Área do Gestor (Pesquisa Global + Modal Completo)
 // ============================================================
 
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
@@ -15,13 +15,24 @@ scriptSupabase.onload = () => {
 };
 document.head.appendChild(scriptSupabase);
 
+// Elementos
 const selectTurma       = document.querySelector('#iturma');
 const listaDeAlunos     = document.querySelector('#listaAlunos');
+const cardAlunos        = document.querySelector('#cardAlunos');
 const documentoporAluno = document.querySelector('#idocumentos');
+const cardDocumentos    = document.querySelector('#cardDocumentos');
 const inputBusca        = document.querySelector('#buscaAluno');
+const btnPesquisar      = document.querySelector('#btnPesquisarAluno');
 const listaSolicitacoes = document.querySelector('#listaSolicitacoes');
 const listaProfsPend    = document.querySelector('#listaProfessoresPendentes');
 const gestorNomeEl      = document.querySelector('#gestorNome');
+
+// Modal Add Aluno
+const btnAddAlunoGestor = document.querySelector('#btnAddAlunoGestor');
+const modalAddAluno     = document.querySelector('#modalAddAlunoGestor');
+const btnFecharModal    = document.querySelector('#btnFecharModalGestor');
+const formAddAluno      = document.querySelector('#formAddAlunoGestor');
+const selectAddTurma    = document.querySelector('#addTurmaGestor');
 
 let gestorLogado = null;
 
@@ -40,7 +51,18 @@ function labelTurma(t) {
     return t.toUpperCase();
 }
 
-function iniciarGestor() {
+function preencherSelects() {
+    const options = TURMAS.map(t => `<option value="${t}">${labelTurma(t)}</option>`).join('');
+    
+    if (selectTurma) {
+        selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>' + options;
+    }
+    if (selectAddTurma) {
+        selectAddTurma.innerHTML = '<option value="" selected disabled>Selecione...</option>' + options;
+    }
+}
+
+async function iniciarGestor() {
     const gString = localStorage.getItem("@gestorLogado");
     if (!gString) {
         alert("Sessão expirada. Faça login novamente.");
@@ -50,82 +72,226 @@ function iniciarGestor() {
     gestorLogado = JSON.parse(gString);
     if (gestorNomeEl) gestorNomeEl.textContent = `Gestor: ${gestorLogado.nome}`;
 
-    if (selectTurma) {
-        selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>';
-        TURMAS.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t;
-            opt.textContent = labelTurma(t);
-            selectTurma.appendChild(opt);
-        });
-    }
-
+    preencherSelects();
     carregarAvisos();
     carregarProfessoresPendentes();
 }
 
+// --- AÇÕES DE NAVEGAÇÃO ---
 if (selectTurma) {
-    selectTurma.addEventListener('change', () => carregarAlunos(selectTurma.value));
-}
-
-if (inputBusca) {
-    inputBusca.addEventListener('input', () => {
-        const termo = inputBusca.value.trim().toLowerCase();
-        if (!listaDeAlunos) return;
-        listaDeAlunos.querySelectorAll('.btn-aluno').forEach(el => {
-            el.style.display = el.dataset.nome.toLowerCase().includes(termo) ? 'block' : 'none';
-        });
-        listaDeAlunos.style.display = 'block';
+    selectTurma.addEventListener('change', () => {
+        if (selectTurma.value) {
+            inputBusca.value = ''; // Limpa a busca se filtrar por turma
+            carregarAlunosPorTurma(selectTurma.value);
+        }
     });
 }
 
-async function carregarAlunos(turma) {
-    if (!turma || !listaDeAlunos) return;
-    listaDeAlunos.style.display = 'block';
+if (btnPesquisar) {
+    btnPesquisar.addEventListener('click', () => {
+        const termo = inputBusca.value.trim();
+        if (termo === '') {
+            alert("Digite o nome do aluno para pesquisar.");
+            return;
+        }
+        selectTurma.value = ""; // Limpa o filtro de turma
+        pesquisarGlobal(termo);
+    });
+}
+
+if (inputBusca) {
+    inputBusca.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (btnPesquisar) btnPesquisar.click();
+        }
+    });
+}
+
+// --- FUNÇÕES DE BUSCA ---
+async function carregarAlunosPorTurma(turma) {
+    cardAlunos.style.display = 'block';
     listaDeAlunos.innerHTML = '<p>Carregando...</p>';
 
     const { data, error } = await supabaseClient
         .from('alunos')
-        .select('id, nome, data_nascimento, status, numero_matricula, turma')
+        .select('id, nome, status, turma')
         .eq('turma', turma)
         .order('nome', { ascending: true });
 
-    if (error) { console.error(error); listaDeAlunos.innerHTML = '<p>Erro ao carregar.</p>'; return; }
+    renderizarListaAlunos(data, error);
+}
 
-    if (!data || data.length === 0) {
-        listaDeAlunos.innerHTML = '<p>Nenhum aluno nesta turma.</p>';
-        return;
+async function pesquisarGlobal(termo) {
+    cardAlunos.style.display = 'block';
+    listaDeAlunos.innerHTML = '<p>Pesquisando em todas as turmas...</p>';
+
+    const { data, error } = await supabaseClient
+        .from('alunos')
+        .select('id, nome, status, turma')
+        .ilike('nome', `%${termo}%`)
+        .order('nome', { ascending: true });
+
+    renderizarListaAlunos(data, error);
+}
+
+function renderizarListaAlunos(data, error) {
+    if (error) { 
+        console.error(error); 
+        listaDeAlunos.innerHTML = '<p>Erro ao carregar.</p>'; 
+        return; 
     }
 
     listaDeAlunos.innerHTML = '';
+    if (!data || data.length === 0) {
+        listaDeAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>';
+        return;
+    }
+
     data.forEach(aluno => {
-        const a = document.createElement('a');
+        const a = document.createElement('button');
         a.className = 'btn-aluno';
         a.dataset.nome = aluno.nome;
         a.dataset.id = aluno.id;
-        const statusTag = aluno.status && aluno.status !== 'Ativa' ? ` [${aluno.status}]` : '';
-        a.textContent = `${aluno.nome}${statusTag}`;
-        a.addEventListener('click', () => abrirDocumentos(aluno));
+        const statusTag = aluno.status !== 'Ativa' ? ` [${aluno.status}]` : '';
+        const turmaTag = labelTurma(aluno.turma);
+        a.innerHTML = `${aluno.nome}${statusTag} <br><small style="color:#666;font-weight:normal;">${turmaTag}</small>`;
+        
+        a.addEventListener('click', () => {
+            document.querySelectorAll('.btn-aluno').forEach(b => b.style.borderColor = '#eee');
+            a.style.borderColor = 'var(--destaque)';
+            abrirDocumentos(aluno);
+        });
         listaDeAlunos.appendChild(a);
     });
 }
 
-function abrirDocumentos(aluno) {
-    if (!documentoporAluno) return;
-    documentoporAluno.style.display = 'block';
-    documentoporAluno.dataset.alunoId = aluno.id;
-    documentoporAluno.dataset.alunoNome = aluno.nome;
-
-    documentoporAluno.querySelectorAll('.cdocumentos a').forEach(link => {
-        link.onclick = (ev) => {
-            ev.preventDefault();
-            const docName = link.dataset.doc || link.textContent.trim();
-            mostrarAcoesDocumento(aluno.id, docName);
-        };
+// --- MODAL ADICIONAR ALUNO ---
+if (btnAddAlunoGestor) {
+    btnAddAlunoGestor.addEventListener('click', () => {
+        modalAddAluno.style.display = 'flex';
+        document.querySelector('#addNomeGestor').focus();
     });
 }
 
-// --- Exibe modal com "Imprimir" e "Baixar Word" ---
+if (btnFecharModal) {
+    btnFecharModal.addEventListener('click', () => {
+        modalAddAluno.style.display = 'none';
+        formAddAluno.reset();
+    });
+}
+
+if (formAddAluno) {
+    formAddAluno.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btnSalvar = formAddAluno.querySelector('.btn-salvar');
+        btnSalvar.disabled = true;
+        btnSalvar.textContent = "Salvando...";
+
+        // Capturando todos os campos do modal
+        const matricula = {
+            nome: document.querySelector('#addNomeGestor').value.trim(),
+            data_nascimento: document.querySelector('#addDataGestor').value,
+            sexo: document.querySelector('#addSexoGestor').value,
+            nacionalidade: document.querySelector('#addNacionalidadeGestor').value.trim(),
+            cidade_nascimento: document.querySelector('#addCidadeNascGestor').value.trim(),
+            turma: document.querySelector('#addTurmaGestor').value,
+            
+            endereco: document.querySelector('#addRuaGestor').value.trim(),
+            bairro: document.querySelector('#addBairroGestor').value.trim(),
+            numero_endereco: document.querySelector('#addNumeroGestor').value.trim(),
+            cidade: document.querySelector('#addCidadeGestor').value.trim(),
+            estado: document.querySelector('#addEstadoGestor').value.trim(),
+            cep: document.querySelector('#addCepGestor').value.trim(),
+            cpf: document.querySelector('#addCpfAlunoGestor').value.trim(),
+            rg: document.querySelector('#addRgGestor').value.trim(),
+
+            nome_pai: document.querySelector('#addPaiGestor').value.trim() || null,
+            cpf_pai: document.querySelector('#addCpfPaiGestor').value.trim() || null,
+            nome_mae: document.querySelector('#addMaeGestor').value.trim() || null,
+            cpf_mae: document.querySelector('#addCpfMaeGestor').value.trim() || null,
+            
+            status: 'Ativa',
+            notas: {}
+        };
+
+        // Gerando matrícula automática
+        const anoAtual = new Date().getFullYear();
+        const { data: ultimo } = await supabaseClient.from('alunos').select('numero_matricula').like('numero_matricula', `${anoAtual}%`).order('numero_matricula', { ascending: false }).limit(1);
+        let numMatricula = `${anoAtual}0001`;
+        if (ultimo && ultimo.length > 0) {
+            const ultimoNum = parseInt(ultimo[0].numero_matricula.slice(-4), 10);
+            numMatricula = `${anoAtual}${(ultimoNum + 1).toString().padStart(4, '0')}`;
+        }
+        matricula.numero_matricula = numMatricula;
+
+        // Inserindo no banco
+        const { error } = await supabaseClient.from('alunos').insert([matricula]);
+
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = "Salvar Matrícula";
+
+        if (error) {
+            console.error(error);
+            alert("Erro ao cadastrar aluno: " + error.message);
+            return;
+        }
+
+        alert(`Aluno ${matricula.nome} matriculado com sucesso!\nMatrícula: ${numMatricula}`);
+        modalAddAluno.style.display = 'none';
+        formAddAluno.reset();
+        
+        // Atualiza a busca para mostrar o aluno novo
+        if (selectTurma.value === matricula.turma) {
+            carregarAlunosPorTurma(matricula.turma);
+        } else {
+            pesquisarGlobal(matricula.nome);
+        }
+    });
+}
+
+// --- EXIBIR DOCUMENTOS ---
+function abrirDocumentos(aluno) {
+    if (!documentoporAluno) return;
+    cardDocumentos.style.display = 'block';
+    
+    const docs = [
+        { label: 'Bolsa Família', icon: 'fa-file-lines' },
+        { label: 'Transferência', icon: 'fa-arrow-right-arrow-left' },
+        { label: 'Declaração de Matrícula', icon: 'fa-id-card' },
+        { label: 'Declaração Provisória', icon: 'fa-file-circle-exclamation' },
+        { label: 'Recibo de Pagamento', icon: 'fa-money-check-dollar' },
+        { label: 'Ficha Individual', icon: 'fa-clipboard-list' },
+        { label: 'Recibo', icon: 'fa-receipt' },
+        { label: 'Declaração de Quitação Simples', icon: 'fa-file-invoice-dollar' },
+        { label: 'Declaração de Quitação Tabela', icon: 'fa-table' },
+        { label: 'Boletim', icon: 'fa-file-pdf' }
+    ];
+
+    documentoporAluno.innerHTML = '';
+    
+    const title = document.createElement('div');
+    title.style.cssText = 'grid-column: 1 / -1; font-size: 0.85rem; color: #666; margin-bottom: 10px; font-style: italic;';
+    title.textContent = `Aluno: ${aluno.nome}`;
+    documentoporAluno.appendChild(title);
+
+    docs.forEach(d => {
+        const a = document.createElement('a');
+        a.href = '#';
+        a.dataset.doc = d.label;
+        a.innerHTML = `<i class="fa-solid ${d.icon}" style="color: var(--titlecor);"></i> ${d.label}`;
+        a.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            mostrarAcoesDocumento(aluno.id, d.label);
+        });
+        const div = document.createElement('div');
+        div.className = 'cdocumentos';
+        div.appendChild(a);
+        documentoporAluno.appendChild(div);
+    });
+}
+
 function mostrarAcoesDocumento(alunoId, nomeDoc) {
     supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
         .then(({ data: aluno, error }) => {
@@ -134,18 +300,17 @@ function mostrarAcoesDocumento(alunoId, nomeDoc) {
             if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
 
             const html = fn(aluno);
-
-            // Cria overlay simples
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+            overlay.className = 'modal-overlay';
             overlay.innerHTML = `
-                <div style="background:#fff;padding:24px;border-radius:10px;max-width:400px;width:90%;text-align:center;">
-                    <h3 style="color:#003869;margin-top:0;">${nomeDoc}</h3>
-                    <p style="font-size:14px;color:#555;">Escolha uma ação:</p>
-                    <button id="btnImprimir" style="padding:10px 16px;margin:6px;border:none;border-radius:6px;background:#0077ff;color:#fff;cursor:pointer;font-weight:bold;">Imprimir</button>
-                    <button id="btnWord" style="padding:10px 16px;margin:6px;border:none;border-radius:6px;background:#28a745;color:#fff;cursor:pointer;font-weight:bold;">Baixar Word</button>
-                    <br>
-                    <button id="btnFechar" style="margin-top:10px;padding:8px 14px;border:1px solid #ccc;border-radius:6px;background:#f5f5f5;cursor:pointer;">Fechar</button>
+                <div class="modal-content" style="text-align: center; max-width: 400px;">
+                    <h2 style="justify-content: center; margin-bottom: 10px;">${nomeDoc}</h2>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Escolha uma ação:</p>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button id="btnImprimir" class="btn-primario" style="background: var(--destaque);">Imprimir</button>
+                        <button id="btnWord" class="btn-primario" style="background: #28a745;">Baixar Word</button>
+                    </div>
+                    <button id="btnFecharDoc" class="btn-cancelar" style="width: 100%; margin-top: 15px;">Fechar</button>
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -167,12 +332,12 @@ function mostrarAcoesDocumento(alunoId, nomeDoc) {
                 URL.revokeObjectURL(url);
             };
 
-            overlay.querySelector('#btnFechar').onclick = () => overlay.remove();
+            overlay.querySelector('#btnFecharDoc').onclick = () => overlay.remove();
         })
         .catch(e => { console.error(e); alert("Erro ao gerar documento."); });
 }
 
-// --- AVISOS / SOLICITAÇÕES ---
+// --- AVISOS ---
 async function carregarAvisos() {
     if (!listaSolicitacoes) return;
     const { data, error } = await supabaseClient
@@ -225,10 +390,9 @@ async function carregarProfessoresPendentes() {
     if (!listaProfsPend) return;
     const { data, error } = await supabaseClient
         .from('usuarios')
-        .select('id, nome, cpf_senha, turmas, criado_em')
+        .select('id, nome, cpf_senha, turmas')
         .eq('tipo', 'professor')
-        .eq('autorizado', false)
-        .order('criado_em', { ascending: true });
+        .eq('autorizado', false);
 
     if (error) { console.error(error); return; }
 

@@ -18,6 +18,7 @@
     </section>
 
     <section id="ficha">
+        <!-- MENU FIXO -->
         <nav id="MCL">
             <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
             <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
@@ -27,60 +28,176 @@
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
         <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
 
-        <div class="text-baner">
-            <h1>Bem vindo à Área do Gestor</h1>
-            <p id="gestorNome" style="text-align:center;"></p>
-        </div>
-
-        <div id="painelAvisos">
-            <div class="aviso-painel">
-                <h3><i class="fa-solid fa-user-check"></i> Professores pendentes de autorização</h3>
-                <div id="listaProfessoresPendentes">Carregando...</div>
-            </div>
-            <div class="aviso-painel">
-                <h3><i class="fa-solid fa-file-circle-exclamation"></i> Solicitações de documentos</h3>
-                <div id="listaSolicitacoes">Carregando...</div>
-            </div>
-        </div>
-
-        <div id="barraBusca">
-            <input type="text" id="buscaAluno" placeholder="Pesquisar aluno pelo nome..." />
-        </div>
-
-        <div id="colunasContainer">
-
-            <div id="selecionarTurma">
-                <label for="iturma">Turma:</label>
-                <select name="turma" id="iturma">
-                    <option value="" selected disabled>Selecione uma turma</option>
-                </select>
+        <!-- ÁREA DO GESTOR -->
+        <div class="gestor-container">
+            <div class="text-baner">
+                <h1>Bem vindo à Área do Gestor</h1>
+                <p id="gestorNome" style="text-align:center;"></p>
             </div>
 
-            <div id="listaAlunos" style="display:none;"></div>
-
-            <div id="idocumentos" style="display:none;">
-                <div class="cdocumentos"><a href="#" data-doc="Bolsa Família"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Bolsa Família</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Transferência"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Transferência</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Declaração de Matrícula"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Declaração de Matrícula</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Declaração Provisória"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Provisória</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Recibo de Pagamento"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Recibo de Pagamento</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Ficha Individual"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Ficha Individual</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Recibo"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Recibo</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Declaração de Quitação Simples"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Quitação Simples</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Declaração de Quitação Tabela"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Quitação Tabela</a></div>
-                <div class="cdocumentos"><a href="#" data-doc="Boletim"><i class="fa-regular fa-file-word" style="color: rgb(30, 48, 80);"></i> Boletim</a></div>
+            <!-- Painel de Avisos -->
+            <div id="painelAvisos">
+                <div class="aviso-painel">
+                    <h3><i class="fa-solid fa-user-check"></i> Professores pendentes</h3>
+                    <div id="listaProfessoresPendentes">Carregando...</div>
+                </div>
+                <div class="aviso-painel">
+                    <h3><i class="fa-solid fa-file-circle-exclamation"></i> Solicitações de documentos</h3>
+                    <div id="listaSolicitacoes">Carregando...</div>
+                </div>
             </div>
 
-        </div>
+            <!-- Toolbar de Ações (Pesquisa, Filtro e Botão) -->
+            <div id="toolbar-gestor">
+                <div class="toolbar-row">
+                    <button id="btnAddAlunoGestor" class="btn-primario">
+                        <i class="fa-solid fa-plus"></i> Adicionar Aluno
+                    </button>
+                    <div id="barraBusca">
+                        <input type="text" id="buscaAluno" placeholder="Pesquisar aluno pelo nome..." />
+                        <button id="btnPesquisarAluno" class="btn-primario" style="border-radius: 0 50px 50px 0; padding: 12px 20px;">
+                            <i class="fa-solid fa-magnifying-glass"></i> Pesquisar
+                        </button>
+                    </div>
+                </div>
+                <div class="toolbar-row">
+                    <div class="filtro-turma">
+                        <i class="fa-solid fa-filter"></i>
+                        <select name="turma" id="iturma">
+                            <option value="" selected disabled>Filtrar por Turma...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
+            <!-- Resultados (Alunos e Documentos) -->
+            <div id="resultados-gestor">
+                <div class="card-gestor" id="cardAlunos" style="display: none;">
+                    <h3><i class="fa-solid fa-user-graduate"></i> Alunos Encontrados</h3>
+                    <div id="listaAlunos"></div>
+                </div>
+
+                <div class="card-gestor" id="cardDocumentos" style="display: none;">
+                    <h3><i class="fa-solid fa-folder-open"></i> Documentos</h3>
+                    <div id="idocumentos" class="lista-documentos"></div>
+                </div>
+            </div>
+
+            <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
+        </div>
 
         <footer>
             <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
         </footer>
     </section>
 
-    <!-- Modelos HTML -->
+    <!-- MODAL DE ADICIONAR ALUNO (COMPLETO) -->
+    <div id="modalAddAlunoGestor" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <h2><i class="fa-solid fa-user-plus" style="color: var(--destaque);"></i> Matrícula Completa (Gestor)</h2>
+            <form id="formAddAlunoGestor">
+                
+                <fieldset class="fieldset-modal">
+                    <legend>Dados do Aluno</legend>
+                    <div class="grid-2col">
+                        <div class="input-group">
+                            <label>Nome Completo:</label>
+                            <input type="text" id="addNomeGestor" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Data de Nascimento:</label>
+                            <input type="date" id="addDataGestor" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Sexo:</label>
+                            <select id="addSexoGestor"><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option></select>
+                        </div>
+                        <div class="input-group">
+                            <label>Nacionalidade:</label>
+                            <input type="text" id="addNacionalidadeGestor" value="Brasileira">
+                        </div>
+                        <div class="input-group">
+                            <label>Cidade de Nascimento:</label>
+                            <input type="text" id="addCidadeNascGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>Turma:</label>
+                            <select id="addTurmaGestor" required>
+                                <option value="" selected disabled>Selecione...</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="fieldset-modal">
+                    <legend>Endereço e Documentos</legend>
+                    <div class="grid-2col">
+                        <div class="input-group">
+                            <label>Rua:</label>
+                            <input type="text" id="addRuaGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>Bairro:</label>
+                            <input type="text" id="addBairroGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>Nº:</label>
+                            <input type="text" id="addNumeroGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>Cidade:</label>
+                            <input type="text" id="addCidadeGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>UF:</label>
+                            <input type="text" id="addEstadoGestor" maxlength="2">
+                        </div>
+                        <div class="input-group">
+                            <label>CEP:</label>
+                            <input type="text" id="addCepGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>CPF do Aluno:</label>
+                            <input type="text" id="addCpfAlunoGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>RG:</label>
+                            <input type="text" id="addRgGestor">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="fieldset-modal">
+                    <legend>Dados dos Responsáveis</legend>
+                    <div class="grid-2col">
+                        <div class="input-group">
+                            <label>Nome do Pai:</label>
+                            <input type="text" id="addPaiGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>CPF do Pai (Login):</label>
+                            <input type="text" id="addCpfPaiGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>Nome da Mãe:</label>
+                            <input type="text" id="addMaeGestor">
+                        </div>
+                        <div class="input-group">
+                            <label>CPF da Mãe (Login):</label>
+                            <input type="text" id="addCpfMaeGestor">
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <div class="modal-botoes">
+                    <button type="button" class="btn-cancelar" id="btnFecharModalGestor">Cancelar</button>
+                    <button type="submit" class="btn-salvar">Salvar Matrícula</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="documentos/html/templates-docs.js"></script>
     <script src="style/login/script/scriptGestor.js"></script>
 

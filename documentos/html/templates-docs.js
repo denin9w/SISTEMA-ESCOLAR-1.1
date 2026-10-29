@@ -1,5 +1,5 @@
 // ============================================================
-// templates-docs.js — Modelos HTML (Responsivo Mobile + Word)
+// templates-docs.js — Modelos de documentos em HTML (COMPLETO)
 // ============================================================
 
 function labelTurma(t) {
@@ -33,11 +33,10 @@ function dadosPais(a) {
     return { pai, mae };
 }
 
-// --- CSS GLOBAL (Usado em quase todos os documentos) ---
+// --- CSS GLOBAL (Com regras para Celular e para Word) ---
 const CSS_GLOBAL = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Regras para Tela/Word */
         @page { size: A4 portrait; margin: 2cm; }
         body { 
             font-family: 'Times New Roman', Times, serif; 
@@ -60,7 +59,6 @@ const CSS_GLOBAL = `
         .doc-title { text-align: center; font-size: 14pt; font-weight: bold; margin: 30px 0; text-transform: uppercase; }
         p { margin: 0 0 10px 0; line-height: 1.8; text-align: justify; }
         
-        /* Regras Específicas para Celular (Telas menores que 768px) */
         @media (max-width: 768px) {
             body { padding: 10px; background: #fff; }
             .doc-container { padding: 15px; box-shadow: none; }
@@ -91,6 +89,15 @@ function headerPadraoBordado() {
     </table>`;
 }
 
+function linhaAssinatura(nome, cargo) {
+    return `
+    <table style="width: 100%; border: none; margin-top: 60px; text-align: center;">
+        <tr><td style="border: none; border-bottom: 1px solid #000; width: 60%; max-width: 300px;">&nbsp;</td></tr>
+        <tr><td style="border: none; padding-top: 5px; font-size: 12pt;">${nome ? `<strong>${nome}</strong><br>` : ''}${cargo}</td></tr>
+    </table>`;
+}
+
+// --- WRAPPER BASE (Tabela Mestra para não quebrar no Word) ---
 function getWordHead(title) {
     return `
     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
@@ -100,11 +107,20 @@ function getWordHead(title) {
         ${CSS_GLOBAL}
     </head>
     <body>
-        <div class="doc-container">`;
+        <div class="doc-container">
+            <table style="width: 100%; border-collapse: collapse; border: none;">
+                <tr>
+                    <td style="border: none; padding: 0;">`;
 }
 
 function footerPadrao() {
-    return `</div></body></html>`;
+    return `
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+    </html>`;
 }
 
 // ============================================================
@@ -122,45 +138,51 @@ function docBolsaFamilia(a) {
     </head>
     <body>
         <div class="doc-container">
-            <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; margin-bottom: 40px;">
+            <table style="width: 100%; border-collapse: collapse; border: none;">
                 <tr>
-                    <td style="padding: 10px 5px 5px 5px;">
-                        <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 70px; margin-bottom: 5px;"><br>
-                        <h1 style="font-size: 18pt; margin: 0; font-family: 'Times New Roman', Times, serif;">CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
+                    <td style="border: none; padding: 0;">
+                        <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; margin-bottom: 40px;">
+                            <tr>
+                                <td style="padding: 10px 5px 5px 5px;">
+                                    <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 70px; margin-bottom: 5px;"><br>
+                                    <h1 style="font-size: 18pt; margin: 0; font-family: 'Times New Roman', Times, serif;">CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0 5px 10px 5px; font-size: 9pt; line-height: 1.3;">
+                                    <strong>Rua Clementino Ricardo de Souza 134 – Severiano Moraes Filho fone: (87) 98114-9883</strong><br>
+                                    <strong>Cadastro Escolar P – 459-058 __ CNPJ 05198.663/0001 -86</strong><br>
+                                    <div style="margin-top: 5px;">
+                                        <span style="display:inline-block; width: 150px; text-align:left;">P – Nº 220</span><span style="display:inline-block; width: 200px; text-align:left;">D.O.E. de 22 / 01 / 2004</span>
+                                    </div>
+                                    <div>
+                                        <span style="display:inline-block; width: 150px; text-align:left;">P – Nº 4160</span><span style="display:inline-block; width: 200px; text-align:left;">D.O.E. de 06 / 06 / 2011</span>
+                                    </div>
+                                    <strong>CEP: 552900 __ Garanhuns __ Pernambuco</strong>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div style="text-align: center; font-size: 14pt; font-weight: bold; margin-bottom: 50px;">DECLARAÇÃO</div>
+
+                        <div style="display: flex; justify-content: center;">
+                            <div style="width: 100%; text-align: justify; line-height: 2;">
+                                Declaro para os devidos fins que o(a) Estudante <strong>${up(a.nome)}</strong>, filho(a) de 
+                                <strong>${p.pai}</strong> e de <strong>${p.mae}</strong>, nascido(a) em <strong>${dataBR(a.data_nascimento)}</strong>, 
+                                natural de <strong>${up(a.cidade_nascimento || '—')}</strong>, estado <strong>${up(a.estado || '—')}</strong>, 
+                                residente no município de <strong>${up(a.cidade || '—')}</strong>, Estado <strong>${up(a.estado || '—')}</strong>, 
+                                está matriculado(a) nesta Unidade de Ensino no <strong>${labelTurma(a.turma)} do(a) EDUCAÇÃO INFANTIL I MANHÃ</strong>.
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 80px;">Garanhuns, ${dataHojeExtenso()}.</div>
+
+                        <table style="width: 100%; border: none; margin-top: 60px; text-align: center;">
+                            <tr><td style="border: none; border-bottom: 1px solid #000; width: 60%;">&nbsp;</td></tr>
+                            <tr><td style="border: none; padding-top: 5px; font-size: 11pt;">Marcia de Souza<br>DIRETORA</td></tr>
+                        </table>
                     </td>
                 </tr>
-                <tr>
-                    <td style="padding: 0 5px 10px 5px; font-size: 9pt; line-height: 1.3;">
-                        <strong>Rua Clementino Ricardo de Souza 134 – Severiano Moraes Filho fone: (87) 98114-9883</strong><br>
-                        <strong>Cadastro Escolar P – 459-058 __ CNPJ 05198.663/0001 -86</strong><br>
-                        <div style="margin-top: 5px;">
-                            <span style="display:inline-block; width: 150px; text-align:left;">P – Nº 220</span><span style="display:inline-block; width: 200px; text-align:left;">D.O.E. de 22 / 01 / 2004</span>
-                        </div>
-                        <div>
-                            <span style="display:inline-block; width: 150px; text-align:left;">P – Nº 4160</span><span style="display:inline-block; width: 200px; text-align:left;">D.O.E. de 06 / 06 / 2011</span>
-                        </div>
-                        <strong>CEP: 552900 __ Garanhuns __ Pernambuco</strong>
-                    </td>
-                </tr>
-            </table>
-
-            <div style="text-align: center; font-size: 14pt; font-weight: bold; margin-bottom: 50px;">DECLARAÇÃO</div>
-
-            <div style="display: flex; justify-content: center;">
-                <div style="width: 100%; text-align: justify; line-height: 2;">
-                    Declaro para os devidos fins que o(a) Estudante <strong>${up(a.nome)}</strong>, filho(a) de 
-                    <strong>${p.pai}</strong> e de <strong>${p.mae}</strong>, nascido(a) em <strong>${dataBR(a.data_nascimento)}</strong>, 
-                    natural de <strong>${up(a.cidade_nascimento || '—')}</strong>, estado <strong>${up(a.estado || '—')}</strong>, 
-                    residente no município de <strong>${up(a.cidade || '—')}</strong>, Estado <strong>${up(a.estado || '—')}</strong>, 
-                    está matriculado(a) nesta Unidade de Ensino no <strong>${labelTurma(a.turma)} do(a) EDUCAÇÃO INFANTIL I MANHÃ</strong>.
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 80px;">Garanhuns, ${dataHojeExtenso()}.</div>
-
-            <table style="width: 100%; border: none; margin-top: 60px; text-align: center;">
-                <tr><td style="border: none; border-bottom: 1px solid #000; width: 60%;">&nbsp;</td></tr>
-                <tr><td style="border: none; padding-top: 5px; font-size: 11pt;">Marcia de Souza<br>DIRETORA</td></tr>
             </table>
         </div>
     </body>
@@ -168,7 +190,7 @@ function docBolsaFamilia(a) {
 }
 
 // ============================================================
-// 2) BOLETIM (Tabela Responsiva)
+// 2) BOLETIM
 // ============================================================
 function docBoletim(a) {
     const materias = [
@@ -205,42 +227,48 @@ function docBoletim(a) {
     </head>
     <body>
         <div class="doc-container">
-            <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 5px;">
+            <table style="width: 100%; border-collapse: collapse; border: none;">
                 <tr>
-                    <td style="width: 120px; text-align: center; border-right: 1px solid #000; padding: 5px;">
-                        <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 70px;"><br>
-                        <div style="font-size: 7pt; margin-top: 5px;">UMA ESCOLA DE GERAÇÕES</div>
-                    </td>
-                    <td style="padding: 10px; text-align: left; font-family: Arial, sans-serif;">
-                        <h2 style="margin: 0; font-size: 14pt; font-weight: bold;">ESCOLA CENTRO EDUCACIONAL JARDIM DO ÉDEN</h2>
-                        <h3 style="margin: 2px 0; font-size: 11pt; font-weight: bold;">EDUCAÇÃO INFANTIL E ENSINO FUNDAMENTAL DO 1º AO 9º ANO</h3>
-                        <h3 style="margin: 2px 0; font-size: 12pt; font-weight: bold;">BOLETIM DE NOTAS <span style="margin-left: 20px;">${new Date().getFullYear()}</span></h3>
-                        <div style="font-size: 11pt; font-weight: bold; margin-top: 5px;">
-                            Nome: <u>${up(a.nome)}</u> &nbsp;&nbsp; Turma: <u>ÚNICA</u> &nbsp;&nbsp; Série: <u>${labelTurma(a.turma)}</u>
+                    <td style="border: none; padding: 0;">
+                        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 5px;">
+                            <tr>
+                                <td style="width: 120px; text-align: center; border-right: 1px solid #000; padding: 5px;">
+                                    <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 80px;"><br>
+                                    <div style="font-size: 7pt; margin-top: 5px;">UMA ESCOLA DE GERAÇÕES</div>
+                                </td>
+                                <td style="padding: 10px; text-align: left; font-family: Arial, sans-serif;">
+                                    <h2 style="margin: 0; font-size: 14pt; font-weight: bold;">ESCOLA CENTRO EDUCACIONAL JARDIM DO ÉDEN</h2>
+                                    <h3 style="margin: 2px 0; font-size: 11pt; font-weight: bold;">EDUCAÇÃO INFANTIL E ENSINO FUNDAMENTAL DO 1º AO 9º ANO</h3>
+                                    <h3 style="margin: 2px 0; font-size: 12pt; font-weight: bold;">BOLETIM DE NOTAS <span style="margin-left: 20px;">${new Date().getFullYear()}</span></h3>
+                                    <div style="font-size: 11pt; font-weight: bold; margin-top: 5px;">
+                                        Nome: <u>${up(a.nome)}</u> &nbsp;&nbsp; Turma: <u>ÚNICA</u> &nbsp;&nbsp; Série: <u>${labelTurma(a.turma)}</u>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="table-responsive">
+                            <table style="width: 100%; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; font-size: 11pt;">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 25%;">Disciplina</th>
+                                        <th colspan="4" style="border: 1px solid #000; padding: 5px;">Unidade</th>
+                                        <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 12%;">MÉDIA<br>FINAL</th>
+                                        <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 15%;">RESULTADO</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="border: 1px solid #000; padding: 5px;">1º Bimestre</th>
+                                        <th style="border: 1px solid #000; padding: 5px;">2º Bimestre</th>
+                                        <th style="border: 1px solid #000; padding: 5px;">3º Bimestre</th>
+                                        <th style="border: 1px solid #000; padding: 5px;">4º Bimestre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${linhas}</tbody>
+                            </table>
                         </div>
                     </td>
                 </tr>
             </table>
-
-            <div class="table-responsive">
-                <table style="width: 100%; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; font-size: 11pt;">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 20%;">Disciplina</th>
-                            <th colspan="4" style="border: 1px solid #000; padding: 5px;">Unidade</th>
-                            <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 10%;">MÉDIA<br>FINAL</th>
-                            <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 15%;">RESULTADO</th>
-                        </tr>
-                        <tr>
-                            <th style="border: 1px solid #000; padding: 5px;">1º Bimestre</th>
-                            <th style="border: 1px solid #000; padding: 5px;">2º Bimestre</th>
-                            <th style="border: 1px solid #000; padding: 5px;">3º Bimestre</th>
-                            <th style="border: 1px solid #000; padding: 5px;">4º Bimestre</th>
-                        </tr>
-                    </thead>
-                    <tbody>${linhas}</tbody>
-                </table>
-            </div>
         </div>
     </body>
     </html>`;
@@ -250,9 +278,9 @@ function docBoletim(a) {
 // 3) HISTÓRICO / TRANSFERÊNCIA
 // ============================================================
 function docTransferencia(a) {
-    const materias = ['Língua Portuguesa','História','Geografia','Arte','Ciências','Matemática','Educação Física','Ensino Religioso','Gramática','Leitura','Língua Estrangeira - Inglês','Cidadania','Redação'];
+    const materias = ['Língua Portuguesa','História','Geografia','Arte','Ciências','Matemática','Educação Física','Ensino Religioso','Gramática','Leitura','Língua Estrangeira','Cidadania','Redação'];
     
-    let cabecalhoMaterias = materias.map(m => `<th style="border: 1px solid #000; padding: 2px; font-size: 6pt; writing-mode: vertical-rl; transform: rotate(180deg); height: 80px;">${m.toUpperCase()}</th>`).join('');
+    let cabecalhoMaterias = materias.map(m => `<th style="border: 1px solid #000; padding: 2px; font-size: 6pt; writing-mode: vertical-rl; transform: rotate(180deg); height: 80px; width: 30px;">${m.toUpperCase()}</th>`).join('');
     
     let linhas = '';
     for (let ano = 0; ano < 8; ano++) {
@@ -281,104 +309,110 @@ function docTransferencia(a) {
     </head>
     <body>
         <div class="doc-container">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 80px;"><br>
-                <div style="font-size: 8pt; margin-top: 5px;">UMA ESCOLA DE GERAÇÕES</div>
-            </div>
+            <table style="width: 100%; border-collapse: collapse; border: none;">
+                <tr>
+                    <td style="border: none; padding: 0;">
+                        <div style="text-align: center; margin-bottom: 10px;">
+                            <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 80px;"><br>
+                            <div style="font-size: 8pt; margin-top: 5px;">UMA ESCOLA DE GERAÇÕES</div>
+                        </div>
 
-            <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; margin-bottom: 5px;">
-                <tr>
-                    <td style="border-bottom: 1px solid #000; text-align: center; padding: 5px;">
-                        <h1 style="font-size: 16pt; margin: 0; font-family: 'Times New Roman', Times, serif;">CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="border-bottom: 1px solid #000; text-align: center; padding: 2px; font-size: 9pt;">
-                        RUA: CLEMENTINO RICARDO DE SOUZA N° 132 &nbsp;&nbsp; Cidade: GARANHUNS &nbsp;&nbsp; UF: PE
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding: 5px;">
-                        <table style="width: 100%; border: none; font-size: 9pt;">
+                        <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; margin-bottom: 5px;">
                             <tr>
-                                <td style="border: none; text-align: left;">Autorização de Funcionamento: P – Nº 220</td>
-                                <td style="border: none; text-align: right;">D.O.E. de 22 / 01 / 2004</td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; padding: 5px;">
+                                    <h1 style="font-size: 16pt; margin: 0; font-family: 'Times New Roman', Times, serif;">CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
+                                </td>
                             </tr>
                             <tr>
-                                <td style="border: none; text-align: left;">P – Nº 4160</td>
-                                <td style="border: none; text-align: right;">D.O.E. de 06 / 06 / 2011</td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; padding: 2px; font-size: 9pt;">
+                                    RUA: CLEMENTINO RICARDO DE SOUZA N° 132 &nbsp;&nbsp; Cidade: GARANHUNS &nbsp;&nbsp; UF: PE
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px;">
+                                    <table style="width: 100%; border: none; font-size: 9pt;">
+                                        <tr>
+                                            <td style="border: none; text-align: left;">Autorização de Funcionamento: P – Nº 220</td>
+                                            <td style="border: none; text-align: right;">D.O.E. de 22 / 01 / 2004</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border: none; text-align: left;">P – Nº 4160</td>
+                                            <td style="border: none; text-align: right;">D.O.E. de 06 / 06 / 2011</td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
                         </table>
-                    </td>
-                </tr>
-            </table>
 
-            <div style="text-align: center; margin-bottom: 20px;">
-                <span style="border: 1px solid #000; padding: 5px 30px; font-weight: bold; font-size: 10pt;">Cadastro Escolar: P – 459 - 058</span>
-            </div>
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <span style="border: 1px solid #000; padding: 5px 30px; font-weight: bold; font-size: 10pt;">Cadastro Escolar: P – 459 - 058</span>
+                        </div>
 
-            <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 10px; font-family: 'Times New Roman', Times, serif;">
-                <tr>
-                    <td style="border-bottom: 1px solid #000; text-align: center; padding: 5px; font-weight: bold; font-size: 11pt;">Histórico Escolar do Ensino Fundamental</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; font-size: 11pt; line-height: 1.8;">
-                        <p>Certificamos que: <strong>${up(a.nome)}</strong></p>
-                        <p>Filiação: <strong>${up(a.nome_pai || '—')}</strong> e de <strong>${up(a.nome_mae || '—')}</strong></p>
-                        <p>Nascido em: <strong>${dataBR(a.data_nascimento)}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Natural de: <strong>${up(a.cidade_nascimento || '—')}</strong> &nbsp;&nbsp;&nbsp;&nbsp; UF: <strong>${up(a.estado || '—')}</strong></p>
-                        <p>Nacionalidade: <strong>BRASILEIRA</strong> &nbsp;&nbsp;&nbsp;&nbsp; RG: <strong>${a.rg || 'XXXXX'}</strong> &nbsp;&nbsp;&nbsp;&nbsp; CPF: <strong>${a.cpf || 'XXXXX'}</strong></p>
-                        <p><strong>Concluiu o 1º ANO</strong> do Ensino Fundamental, nos termos da Lei Federal 9.394 de 20 de dezembro 1996.</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="border-top: 1px solid #000; text-align: center; padding: 5px; font-weight: bold; font-size: 11pt;">INFORMAÇÕES COMPLEMENTARES</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; font-size: 10pt; line-height: 1.5;">
-                        <p>1- O mínimo exigido para promoção é 6,0(seis) e 75% de frequência do total de horas letivas</p>
-                        <p>Formas de acesso: ( &nbsp; ) Classificação &nbsp;&nbsp; ( &nbsp; ) Reclassificação &nbsp;&nbsp; Base Legal: Artigo 23 e 24 da Lei Federal Nº 9.394/96:</p>
-                        <p style="text-align: center;">Série ( &nbsp; ) &nbsp;&nbsp; ano ( X ) &nbsp;&nbsp; Fase ( &nbsp; ) &nbsp;&nbsp; Ciclo / Ano ( &nbsp; )</p>
-                        <p>1- Dispensa de Ensino Religioso: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;X&nbsp; ) Sim &nbsp;&nbsp; ( &nbsp; ) Não</p>
-                        <p>Base Legal:</p>
-                        <p>4- Dispensa de Educação Física: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp; ) Sim &nbsp;&nbsp; ( &nbsp;X&nbsp; ) Não</p>
-                        <p>Base Legal: ___________________________________________________________________________.</p>
-                        <p style="margin-top: 10px;">Observação:</p>
-                        <div style="border-bottom: 1px solid #000; width: 100%; height: 15px;"></div>
-                        <div style="border-bottom: 1px solid #000; width: 100%; height: 15px; margin-top: 5px;"></div>
-                    </td>
-                </tr>
-            </table>
+                        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 10px; font-family: 'Times New Roman', Times, serif;">
+                            <tr>
+                                <td style="border-bottom: 1px solid #000; text-align: center; padding: 5px; font-weight: bold; font-size: 11pt;">Histórico Escolar do Ensino Fundamental</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-size: 11pt; line-height: 1.8;">
+                                    <p style="margin: 2px 0;">Certificamos que: <strong>${up(a.nome)}</strong></p>
+                                    <p style="margin: 2px 0;">Filiação: <strong>${up(a.nome_pai || '—')}</strong> e de <strong>${up(a.nome_mae || '—')}</strong></p>
+                                    <p style="margin: 2px 0;">Nascido em: <strong>${dataBR(a.data_nascimento)}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Natural de: <strong>${up(a.cidade_nascimento || '—')}</strong> &nbsp;&nbsp;&nbsp;&nbsp; UF: <strong>${up(a.estado || '—')}</strong></p>
+                                    <p style="margin: 2px 0;">Nacionalidade: <strong>BRASILEIRA</strong> &nbsp;&nbsp;&nbsp;&nbsp; RG: <strong>${a.rg || 'XXXXX'}</strong> &nbsp;&nbsp;&nbsp;&nbsp; CPF: <strong>${a.cpf || 'XXXXX'}</strong></p>
+                                    <p style="margin: 2px 0;"><strong>Concluiu o 1º ANO</strong> do Ensino Fundamental, nos termos da Lei Federal 9.394 de 20 de dezembro 1996.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-top: 1px solid #000; text-align: center; padding: 5px; font-weight: bold; font-size: 11pt;">INFORMAÇÕES COMPLEMENTARES</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-size: 10pt; line-height: 1.5;">
+                                    <p style="margin: 2px 0;">1- O mínimo exigido para promoção é 6,0(seis) e 75% de frequência do total de horas letivas</p>
+                                    <p style="margin: 2px 0;">Formas de acesso: ( &nbsp; ) Classificação &nbsp;&nbsp; ( &nbsp; ) Reclassificação &nbsp;&nbsp; Base Legal: Artigo 23 e 24 da Lei Federal Nº 9.394/96:</p>
+                                    <p style="text-align: center; margin: 2px 0;">Série ( &nbsp; ) &nbsp;&nbsp; ano ( X ) &nbsp;&nbsp; Fase ( &nbsp; ) &nbsp;&nbsp; Ciclo / Ano ( &nbsp; )</p>
+                                    <p style="margin: 2px 0;">1- Dispensa de Ensino Religioso: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;X&nbsp; ) Sim &nbsp;&nbsp; ( &nbsp; ) Não</p>
+                                    <p style="margin: 2px 0;">Base Legal:</p>
+                                    <p style="margin: 2px 0;">4- Dispensa de Educação Física: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp; ) Sim &nbsp;&nbsp; ( &nbsp;X&nbsp; ) Não</p>
+                                    <p style="margin: 2px 0;">Base Legal: ___________________________________________________________________________.</p>
+                                    <p style="margin-top: 10px;">Observação:</p>
+                                    <div style="border-bottom: 1px solid #000; width: 100%; height: 15px;"></div>
+                                    <div style="border-bottom: 1px solid #000; width: 100%; height: 15px; margin-top: 5px;"></div>
+                                </td>
+                            </tr>
+                        </table>
 
-            <div style="text-align: center; font-size: 12pt; font-weight: bold; font-family: 'Times New Roman', Times, serif; margin: 20px 0;">CERTIFICADO E HISTÓRICO ESCOLAR DO ENSINO FUNDAMENTAL</div>
+                        <div style="text-align: center; font-size: 12pt; font-weight: bold; font-family: 'Times New Roman', Times, serif; margin: 20px 0;">CERTIFICADO E HISTÓRICO ESCOLAR DO ENSINO FUNDAMENTAL</div>
 
-            <div class="table-responsive">
-                <table style="width: 100%; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; font-size: 8pt;">
-                    <thead>
-                        <tr>
-                            <th colspan="15" style="border: 1px solid #000; padding: 2px;">BASE CURRICULAR COMUM</th>
-                            <th colspan="4" style="border: 1px solid #000; padding: 2px;">PARTE DIVERSIFICADA</th>
-                        </tr>
-                        <tr>
-                            <th style="border: 1px solid #000; padding: 2px;">SÉRIE / ANO</th>
-                            <th style="border: 1px solid #000; padding: 2px;">COMPONENTES CURRICULARES</th>
-                            ${cabecalhoMaterias}
-                        </tr>
-                    </thead>
-                    <tbody>${linhas}</tbody>
-                </table>
-            </div>
+                        <div class="table-responsive">
+                            <table style="width: 100%; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; font-size: 8pt;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="15" style="border: 1px solid #000; padding: 2px;">BASE CURRICULAR COMUM</th>
+                                        <th colspan="4" style="border: 1px solid #000; padding: 2px;">PARTE DIVERSIFICADA</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="border: 1px solid #000; padding: 2px;">SÉRIE / ANO</th>
+                                        <th style="border: 1px solid #000; padding: 2px;">COMPONENTES CURRICULARES</th>
+                                        ${cabecalhoMaterias}
+                                    </tr>
+                                </thead>
+                                <tbody>${linhas}</tbody>
+                            </table>
+                        </div>
 
-            <div style="text-align: center; margin-top: 20px; font-size: 10pt; font-weight: bold;">Garanhuns, ${dataHojeExtenso()}.</div>
+                        <div style="text-align: center; margin-top: 20px; font-size: 10pt; font-weight: bold;">Garanhuns, ${dataHojeExtenso()}.</div>
 
-            <table style="width: 100%; border: none; margin-top: 30px; font-size: 10pt;">
-                <tr>
-                    <td style="border: none; text-align: center; width: 50%;">
-                        <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto;">&nbsp;</div>
-                        Secretário(a)<br>Autorização nº<br>Carimbo
-                    </td>
-                    <td style="border: none; text-align: center; width: 50%;">
-                        <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto;">&nbsp;</div>
-                        Gestor(a)<br>Autorização nº<br>Carimbo
+                        <table style="width: 100%; border: none; margin-top: 30px; font-size: 10pt;">
+                            <tr>
+                                <td style="border: none; text-align: center; width: 50%;">
+                                    <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto;">&nbsp;</div>
+                                    Secretário(a)<br>Autorização nº<br>Carimbo
+                                </td>
+                                <td style="border: none; text-align: center; width: 50%;">
+                                    <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto;">&nbsp;</div>
+                                    Gestor(a)<br>Autorização nº<br>Carimbo
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
             </table>
@@ -388,9 +422,8 @@ function docTransferencia(a) {
 }
 
 // ============================================================
-// DEMAIS DOCUMENTOS (Aplicando o CSS_GLOBAL Responsivo)
+// 4) DECLARAÇÃO DE MATRÍCULA
 // ============================================================
-
 function docDeclaracaoMatricula(a) {
     const p = dadosPais(a);
     return `${getWordHead('Declaração de Matrícula')}
@@ -403,6 +436,9 @@ function docDeclaracaoMatricula(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 5) DECLARAÇÃO PROVISÓRIA
+// ============================================================
 function docProvissoria(a) {
     const p = dadosPais(a);
     return `${getWordHead('Provisória')}
@@ -417,6 +453,9 @@ function docProvissoria(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 6) RECIBO DE PAGAMENTO
+// ============================================================
 function docReciboPagamento(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Recibo de Pagamento')}
@@ -432,6 +471,9 @@ function docReciboPagamento(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 7) FICHA INDIVIDUAL
+// ============================================================
 function docFichaIndividual(a) {
     const materias = ['Língua Portuguesa e Literatura','História','Geografia','Ciências','Matemática','Educação Física','Inglês','Arte','Cidadania'];
     let linhas = '';
@@ -469,6 +511,9 @@ function docFichaIndividual(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 8) RECIBO
+// ============================================================
 function docRecibo(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Recibo')}
@@ -482,6 +527,9 @@ function docRecibo(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 9) QUITAÇÃO SIMPLES
+// ============================================================
 function docQuitacaoSimples(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Quitação')}
@@ -495,6 +543,9 @@ function docQuitacaoSimples(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 10) QUITAÇÃO TABELA
+// ============================================================
 function docQuitacaoTabela(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     const ano = new Date().getFullYear();
@@ -517,6 +568,9 @@ function docQuitacaoTabela(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 11) DECLARAÇÃO NORMAL
+// ============================================================
 function docDeclaracaoNormal(a) {
     return `${getWordHead('Declaração')}
         ${headerPadraoBordado()}
@@ -528,6 +582,9 @@ function docDeclaracaoNormal(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 12) DECLARAÇÃO NORMAL PAI E MÃE
+// ============================================================
 function docDeclaracaoNormalPaiMae(a) {
     const p = dadosPais(a);
     return `${getWordHead('Declaração Pai Mãe')}
@@ -540,6 +597,9 @@ function docDeclaracaoNormalPaiMae(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 13) DECLARAÇÃO DE PROFESSOR QUE SAIU
+// ============================================================
 function docProfessorSaiu(a) {
     return `${getWordHead('Professor Saiu')}
         ${headerPadraoBordado()}
@@ -551,6 +611,9 @@ function docProfessorSaiu(a) {
     ${footerPadrao()}`;
 }
 
+// ============================================================
+// 14) PAGAMENTO ESCOLAR
+// ============================================================
 function docPagamentoEscolar(a) {
     const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
     return `${getWordHead('Pagamento Escolar')}
@@ -564,14 +627,118 @@ function docPagamentoEscolar(a) {
 }
 
 // ============================================================
-// FUNÇÃO AUXILIAR DE ASSINATURA (Responsiva)
+// 15) CARNÊ DE PAGAMENTO
 // ============================================================
-function linhaAssinatura(nome, cargo) {
-    return `
-    <table style="width: 100%; border: none; margin-top: 60px; text-align: center;">
-        <tr><td style="border: none; border-bottom: 1px solid #000; width: 60%; max-width: 300px;">&nbsp;</td></tr>
-        <tr><td style="border: none; padding-top: 5px; font-size: 12pt;">${nome ? `<strong>${nome}</strong><br>` : ''}${cargo}</td></tr>
-    </table>`;
+function docCarne(a) {
+    const nomeResponsavel = a.nome_pai || a.nome_mae || a.responsavel_outro || 'NÃO INFORMADO';
+    const endereco = a.endereco ? `${a.endereco}, Nº ${a.numero_endereco || 'S/N'}` : 'Endereço não informado';
+    const cidadeEstado = a.cidade ? `${a.cidade}/${a.estado || ''}` : '';
+    const cpfResp = a.cpf_pai || a.cpf_mae || 'NÃO INFORMADO';
+    const serie = labelTurma(a.turma);
+    const letraTurma = (a.turma || '').slice(-1).toUpperCase();
+    const anoAtual = new Date().getFullYear();
+    
+    let parcelasHTML = '';
+    for (let mes = 1; mes <= 12; mes++) {
+        const diaVencimento = (mes === 2) ? '28' : '30';
+        const dataVencimento = `${String(diaVencimento).padStart(2,'0')}/${String(mes).padStart(2,'0')}/${anoAtual}`;
+        
+        parcelasHTML += `
+            <td style="border: 1px solid #000; padding: 2px; vertical-align: top; width: 50%;">
+                <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 8pt;">
+                    <tr><td style="border-bottom: 1px solid #000; padding: 2px; font-size: 6pt; color: #555;">NOME</td></tr>
+                    <tr><td style="border-bottom: 1px solid #000; padding: 4px; font-weight: bold;">${up(a.nome)}</td></tr>
+                    <tr>
+                        <td style="border-bottom: 1px solid #000; padding: 0;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="border-right: 1px solid #000; width: 50%;">
+                                        <div style="font-size: 6pt; color: #555; padding: 2px;">TURMA</div>
+                                        <div style="padding: 2px 4px; font-weight: bold; text-transform: uppercase;">${letraTurma}</div>
+                                    </td>
+                                    <td style="width: 50%;">
+                                        <div style="font-size: 6pt; color: #555; padding: 2px;">SÉRIE</div>
+                                        <div style="padding: 2px 4px; font-weight: bold;">${serie}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border-bottom: 1px solid #000; padding: 0;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="border-right: 1px solid #000; width: 33%;">
+                                        <div style="font-size: 6pt; color: #555; padding: 2px;">TURNO</div>
+                                        <div style="padding: 2px 4px; font-weight: bold;">DIURNO</div>
+                                    </td>
+                                    <td style="border-right: 1px solid #000; width: 33%;">
+                                        <div style="font-size: 6pt; color: #555; padding: 2px;">PARCELA</div>
+                                        <div style="padding: 2px 4px; font-weight: bold;">${mes}/12</div>
+                                    </td>
+                                    <td style="width: 34%;">
+                                        <div style="font-size: 6pt; color: #555; padding: 2px;">VENCIMENTO</div>
+                                        <div style="padding: 2px 4px; font-weight: bold;">${dataVencimento}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr><td style="border-bottom: 1px solid #000; padding: 2px; font-size: 6pt; color: #555;">RESPONSÁVEL</td></tr>
+                    <tr>
+                        <td style="border-bottom: 1px solid #000; padding: 4px; font-weight: bold; line-height: 1.3;">
+                            ${up(nomeResponsavel)}<br>${up(endereco)}<br>${up(cidadeEstado)}<br>C.P.F: ${cpfResp}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="border-right: 1px solid #000; width: 50%;">
+                                        <div style="font-size: 6pt; color: #555; padding: 2px;">VR. NORMAL</div>
+                                        <div style="padding: 2px 4px; font-weight: bold;">R$300,00</div>
+                                    </td>
+                                    <td style="width: 50%;">
+                                        <div style="font-size: 6pt; color: #555; padding: 2px;">VR. PAGO</div>
+                                        <div style="padding: 2px 4px; height: 15px;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>`;
+        if (mes % 2 === 0) { parcelasHTML += `</tr><tr>`; }
+    }
+
+    return `<!DOCTYPE html>
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+        <meta charset="UTF-8">
+        <title>Carnê — ${a.nome}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            @page { size: A4 portrait; margin: 1cm; }
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; justify-content: center; }
+            .doc-container { width: 100%; max-width: 800px; background: #fff; padding: 20px; box-sizing: border-box; }
+            .tabela-parcelas { width: 100%; border-collapse: collapse; }
+            .tabela-parcelas > tbody > tr > td { border: 1px solid #000; padding: 2px; vertical-align: top; width: 50%; }
+            @media print {
+                body { background: #fff; }
+                .doc-container { box-shadow: none; padding: 0; max-width: 100%; }
+                .tabela-parcelas { page-break-inside: auto; }
+                .tabela-parcelas tr { page-break-inside: avoid; page-break-after: auto; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="doc-container">
+            <table class="tabela-parcelas">
+                <tr>${parcelasHTML}</tr>
+            </table>
+        </div>
+    </body>
+    </html>`;
 }
 
 // ============================================================
@@ -609,5 +776,7 @@ const DOCUMENTOS_HTML = {
     'Declaracao Professor Saiu':           docProfessorSaiu,
     'Pagamento Escolar':                   docPagamentoEscolar,
     'Boletim':                             docBoletim,
-    'boletim':                             docBoletim
+    'boletim':                             docBoletim,
+    'Carnê':                               docCarne,
+    'Carne':                               docCarne
 };
