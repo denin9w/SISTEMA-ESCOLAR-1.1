@@ -63,20 +63,27 @@
         <img class="moeda" src="imagens/moeda.png" alt="Moeda">
     </footer>
 
+    <!-- Carrega o script principal -->
     <script src="style/login/script/script.js"></script>
+    
+    <!-- Script para controle das abas e link de cadastro -->
     <script>
         (function () {
             const link = document.getElementById('linkCadastroProf');
             const abaProf = document.getElementById('professor');
             const abaResp = document.getElementById('responsavel');
             const abaGest = document.getElementById('gestor');
+            
             if (!link) return;
+            
             function atualizar() {
                 link.style.display = abaProf && abaProf.classList.contains('ativa') ? 'block' : 'none';
             }
+            
             [abaProf, abaResp, abaGest].forEach(b => {
                 if (b) b.addEventListener('click', () => setTimeout(atualizar, 10));
             });
+            
             atualizar();
         })();
     </script>

@@ -27,6 +27,13 @@ function dataHojeExtenso() {
 
 function up(s) { return (s || '').toString().toUpperCase(); }
 
+// --- NOVA FUNÇÃO PARA FORMATAR AS NOTAS NO DOCUMENTO ---
+function formatarNotaDoc(valor) {
+    if (valor === null || valor === undefined || valor === '') return '-';
+    // Converte para número, fixa 1 casa decimal e troca ponto por vírgula
+    return Number(valor).toFixed(1).replace('.', ',');
+}
+
 function dadosPais(a) {
     const pai = a.nome_pai ? up(a.nome_pai) : '_________________________________';
     const mae = a.nome_mae ? up(a.nome_mae) : '_________________________________';
@@ -200,9 +207,14 @@ function docBoletim(a) {
     
     let linhas = '';
     materias.forEach(mat => {
-        const b1 = a[`b1_${mat.id}`] || '-'; const b2 = a[`b2_${mat.id}`] || '-';
-        const b3 = a[`b3_${mat.id}`] || '-'; const b4 = a[`b4_${mat.id}`] || '-';
-        const mdf = a[`mdf_${mat.id}`] || '-'; const st = a[`status_${mat.id}`] || '-';
+        // Usando a nova função formatarNotaDoc
+        const b1 = formatarNotaDoc(a[`b1_${mat.id}`]); 
+        const b2 = formatarNotaDoc(a[`b2_${mat.id}`]);
+        const b3 = formatarNotaDoc(a[`b3_${mat.id}`]); 
+        const b4 = formatarNotaDoc(a[`b4_${mat.id}`]);
+        const mdf = formatarNotaDoc(a[`mdf_${mat.id}`]); 
+        const st = a[`status_${mat.id}`] || '-';
+
         linhas += `<tr>
             <td style="border: 1px solid #000; padding: 4px;">${mat.nome}</td>
             <td style="border: 1px solid #000; padding: 4px;"><strong>${b1}</strong></td>
@@ -877,13 +889,11 @@ function docRelatorioGlobal(alunos, tipo) {
     </html>`;
 }
 
-
 // ============================================================
 // ALIAS
 // ============================================================
 function docDeclaracaoQuitacaoDebito(a) { return docQuitacaoSimples(a); }
 function docDeclaracaoQuitacaoDebitoTabela(a) { return docQuitacaoTabela(a); }
-
 
 // ============================================================
 // MAPA DE DOCUMENTOS

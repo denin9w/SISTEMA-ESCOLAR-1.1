@@ -40,52 +40,6 @@ function voltar(){
 window.proximo = proximo;
 window.voltar = voltar;
 
-// --- GERA NÚMERO DE MATRÍCULA AUTOMÁTICO (CORRIGIDO) ---
-async function gerarNumeroMatricula() {
-    if (!supabaseClient) return `${new Date().getFullYear()}0001`;
-
-    const anoAtual = new Date().getFullYear();
-
-    // Busca o MAIOR número de matrícula que começa com o ano atual
-    // O 'order' descendente + 'limit(1)' garante que pegamos o último
-    const { data, error } = await supabaseClient
-        .from('alunos')
-        .select('numero_matricula')
-        .like('numero_matricula', `${anoAtual}%`) // Filtra apenas do ano atual
-        .order('numero_matricula', { ascending: false })
-        .limit(1);
-
-    if (error) {
-        console.error("Erro ao buscar última matrícula:", error);
-        // Fallback: tenta gerar um número baseado no timestamp para não travar
-        return `${anoAtual}${Date.now().toString().slice(-4)}`;
-    }
-
-    // Se não houver nenhum aluno no ano atual, começa do 0001
-    if (!data || data.length === 0) {
-        return `${anoAtual}0001`;
-    }
-
-    const ultimaMatricula = data[0].numero_matricula;
-
-    // Verifica se a última matrícula é válida e do ano atual
-    if (!ultimaMatricula || typeof ultimaMatricula !== 'string' || !ultimaMatricula.startsWith(anoAtual.toString())) {
-        return `${anoAtual}0001`;
-    }
-
-    // Extrai a parte numérica e incrementa
-    try {
-        const ultimoNumero = parseInt(ultimaMatricula.slice(-4), 10);
-        if (isNaN(ultimoNumero)) return `${anoAtual}0001`;
-        
-        const novoNumero = (ultimoNumero + 1).toString().padStart(4, '0');
-        return `${anoAtual}${novoNumero}`;
-    } catch (e) {
-        console.error("Erro ao parsear matrícula:", e);
-        return `${anoAtual}0001`;
-    }
-}
-
 // --- FINALIZAR MATRÍCULA ---
 if (formulario) {
     formulario.addEventListener("submit", async function(event) {
@@ -99,12 +53,27 @@ if (formulario) {
         const dados = new FormData(formulario);
         const matricula = Object.fromEntries(dados);
 
+        // --- VALIDAÇÃO DE CPF AQUI ---
+        const cpfPaiInput = matricula['cpf-pai'] || '';
+        const cpfMaeInput = matricula['cpf-mae'] || '';
+
+        const cpfPaiLimpo = cpfPaiInput.replace(/\D/g, '');
+        const cpfMaeLimpo = cpfMaeInput.replace(/\D/g, '');
+
+        if (cpfPaiLimpo && cpfPaiLimpo.length !== 11) {
+            alert("O CPF do Pai precisa ter exatamente 11 números.");
+            return;
+        }
+        if (cpfMaeLimpo && cpfMaeLimpo.length !== 11) {
+            alert("O CPF da Mãe precisa ter exatamente 11 números.");
+            return;
+        }
+        // --- FIM DA VALIDAÇÃO ---
+
         if (btnfinalizar) {
             btnfinalizar.disabled = true;
-            btnfinalizar.textContent = "Gerando matrícula...";
+            btnfinalizar.textContent = "Salvando dados...";
         }
-
-        const numeroMatriculaGerado = await gerarNumeroMatricula();
 
         const tipoResponsavel = matricula.responsavel || '';
         const responsavelOutro = tipoResponsavel === 'outro'
@@ -114,8 +83,8 @@ if (formulario) {
         const cpfPai = (matricula['cpf-pai'] || '').trim();
         const cpfMae = (matricula['cpf-mae'] || '').trim();
 
+        // Monta o objeto do aluno (O numero_matricula não é enviado, o banco gera automaticamente)
         const novoAluno = {
-            numero_matricula: numeroMatriculaGerado,
             nome: matricula.nome,
             data_nascimento: matricula['data-nascimento'] || null,
             sexo: matricula.sexo,
@@ -154,11 +123,35 @@ if (formulario) {
             notas: {}
         };
 
-        if (btnfinalizar) btnfinalizar.textContent = "Salvando dados...";
+        // --- CRIA A CONTA DO RESPONSÁVEL NO AUTH (TRATANDO DUPLICIDADE) ---
+        const cpfResponsavel = cpfPai || cpfMae;
+        if (cpfResponsavel) {
+            const emailAuth = `${cpfResponsavel.replace(/\D/g, '')}@ceje.local`;
+            const senhaAuth = cpfResponsavel.replace(/\D/g, '');
+            
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                email: emailAuth,
+                password: senhaAuth,
+            });
+            
+            if (authData && authData.user) {
+                novoAluno.auth_id = authData.user.id; 
+            } else if (authError && (authError.message.includes("already registered") || authError.message.includes("User already exists"))) {
+                const { data: loginData } = await supabaseClient.auth.signInWithPassword({
+                    email: emailAuth,
+                    password: senhaAuth,
+                });
+                if (loginData && loginData.user) {
+                    novoAluno.auth_id = loginData.user.id;
+                }
+            }
+        }
 
-        const { data, error } = await supabaseClient
+        // --- SALVA O ALUNO (BANCO GERA MATRÍCULA) ---
+        const { data: alunoInserido, error } = await supabaseClient
             .from('alunos')
-            .insert([novoAluno]);
+            .insert([novoAluno])
+            .select();
 
         if (btnfinalizar) {
             btnfinalizar.disabled = false;
@@ -171,8 +164,10 @@ if (formulario) {
             return;
         }
 
+        const matriculaGerada = alunoInserido[0].numero_matricula;
         formulario.reset();
         voltar();
-        alert(`Matrícula finalizada com sucesso!\nO número de matrícula do aluno é: ${numeroMatriculaGerado}`);
+        
+        alert(`Matrícula finalizada com sucesso!\nO número de matrícula do aluno é: ${matriculaGerada}`);
     });
 }

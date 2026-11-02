@@ -1,5 +1,5 @@
 // ============================================================
-// cadastro-professor.js
+// cadastro-professor.js — Versão Corrigida
 // ============================================================
 
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
@@ -32,20 +32,24 @@ const TURMAS = [
     { v: '9ano-a', l: '9º Ano A' }
 ];
 
-// --- RENDER CHECKBOXES ---
-const grid = document.querySelector('#turmasGrid');
-if (grid) {
-    TURMAS.forEach(t => {
-        const lbl = document.createElement('label');
-        const cb  = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.value = t.v;
-        cb.name = 'turmas';
-        lbl.appendChild(cb);
-        lbl.appendChild(document.createTextNode(t.l));
-        grid.appendChild(lbl);
-    });
-}
+// --- RENDER CHECKBOXES (AGORA ESPERANDO A PÁGINA CARREGAR) ---
+window.addEventListener('DOMContentLoaded', () => {
+    const grid = document.querySelector('#turmasGrid');
+    if (grid) {
+        TURMAS.forEach(t => {
+            const lbl = document.createElement('label');
+            const cb  = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = t.v;
+            cb.name = 'turmas';
+            lbl.appendChild(cb);
+            lbl.appendChild(document.createTextNode(t.l));
+            grid.appendChild(lbl);
+        });
+    } else {
+        console.error("Erro: O elemento #turmasGrid não foi encontrado no HTML.");
+    }
+});
 
 // --- ENVIO ---
 const form = document.querySelector('#formCadastroProf');
@@ -110,10 +114,31 @@ if (form) {
 
             btn.textContent = "Cadastrando...";
 
-            // 2) Insere professor com autorizado=false
+            // 2) Cria o usuário no Supabase Auth
+            const emailAuth = `${cpf.replace(/\D/g, '')}@ceje.local`;
+            const senhaAuth = cpf.replace(/\D/g, '');
+
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                email: emailAuth,
+                password: senhaAuth,
+            });
+
+            if (authError) {
+                if (authError.message.includes("already registered") || authError.message.includes("User already exists")) {
+                    mostrarErro("Este CPF já possui uma conta de acesso. Tente fazer login ou use outro CPF.");
+                    btn.disabled = false;
+                    btn.textContent = "Cadastrar";
+                    return;
+                }
+                throw authError;
+            }
+            if (!authData.user) throw new Error("Falha ao criar usuário de autenticação.");
+
+            // 3) Insere o professor na tabela usuarios
             const { data: novo, error: errInsert } = await supabaseClient
                 .from('usuarios')
                 .insert([{
+                    auth_id: authData.user.id, 
                     nome,
                     cpf_senha: cpf,
                     tipo: 'professor',
@@ -127,13 +152,12 @@ if (form) {
 
             if (errInsert) throw errInsert;
 
-            // 3) Aviso para o gestor
-            await supabaseClient.from('avisos').insert([{
-                tipo: 'Professor Pendente',
-                mensagem: `Novo cadastro de professor: "${nome}" (CPF ${cpf}). Aguardando autorização.`,
-                usuario_id: novo.id,
-                lido: false
-            }]);
+            // 4) Aviso para o gestor (usando as colunas corretas: titulo e autor_id)
+            if (errInsert) throw errInsert;
+
+            btn.textContent = "Cadastrado!";
+            alert("Cadastro enviado! O gestor irá autorizar seu acesso. Você será redirecionado ao login.");
+            setTimeout(() => { window.location.href = "login.htm"; }, 1500);
 
             btn.textContent = "Cadastrado!";
             alert("Cadastro enviado! O gestor irá autorizar seu acesso. Você será redirecionado ao login.");

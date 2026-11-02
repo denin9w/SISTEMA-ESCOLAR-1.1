@@ -1,5 +1,5 @@
 // ============================================================
-// scriptResponsavel.js — Área do Responsável
+// scriptResponsavel.js — Área do Responsável (Versão Final)
 // ============================================================
 
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
@@ -15,8 +15,8 @@ scriptSupabase.onload = () => {
 document.head.appendChild(scriptSupabase);
 
 // --- SESSÃO ---
-const alunoId   = localStorage.getItem("@alunoLogadoId");
-const alunoNome = localStorage.getItem("@alunoLogadoNome");
+const alunoId   = sessionStorage.getItem("@alunoLogadoId");
+const alunoNome = sessionStorage.getItem("@alunoLogadoNome");
 
 const estaNaPaginaResponsavel = window.location.pathname.toLowerCase().includes('loginresponsavel');
 if (estaNaPaginaResponsavel && !alunoId) {
@@ -59,24 +59,19 @@ if (btnSolicitar) {
                 status: 'Pendente'
             }));
 
+            // 1) Salva a solicitação na tabela (sem tentar criar avisos)
             const { error: errSol } = await supabaseClient
                 .from('solicitacoes_documentos')
                 .insert(solicitacoes);
 
             if (errSol) throw errSol;
 
-            const nomesDocs = solicitacoes.map(s => s.documento).join(', ');
-            await supabaseClient.from('avisos').insert([{
-                tipo: 'Solicitacao Documento',
-                mensagem: `Responsável do aluno "${alunoNome}" solicitou: ${nomesDocs}.`,
-                aluno_id: alunoId,
-                lido: false
-            }]);
-
+            // 2) Mostra a mensagem de sucesso e limpa os campos
             alert("Solicitação enviada! O gestor foi notificado.");
             marcados.forEach(cb => { cb.checked = false; });
+
         } catch (e) {
-            console.error(e);
+            console.error("Erro detalhado:", e);
             alert("Erro ao enviar solicitação. Tente novamente.");
         } finally {
             btnSolicitar.disabled = false;

@@ -48,7 +48,20 @@
 
             <!-- Tela de Lançar Notas -->
             <div id="lancar-Notas" style="display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 20px;">
-                <h2 id="nomeAlunoNota" style="color: var(--titlecor); margin-bottom: 20px;">Notas do Aluno</h2>
+                
+                <!-- CABEÇALHO DA TELA DE NOTAS COM OS BOTÕES -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                    <h2 id="nomeAlunoNota" style="color: var(--titlecor); margin: 0;">Notas do Aluno</h2>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" id="btnImprimirBoletimProf" style="background: var(--destaque); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                            <i class="fa-solid fa-print"></i> Imprimir Boletim
+                        </button>
+                        <button type="button" id="btnBaixarBoletimProf" style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                            <i class="fa-solid fa-download"></i> Baixar Word
+                        </button>
+                    </div>
+                </div>
                 
                 <form id="formularioNotas">
                     <!-- 1º Bimestre -->
@@ -223,6 +236,28 @@
         <p>CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
     </footer>
 
+    <!-- Importa os modelos de documentos -->
+    <script src="documentos/html/templates-docs.js"></script>
+    <!-- Script principal do professor -->
     <script src="style/login/script/scriptProfessores.js"></script>
+
+    <!-- Script do botão Sair -->
+    <script>
+    (function () {
+        const sair = document.getElementById('btnSair');
+        if (sair) {
+            sair.addEventListener('click', function (e) {
+                e.preventDefault();
+                sessionStorage.removeItem("@alunoLogadoId");
+                sessionStorage.removeItem("@alunoLogadoNome");
+                sessionStorage.removeItem("@professorLogado");
+                sessionStorage.removeItem("@gestorLogado");
+                window.location.href = "login.htm";
+            });
+        }
+    })();
+    </script>
+
+    
 </body>
 </html>

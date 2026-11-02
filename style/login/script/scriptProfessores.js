@@ -1,12 +1,17 @@
-// --- CONFIGURAÇÃO DO SUPABASE ---
-const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
-const SUPABASE_KEY = "sb_publishable_iMAadQ-9tSFXgNPoUApsEQ_eDpd-gf1";
+// ============================================================
+// scriptProfessores.js — Área do Professor (Versão Final)
+// ============================================================
 
+// Não precisamos recriar o Supabase aqui, pois a página login-professores.htm 
+// já carrega o script do Supabase. Vamos apenas esperar ele carregar.
 let supabaseClient = null;
 const scriptSupabase = document.createElement('script');
 scriptSupabase.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 scriptSupabase.onload = () => {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabaseClient = supabase.createClient(
+        "https://glnfbataoyvsnqnfkvvb.supabase.co", 
+        "sb_publishable_iMAadQ-9tSFXgNPoUApsEQ_eDpd-gf1"
+    );
     iniciarSistema();
 };
 document.head.appendChild(scriptSupabase);
@@ -41,7 +46,7 @@ function formatarDataBR(iso) {
 }
 
 function iniciarSistema() {
-    const profString = localStorage.getItem("@professorLogado");
+    const profString = sessionStorage.getItem("@professorLogado");
     if (!profString) {
         alert("Sessão expirada.");
         window.location.href = "login.htm";
@@ -72,18 +77,18 @@ function iniciarSistema() {
     }
 }
 
-// --- AUTO-FORMATAR O INPUT DE NOTA AO SAIR DO CAMPO (8 vira 8.0) ---
+// --- AUTO-FORMATAR O INPUT DE NOTA ---
 document.addEventListener('blur', function(e) {
     if (e.target && e.target.type === 'number' && e.target.name && e.target.name.includes('_')) {
         const val = e.target.value.trim();
         if (val !== "") {
             const num = parseFloat(val);
             if (!isNaN(num)) {
-                e.target.value = num.toFixed(1); // Força 1 casa decimal (ex: 8 -> 8.0)
+                e.target.value = num.toFixed(1);
             }
         }
     }
-}, true); // true para pegar no capture phase
+}, true);
 
 // --- CARREGAR ALUNOS ---
 if (selectTurma) {
@@ -171,28 +176,23 @@ if (formAddAluno) {
 
         if (!turmaSelecionada) return alert("Selecione uma turma primeiro.");
 
-        const anoAtual = new Date().getFullYear();
-        const numProvisorio = `PROV-${anoAtual}-${Math.floor(Math.random() * 10000)}`;
-
+        // O banco vai gerar a matrícula automaticamente agora
         const { data, error } = await supabaseClient.from('alunos').insert([{
             nome: nome,
             data_nascimento: dataNasc || null,
             turma: turmaSelecionada,
             status: 'Ativa',
-            numero_matricula: numProvisorio,
             notas: {}
         }]).select();
 
-        if (error) { console.error(error); return alert("Erro ao adicionar aluno."); }
+        if (error) { 
+            console.error(error); 
+            return alert("Erro ao adicionar aluno."); 
+        }
 
-        await supabaseClient.from('avisos').insert([{
-            tipo: 'Aluno Incompleto',
-            mensagem: `O professor adicionou o aluno "${nome}" na turma ${turmaSelecionada.toUpperCase()}. Faltam dados cadastrais.`,
-            aluno_id: data[0].id,
-            lido: false
-        }]);
+        // Aviso para o gestor foi removido para evitar erro de permissão 403
 
-        alert("Aluno adicionado com sucesso! O Gestor foi notificado.");
+        alert("Aluno adicionado com sucesso!");
         if (modalAddAluno) modalAddAluno.style.display = "none";
         formAddAluno.reset();
         selectTurma.dispatchEvent(new Event('change'));
@@ -213,7 +213,7 @@ window.mudarStatus = async function(id, novoStatus) {
 
 window.excluirAluno = async function(id) {
     if (!confirm("⚠️ ATENÇÃO: Tem certeza que deseja EXCLUIR este aluno permanentemente?")) return;
-    await supabaseClient.from('avisos').delete().eq('aluno_id', id);
+    await supabaseClient.from('avisos').delete().eq('autor_id', id);
     await supabaseClient.from('solicitacoes_documentos').delete().eq('aluno_id', id);
     const { error } = await supabaseClient.from('alunos').delete().eq('id', id);
     if (error) alert("Erro ao excluir aluno.");
@@ -310,7 +310,6 @@ function abrirTelaNotas(aluno) {
                         for (let i = 1; i <= 3; i++) {
                             const inputNota = document.querySelector(`input[name="${bimestre}_${materia}_${i}"]`);
                             if (inputNota && notas[`n${i}`]) {
-                                // FORÇA A EXIBIÇÃO COM 1 CASA DECIMAL (8 vira 8.0)
                                 inputNota.value = Number(notas[`n${i}`]).toFixed(1);
                             }
                         }
@@ -322,6 +321,60 @@ function abrirTelaNotas(aluno) {
     }
     telaNotas.scrollIntoView({ behavior: 'smooth' });
 }
+
+// --- IMPRIMIR E BAIXAR BOLETIM (ÁREA DO PROFESSOR) ---
+const btnImprimirBoletimProf = document.querySelector('#btnImprimirBoletimProf');
+const btnBaixarBoletimProf = document.querySelector('#btnBaixarBoletimProf');
+
+async function gerarDocumentoBoletimProf() {
+    if (!alunoSelecionadoId) return alert("Selecione um aluno primeiro.");
+
+    // Busca os dados atualizados do aluno no banco
+    const { data: aluno, error } = await supabaseClient
+        .from('alunos')
+        .select('*')
+        .eq('id', alunoSelecionadoId)
+        .single();
+
+    if (error || !aluno) return alert("Erro ao buscar dados do aluno.");
+
+    // Chama a função de gerar o HTML do boletim que está no templates-docs.js
+    const html = docBoletim(aluno);
+    return html;
+}
+
+if (btnImprimirBoletimProf) {
+    btnImprimirBoletimProf.addEventListener('click', async () => {
+        const html = await gerarDocumentoBoletimProf();
+        if (!html) return;
+
+        const win = window.open('', '_blank');
+        win.document.write(html);
+        win.document.close();
+        win.onload = () => { win.print(); };
+    });
+}
+
+if (btnBaixarBoletimProf) {
+    btnBaixarBoletimProf.addEventListener('click', async () => {
+        const html = await gerarDocumentoBoletimProf();
+        if (!html) return;
+
+        const aluno = await supabaseClient.from('alunos').select('nome').eq('id', alunoSelecionadoId).single();
+        const nomeAluno = aluno.data ? aluno.data.nome : 'Aluno';
+
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Boletim-${nomeAluno.replace(/\s+/g,'_')}.doc`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+}
+
+
+
 
 if (btnCancelarNotas) {
     btnCancelarNotas.addEventListener('click', () => {

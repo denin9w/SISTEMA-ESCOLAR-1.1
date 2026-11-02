@@ -230,10 +230,10 @@
         if (sair) {
             sair.addEventListener('click', function (e) {
                 e.preventDefault();
-                localStorage.removeItem("@alunoLogadoId");
-                localStorage.removeItem("@alunoLogadoNome");
-                localStorage.removeItem("@professorLogado");
-                localStorage.removeItem("@gestorLogado");
+                sessionStorage.removeItem("@alunoLogadoId");
+                sessionStorage.removeItem("@alunoLogadoNome");
+                sessionStorage.removeItem("@professorLogado");
+                sessionStorage.removeItem("@gestorLogado");
                 window.location.href = "login.htm";
             });
         }

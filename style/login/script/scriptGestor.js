@@ -1,5 +1,5 @@
 // ============================================================
-// scriptGestor.js — Área do Gestor (Com Carnê e Financeiro)
+// scriptGestor.js — Área do Gestor (Versão Final e Segura)
 // ============================================================
 
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
@@ -15,7 +15,6 @@ scriptSupabase.onload = () => {
 };
 document.head.appendChild(scriptSupabase);
 
-// Elementos
 const selectTurma       = document.querySelector('#iturma');
 const listaDeAlunos     = document.querySelector('#listaAlunos');
 const cardAlunos        = document.querySelector('#cardAlunos');
@@ -27,7 +26,6 @@ const listaSolicitacoes = document.querySelector('#listaSolicitacoes');
 const listaProfsPend    = document.querySelector('#listaProfessoresPendentes');
 const gestorNomeEl      = document.querySelector('#gestorNome');
 
-// Modal Add Aluno
 const btnAddAlunoGestor = document.querySelector('#btnAddAlunoGestor');
 const modalAddAluno     = document.querySelector('#modalAddAlunoGestor');
 const btnFecharModal    = document.querySelector('#btnFecharModalGestor');
@@ -53,17 +51,12 @@ function labelTurma(t) {
 
 function preencherSelects() {
     const options = TURMAS.map(t => `<option value="${t}">${labelTurma(t)}</option>`).join('');
-    
-    if (selectTurma) {
-        selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>' + options;
-    }
-    if (selectAddTurma) {
-        selectAddTurma.innerHTML = '<option value="" selected disabled>Selecione...</option>' + options;
-    }
+    if (selectTurma) selectTurma.innerHTML = '<option value="" selected disabled>Selecione uma turma</option>' + options;
+    if (selectAddTurma) selectAddTurma.innerHTML = '<option value="" selected disabled>Selecione...</option>' + options;
 }
 
 async function iniciarGestor() {
-    const gString = localStorage.getItem("@gestorLogado");
+    const gString = sessionStorage.getItem("@gestorLogado");
     if (!gString) {
         alert("Sessão expirada. Faça login novamente.");
         window.location.href = "login.htm";
@@ -77,7 +70,6 @@ async function iniciarGestor() {
     carregarProfessoresPendentes();
 }
 
-// --- AÇÕES DE NAVEGAÇÃO ---
 if (selectTurma) {
     selectTurma.addEventListener('change', () => {
         if (selectTurma.value) {
@@ -90,10 +82,7 @@ if (selectTurma) {
 if (btnPesquisar) {
     btnPesquisar.addEventListener('click', () => {
         const termo = inputBusca.value.trim();
-        if (termo === '') {
-            alert("Digite o nome do aluno para pesquisar.");
-            return;
-        }
+        if (termo === '') return alert("Digite o nome do aluno para pesquisar.");
         selectTurma.value = ""; 
         pesquisarGlobal(termo);
     });
@@ -108,45 +97,24 @@ if (inputBusca) {
     });
 }
 
-// --- FUNÇÕES DE BUSCA ---
 async function carregarAlunosPorTurma(turma) {
     cardAlunos.style.display = 'block';
     listaDeAlunos.innerHTML = '<p>Carregando...</p>';
-
-    const { data, error } = await supabaseClient
-        .from('alunos')
-        .select('id, nome, status, turma, pagamentos')
-        .eq('turma', turma)
-        .order('nome', { ascending: true });
-
+    const { data, error } = await supabaseClient.from('alunos').select('id, nome, status, turma, pagamentos').eq('turma', turma).order('nome', { ascending: true });
     renderizarListaAlunos(data, error);
 }
 
 async function pesquisarGlobal(termo) {
     cardAlunos.style.display = 'block';
-    listaDeAlunos.innerHTML = '<p>Pesquisando em todas as turmas...</p>';
-
-    const { data, error } = await supabaseClient
-        .from('alunos')
-        .select('id, nome, status, turma, pagamentos')
-        .ilike('nome', `%${termo}%`)
-        .order('nome', { ascending: true });
-
+    listaDeAlunos.innerHTML = '<p>Pesquisando...</p>';
+    const { data, error } = await supabaseClient.from('alunos').select('id, nome, status, turma, pagamentos').ilike('nome', `%${termo}%`).order('nome', { ascending: true });
     renderizarListaAlunos(data, error);
 }
 
 function renderizarListaAlunos(data, error) {
-    if (error) { 
-        console.error(error); 
-        listaDeAlunos.innerHTML = '<p>Erro ao carregar.</p>'; 
-        return; 
-    }
-
+    if (error) { console.error(error); listaDeAlunos.innerHTML = '<p>Erro ao carregar.</p>'; return; }
     listaDeAlunos.innerHTML = '';
-    if (!data || data.length === 0) {
-        listaDeAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>';
-        return;
-    }
+    if (!data || data.length === 0) return listaDeAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>';
 
     data.forEach(aluno => {
         const a = document.createElement('button');
@@ -154,9 +122,7 @@ function renderizarListaAlunos(data, error) {
         a.dataset.nome = aluno.nome;
         a.dataset.id = aluno.id;
         const statusTag = aluno.status !== 'Ativa' ? ` [${aluno.status}]` : '';
-        const turmaTag = labelTurma(aluno.turma);
-        a.innerHTML = `${aluno.nome}${statusTag} <br><small style="color:#666;font-weight:normal;">${turmaTag}</small>`;
-        
+        a.innerHTML = `${aluno.nome}${statusTag} <br><small style="color:#666;font-weight:normal;">${labelTurma(aluno.turma)}</small>`;
         a.addEventListener('click', () => {
             document.querySelectorAll('.btn-aluno').forEach(b => b.style.borderColor = '#eee');
             a.style.borderColor = 'var(--destaque)';
@@ -166,7 +132,6 @@ function renderizarListaAlunos(data, error) {
     });
 }
 
-// --- MODAL ADICIONAR ALUNO ---
 if (btnAddAlunoGestor) {
     btnAddAlunoGestor.addEventListener('click', () => {
         modalAddAluno.style.display = 'flex';
@@ -186,6 +151,24 @@ if (formAddAluno) {
         e.preventDefault();
         
         const btnSalvar = formAddAluno.querySelector('.btn-salvar');
+
+        // --- VALIDAÇÃO DE CPF AQUI ---
+        const cpfPaiInput = document.querySelector('#addCpfPaiGestor').value.trim();
+        const cpfMaeInput = document.querySelector('#addCpfMaeGestor').value.trim();
+        
+        const cpfPaiLimpo = cpfPaiInput.replace(/\D/g, '');
+        const cpfMaeLimpo = cpfMaeInput.replace(/\D/g, '');
+
+        if (cpfPaiLimpo && cpfPaiLimpo.length !== 11) {
+            alert("O CPF do Pai precisa ter exatamente 11 números. Verifique o que foi digitado.");
+            return; // Para o código aqui, não salva
+        }
+        if (cpfMaeLimpo && cpfMaeLimpo.length !== 11) {
+            alert("O CPF da Mãe precisa ter exatamente 11 números. Verifique o que foi digitado.");
+            return; // Para o código aqui, não salva
+        }
+        // --- FIM DA VALIDAÇÃO ---
+
         btnSalvar.disabled = true;
         btnSalvar.textContent = "Salvando...";
 
@@ -216,16 +199,30 @@ if (formAddAluno) {
             pagamentos: []
         };
 
-        const anoAtual = new Date().getFullYear();
-        const { data: ultimo } = await supabaseClient.from('alunos').select('numero_matricula').like('numero_matricula', `${anoAtual}%`).order('numero_matricula', { ascending: false }).limit(1);
-        let numMatricula = `${anoAtual}0001`;
-        if (ultimo && ultimo.length > 0) {
-            const ultimoNum = parseInt(ultimo[0].numero_matricula.slice(-4), 10);
-            numMatricula = `${anoAtual}${(ultimoNum + 1).toString().padStart(4, '0')}`;
+        // --- CRIA A CONTA DO RESPONSÁVEL NO AUTH (TRATANDO DUPLICIDADE) ---
+        const cpfResponsavel = matricula.cpf_pai || matricula.cpf_mae;
+        if (cpfResponsavel) {
+            const emailAuth = `${cpfResponsavel.replace(/\D/g, '')}@ceje.local`;
+            const senhaAuth = cpfResponsavel.replace(/\D/g, '');
+            
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                email: emailAuth,
+                password: senhaAuth,
+            });
+            
+            if (authData && authData.user) {
+                matricula.auth_id = authData.user.id; 
+            } else if (authError && (authError.message.includes("already registered") || authError.message.includes("User already exists"))) {
+                const { data: loginData } = await supabaseClient.auth.signInWithPassword({
+                    email: emailAuth,
+                    password: senhaAuth,
+                });
+                if (loginData && loginData.user) matricula.auth_id = loginData.user.id;
+            }
         }
-        matricula.numero_matricula = numMatricula;
 
-        const { error } = await supabaseClient.from('alunos').insert([matricula]);
+        // --- SALVA O ALUNO (BANCO GERA MATRÍCULA) ---
+        const { data: alunoInserido, error } = await supabaseClient.from('alunos').insert([matricula]).select();
 
         btnSalvar.disabled = false;
         btnSalvar.textContent = "Salvar Matrícula";
@@ -233,81 +230,50 @@ if (formAddAluno) {
         if (error) {
             console.error(error);
             alert("Erro ao cadastrar aluno: " + error.message);
-            return;
+            return; 
         }
 
-        alert(`Aluno ${matricula.nome} matriculado com sucesso!\nMatrícula: ${numMatricula}`);
+        const matriculaGerada = alunoInserido[0].numero_matricula;
+        alert(`Aluno ${matricula.nome} matriculado com sucesso!\nMatrícula: ${matriculaGerada}`);
+        
         modalAddAluno.style.display = 'none';
         formAddAluno.reset();
         
-        if (selectTurma.value === matricula.turma) {
-            carregarAlunosPorTurma(matricula.turma);
-        } else {
-            pesquisarGlobal(matricula.nome);
-        }
+        if (selectTurma.value === matricula.turma) carregarAlunosPorTurma(matricula.turma);
+        else pesquisarGlobal(matricula.nome);
     });
 }
-
-// --- EXIBIR DOCUMENTOS ---
 function abrirDocumentos(aluno) {
     if (!documentoporAluno) return;
     cardDocumentos.style.display = 'block';
-    
     const docs = [
-        { label: 'Bolsa Família', icon: 'fa-file-lines' },
-        { label: 'Transferência', icon: 'fa-arrow-right-arrow-left' },
-        { label: 'Declaração de Matrícula', icon: 'fa-id-card' },
-        { label: 'Declaração Provisória', icon: 'fa-file-circle-exclamation' },
-        { label: 'Recibo de Pagamento', icon: 'fa-money-check-dollar' },
-        { label: 'Ficha Individual', icon: 'fa-clipboard-list' },
-        { label: 'Recibo', icon: 'fa-receipt' },
-        { label: 'Declaração de Quitação Simples', icon: 'fa-file-invoice-dollar' },
-        { label: 'Declaração de Quitação Tabela', icon: 'fa-table' },
-        { label: 'Boletim', icon: 'fa-file-pdf' }
+        { label: 'Bolsa Família', icon: 'fa-file-lines' }, { label: 'Transferência', icon: 'fa-arrow-right-arrow-left' },
+        { label: 'Declaração de Matrícula', icon: 'fa-id-card' }, { label: 'Declaração Provisória', icon: 'fa-file-circle-exclamation' },
+        { label: 'Recibo de Pagamento', icon: 'fa-money-check-dollar' }, { label: 'Ficha Individual', icon: 'fa-clipboard-list' },
+        { label: 'Recibo', icon: 'fa-receipt' }, { label: 'Declaração de Quitação Simples', icon: 'fa-file-invoice-dollar' },
+        { label: 'Declaração de Quitação Tabela', icon: 'fa-table' }, { label: 'Boletim', icon: 'fa-file-pdf' }
     ];
-
     documentoporAluno.innerHTML = '';
-    
     const title = document.createElement('div');
     title.style.cssText = 'grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;';
     title.innerHTML = `<span style="font-size: 0.85rem; color: #666; font-style: italic;">Aluno: ${aluno.nome}</span>`;
-    
     const btnGroup = document.createElement('div');
     btnGroup.style.cssText = 'display: flex; gap: 10px;';
     
-    const btnCarne = document.createElement('button');
-    btnCarne.className = 'btn-primario';
-    btnCarne.innerHTML = '<i class="fa-solid fa-barcode"></i> Emitir Carnê';
-    btnCarne.style.cssText = 'padding: 8px 15px; font-size: 0.8rem;';
-    btnCarne.onclick = () => abrirModalCarne(aluno);
-
-    const btnFinanceiro = document.createElement('button');
-    btnFinanceiro.className = 'btn-primario';
-    btnFinanceiro.innerHTML = '<i class="fa-solid fa-chart-line"></i> Financeiro';
-    btnFinanceiro.style.cssText = 'padding: 8px 15px; font-size: 0.8rem; background: #28a745;';
-    btnFinanceiro.onclick = () => abrirModalFinanceiro(aluno);
+    const btnCarne = document.createElement('button'); btnCarne.className = 'btn-primario'; btnCarne.innerHTML = '<i class="fa-solid fa-barcode"></i> Emitir Carnê'; btnCarne.style.cssText = 'padding: 8px 15px; font-size: 0.8rem;'; btnCarne.onclick = () => abrirModalCarne(aluno);
+    const btnFinanceiro = document.createElement('button'); btnFinanceiro.className = 'btn-primario'; btnFinanceiro.innerHTML = '<i class="fa-solid fa-chart-line"></i> Financeiro'; btnFinanceiro.style.cssText = 'padding: 8px 15px; font-size: 0.8rem; background: #28a745;'; btnFinanceiro.onclick = () => abrirModalFinanceiro(aluno);
     
-    btnGroup.appendChild(btnCarne);
-    btnGroup.appendChild(btnFinanceiro);
-    title.appendChild(btnGroup);
-    documentoporAluno.appendChild(title);
+    btnGroup.appendChild(btnCarne); btnGroup.appendChild(btnFinanceiro); title.appendChild(btnGroup); documentoporAluno.appendChild(title);
 
     docs.forEach(d => {
-        const a = document.createElement('a');
-        a.href = '#';
-        a.dataset.doc = d.label;
-        a.innerHTML = `<i class="fa-solid ${d.icon}" style="color: var(--titlecor);"></i> ${d.label}`;
-        a.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            mostrarAcoesDocumento(aluno.id, d.label);
-        });
-        const div = document.createElement('div');
-        div.className = 'cdocumentos';
-        div.appendChild(a);
-        documentoporAluno.appendChild(div);
+        const a = document.createElement('a'); a.href = '#'; a.dataset.doc = d.label; a.innerHTML = `<i class="fa-solid ${d.icon}" style="color: var(--titlecor);"></i> ${d.label}`;
+        a.addEventListener('click', (ev) => { ev.preventDefault(); mostrarAcoesDocumento(aluno.id, d.label); });
+        const div = document.createElement('div'); div.className = 'cdocumentos'; div.appendChild(a); documentoporAluno.appendChild(div);
     });
 }
 
+// ... (Funções de Modal Carnê, Financeiro, Documentos, Avisos e Professores Pendentes permanecem iguais) ...
+// Se precisar do restante do código a partir daqui, me avise!
 // --- MODAL EMITIR CARNÊ ---
 function abrirModalCarne(aluno) {
     let modalCarne = document.getElementById('modalCarne');
