@@ -1,16 +1,15 @@
 @import url(../principal/style.css);
 
-/* ÁREA DA FICHA/MAIN (Mobile e Padrão): Recebe a imagem de fundo */
+/* ÁREA DA FICHA/MAIN (Mobile e Padrão) */
 main#dados-container{
     display: flex;
     flex-direction: column;
     width: 100vw;
-    min-height: 100vh;
+    flex: 1; /* Ocupa o espaço restante em vez de forçar 100vh */
     padding: 1rem;
     justify-content: center;
     align-items: center;
-    
-    background: url(../../imagens/fundo.png) center center no-repeat; /* Imagem de fundo no mobile */
+    background: url(../../imagens/fundo.png) center center no-repeat;
     background-size: cover;
     background-attachment: fixed;
 }
@@ -26,13 +25,13 @@ fieldset.dados-aluno{
     border: 2px dashed var(--destaque);
     border-radius: 10px;
     padding: 10px;
-    background: var(--fundo-card); /* Fundo branco para o fieldset */
+    background: var(--fundo-card);
 }
 
 form#formulario{
     display: flex;
     flex-direction: column;
-    background: var(--fundo-card); /* Fundo branco para o form no mobile */
+    background: var(--fundo-card);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -71,7 +70,7 @@ label{
     color: var(--texto);
     font-size: 1rem;
     border-radius: 20px;
-    border:0.2rem solid var(--texto);
+    border: 0.2rem solid var(--texto);
 }
 
 div.linha-dupla{
@@ -87,7 +86,7 @@ div.linha-dupla{
     color: var(--texto);
     font-size: 1rem;
     border-radius: 20px;
-    border:0.2rem solid var(--texto);
+    border: 0.2rem solid var(--texto);
 }
 
 select#iresponsavel{
@@ -121,12 +120,7 @@ div.sexo{
     align-items: center;
 }
 
-div.sexo-m{
-    display: flex;
-    align-items: center;
-}
-
-div.sexo-f{
+div.sexo-m, div.sexo-f{
     display: flex;
     align-items: center;
 }
@@ -157,64 +151,34 @@ textarea{
 }
 
 div.botoes{
-    
     display: flex;
     flex-direction: column;
     align-self: center;
     margin-top: 10px;
     gap: 10px;
-  
-
-  
 }
 
 div.botoes button{
-    background-color: none;
     color: var(--texto);
     padding: 10px;
     background-color: var(--fundo-card);
     border-radius: 25px;
 }
 
-button#btnProximo{
+button#btnProximo, button#btnVoltar, button#btnFinalizar{
     font-size: 1.2rem;
     border: none;
-   
     cursor: pointer;
     text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
-    
-  
 }
 
-button#btnProximo:hover{
+button#btnProximo:hover, button#btnVoltar:hover, button#btnFinalizar:hover{
     color: var(--destaque);
     scale: 1.05;
 }
 
-button#btnVoltar{
-    font-size: 1.2rem;
-    border: none;
-    cursor: pointer;
-    text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
+button#btnVoltar, button#btnFinalizar{
     display: none;
-}
-
-button#btnVoltar:hover{
-    color: var(--destaque);
-   scale: 1.05;
-}
-
-button#btnFinalizar{
-    font-size: 1.2rem;
-    border: none;
-    cursor: pointer;
-    text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.095);
-    display: none;
-}
-
-button#btnFinalizar:hover{
-   color: var(--destaque);
-    scale: 1.05;
 }
 
 div.etapa2{

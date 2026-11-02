@@ -97,22 +97,6 @@
         </div>
     </main>
 
-    <!-- FOOTER PADRONIZADO -->
-    <footer>
-        <img src="imagens/logoceje.png" alt="logo da escola">
-
-        <div class="text-footer">
-            <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN </h1>
-            <p>Rua Clementino Ricardo de Souza, 134 — Severiano Moraes Filho</p>
-            <p>Fone: (87) 98114-9883 — Cadastro Escolar P-459-058 — CNPJ 05.198.663/0001-86</p>
-            <p>Portaria nº 220 D.O.E. 22/01/2004 — Portaria nº 4160 D.O.E. 06/06/2011</p>
-            <p>CEP: 552900 — Garanhuns — Pernambuco</p>
-        </div>
-
-        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
-    </footer>
-
     <!-- MODAL DE ADICIONAR ALUNO -->
     <div id="modalAddAlunoGestor" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
@@ -224,6 +208,7 @@
     <script src="documentos/html/templates-docs.js"></script>
     <script src="style/login/script/scriptGestor.js"></script>
 
+    <!-- SCRIPT DO BOTÃO SAIR -->
     <script>
     (function () {
         const sair = document.getElementById('btnSair');
@@ -239,5 +224,24 @@
         }
     })();
     </script>
+
+    <!-- FOOTER PADRONIZADO (AQUI, DEPOIS DOS SCRIPTS) -->
+      <footer>
+        <img src="imagens/logoceje.png" alt="logo da escola">
+        <div class="text-footer">
+            <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
+            <p>© 2008-2026 Companyend</p>
+            <p>Rua Clementino Ricardo de Souza, 134 — Severiano Moraes Filho - Fone: (87) 98114-9883</p>
+         <p>CEP: 552900 — Garanhuns — Pernambuco</p>
+        
+        <!-- NOVO LINK DO GOOGLE MAPS -->
+            <a href="https://maps.app.goo.gl/kVnhnifLVjHVQg247" target="_blank" class="link-mapa">
+                <i class="fa-solid fa-location-dot"></i> Ver localização no Google Maps
+            </a>
+        
+        </div>
+        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
+        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+    </footer>
 </body>
 </html>

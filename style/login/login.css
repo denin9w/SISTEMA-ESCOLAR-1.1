@@ -10,9 +10,9 @@
   --destaque-inverso: #66bbff;
   --fundo-card: #ffffff;
 
-  --font-titulos: "Sacramento", cursive, sans-serif;
-  --font-subtitulo: "Teachers", sans-serif;
-  --font-botoes: "Roboto", sans-serif;
+  --font-titulos:"Sacramento", cursive, sans-serif;
+  --font-subtitulo:"Teachers", sans-serif;
+  --font-botoes:"Roboto", sans-serif;
 }
 
 * {
@@ -22,82 +22,41 @@
 }
 
 body {
-    width: 100%;
-    min-height: 100vh;
-    background-color: var(--fundo-principal);
     font-family: var(--font-subtitulo);
+    background-color: var(--fundo-card);
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
-/* ÁREA PRINCIPAL (mobile): fundo + card centralizado */
+/* ============================================================
+   MOBILE (O que já funcionava, mas mais limpo)
+   ============================================================ */
+header {
+    display: none; /* Esconde o header gigante no celular para focar no login */
+}
+
 main#login-main {
+    flex: 1;
     display: flex;
-    flex-direction: column;
-    width: 100vw;
-    min-height: 100vh;
-    padding: 80px 20px 60px 20px;
     align-items: center;
     justify-content: center;
-    background: url(../../imagens/fundo.png) center center no-repeat !important;
+    padding: 80px 20px 60px 20px;
+   
     background-size: cover;
     background-attachment: fixed;
     position: relative;
+    width: 100%;
 }
 
-/* Overlay suave igual à matrícula */
 main#login-main::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.7);
     z-index: 1;
 }
 
-/* Imagens decorativas */
-img.boneco {
-    position: absolute;
-    width: 7rem;
-    top: 15%;
-    left: 5%;
-    z-index: 2;
-}
-img.moeda {
-    position: absolute;
-    width: 5rem;
-    bottom: 15%;
-    right: 5%;
-    z-index: 2;
-}
-
-/* NAVBAR */
-nav#MCL {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    background-color: var(--titlecor);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    height: 60px;
-    align-items: center;
-    z-index: 10;
-    width: 100%;
-}
-
-nav#MCL a {
-    color: var(--texto-inverso);
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-nav#MCL a:hover {
-    color: var(--destaque-inverso);
-}
-
-/* CARD CENTRALIZADO */
 #login-card {
     position: relative;
     z-index: 5;
@@ -111,17 +70,13 @@ nav#MCL a:hover {
     flex-direction: column;
 }
 
-.text-banerL {
+.text-banerL h1 {
+    font-size: 2.5rem;
+    color: var(--titlecor);
+    font-weight:lighter;
+    font-family: var(--font-titulos);
     text-align: center;
     margin-bottom: 25px;
-}
-
-.text-banerL h1 {
-    font-size: 3rem;
-    color: var(--titlecor);
-    font-family: var(--font-titulos);
-    line-height: 1.2;
-    font-weight: lighter;
 }
 
 /* ABAS */
@@ -146,10 +101,6 @@ nav#MCL a:hover {
     transition: all 0.3s ease;
 }
 
-.tab:hover {
-    background-color: #e1eaf5;
-}
-
 .tab.ativa {
     background-color: var(--destaque);
     color: var(--texto-inverso);
@@ -162,12 +113,6 @@ nav#MCL a:hover {
     flex-direction: column;
     gap: 15px;
     width: 100%;
-}
-
-.input-one {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 
 .input-one label {
@@ -194,7 +139,6 @@ nav#MCL a:hover {
     box-shadow: 0 0 0 4px rgba(0, 119, 255, 0.1);
 }
 
-/* BOTÃO ENTRAR */
 button.input-b {
     width: 100%;
     padding: 15px;
@@ -213,11 +157,6 @@ button.input-b:hover {
     background-color: var(--destaque);
 }
 
-button.input-b:disabled {
-    background-color: #ccc;
-    cursor: wait;
-}
-
 #linkCadastroProf {
     text-align: center;
     margin-top: 10px;
@@ -229,112 +168,144 @@ button.input-b:disabled {
   font-weight: bolder;
 }
 
-#linkCadastroProf a:hover{
-    color: var(--destaque);
-
-}
-
-/* FOOTER igual ao da matrícula */
-footer {
-    width: 100%;
-    max-height: 220px; /* Mantém o limite */
-    box-sizing: border-box;
-    background-color: var(--fundo-card);
-    color: var(--titlecor);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    
-    gap: 20px;
-    padding: 15px 30px;
-    margin-top: auto;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 1;
-    overflow: hidden;
-}
-
-/* Mantém a logo da escola, mas com um tamanho menor */
-footer > img:first-child {
-    width: 90px; /* Reduzido para sobrar mais espaço para o texto */
-    height: auto;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-/* Container do Texto */
-footer div.text-footer {
-    color: var(--titlecor);
-    flex: 1; 
-    min-width: 0; /* Permite encolher no flexbox */
-             
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px; /* Menos espaço entre as linhas */
-}
-
-footer div.text-footer h1 {
-    margin: 0;
-    font-size: 1rem; /* Fonte do título um pouco menor */
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Texto do endereço e CNPJ - Fonte bem pequena para caber tudo */
-footer div.text-footer p {
-    margin: 0;
-    font-size: 0.68rem; /* Fonte reduzida */
-    line-height: 1.2;
-    color: rgba(0, 0, 0, 0.7);
-    white-space: pre-line;
-    overflow-wrap: break-word;
+/* Esconde as imagens soltas e bonecos no mobile para não quebrar o layout */
+main#login-main img.boneco,
+main#login-main img.moeda {
+    display: none;
 }
 
 /* ============================================================
-   ESCONDE OS BONECOS DO FOOTER (Conforme sua solicitação)
+   DESKTOP (Estilo Tela Dividida)
    ============================================================ */
-footer img.boneco,
-footer img.moeda {
-    display: none !important;
-}
-
-
-/* ============================================================
-   RESPONSIVIDADE (CELULARES)
-   ============================================================ */
-@media (max-width: 600px) {
-    main#login-main img.boneco,
-    main#login-main img.moeda {
-        display: none;
+@media screen and (min-width: 764px) {
+   body {
+        display: grid;
+        width: 100vw;
+        min-height: 100vh;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 60px 1fr auto;
+        
+        /* Imagem de fundo na tela toda */
+        background: url(../../imagens/fundo.png) center center no-repeat !important;
+        background-size: cover;
+        background-attachment: fixed;
     }
 
+        nav#MCL {
+        grid-column: 1 / -1;
+        grid-row: 1 / span 1;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        
+        /* A MÁGICA PARA O MENU BRANCO */
+        background-color: #ffffff !important; 
+        width: 100%;
+        justify-content: flex-end;
+        padding-right: 40px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Sombra sutil para separar do resto */
+    }
+
+    /* Deixa os links normais, sem fundo extra */
+    nav#MCL a {
+        color: var(--titlecor);
+        background-color: transparent; /* Remove aquele fundo que eu tinha colocado */
+        padding: 0;
+    }
+
+    nav#MCL a:hover {
+        color: var(--destaque);
+    }
+
+    /* HEADER (Esquerda) - Agora ele fica transparente para mostrar a imagem do body */
+    header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        grid-column: 1 / span 1;
+        grid-row: 2 / span 1;
+        background: transparent; /* Tira a imagem daqui */
+        position: relative;
+        height: 100%;
+        box-shadow: none;
+    }
+
+    /* Adiciona um leve degradê branco atrás do texto para ele ficar legível */
+    .text-fixo {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 20px;
+        backdrop-filter: blur(5px); /* Efeito de vidro embaçado super moderno */
+    }
+
+    .text-fixo h1 {
+        font-size: 3.5rem;
+        color: var(--titlecor) !important;
+    }
+
+    /* MAIN (Direita) - Fica transparente para mostrar a imagem do body */
+   main#login-main {
+        grid-column: 2 / -1;
+        grid-row: 2 / span 1;
+        width: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 40px 60px 40px; 
+        
+        /* A CORREÇÃO ESTÁ AQUI: Fundo totalmente transparente */
+        background: transparent !important; 
+    }
+
+    /* Garante que o "falso" fundo branco do mobile não apareça */
+    main#login-main::before {
+        display: none !important;
+    }
+
+    /* O Card continua branco e flutuando sobre a imagem */
     #login-card {
-        padding: 30px 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15); /* Sombra mais forte para destacar */
+        padding: 50px 40px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+        background: var(--fundo-card); /* Fundo branco no card */
+        border: none;
     }
 
-    .text-banerL h1 {
-        font-size: 1.8rem;
+    /* ... (resto do código das abas, inputs e footer continua igual) ... */
+}
+   
+    .tabs {
+        margin-bottom: 35px;
     }
 
     .tab {
-        font-size: 0.75rem;
-        padding: 10px 2px;
+        font-size: 0.95rem;
+        padding: 12px 5px;
     }
 
     .input-l {
-        padding: 12px 15px;
-        font-size: 0.95rem;
+        padding: 16px 20px;
+        border-radius: 8px;
     }
 
+    button.input-b {
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
+    /* FOOTER */
     footer {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
+        grid-column: 1 / -1;
+        grid-row: 3 / span 1;
+        width: 100%;
+        z-index: 10;
+        position: relative;
     }
-
-    footer img {
-        width: 40%;
-    }
-}
