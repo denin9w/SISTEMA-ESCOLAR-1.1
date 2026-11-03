@@ -109,7 +109,7 @@ nav#MCL {
     justify-content: flex-end; /* Joga os links para a direita no Desktop */
     align-items: center;
     gap: 30px; /* Espaçamento elegante entre os links */
-    
+    background-color: var(--fundo-card);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     height: 60px;
     padding: 0 40px; /* Respiro nas laterais */
