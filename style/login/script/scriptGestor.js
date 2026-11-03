@@ -149,6 +149,13 @@ if (btnFecharModal) {
 if (formAddAluno) {
     formAddAluno.addEventListener('submit', async (e) => {
         e.preventDefault();
+// --- VALIDAÇÃO DA DATA ---
+        const dataNasc = document.querySelector('#addDataGestor').value;
+        if (!dataNasc) {
+            alert("⚠️ Por favor, preencha a Data de Nascimento do aluno.");
+            return; // Para o envio
+        }
+        // --- FIM DA VALIDAÇÃO ---
         
         const btnSalvar = formAddAluno.querySelector('.btn-salvar');
 

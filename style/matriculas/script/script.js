@@ -53,6 +53,14 @@ if (formulario) {
         const dados = new FormData(formulario);
         const matricula = Object.fromEntries(dados);
 
+        // --- VALIDAÇÃO DA DATA DE NASCIMENTO ---
+        if (!matricula['data-nascimento'] || matricula['data-nascimento'].trim() === '') {
+            alert("⚠️ Por favor, preencha a Data de Nascimento do aluno antes de finalizar.");
+            return; // Para o envio aqui
+        }
+
+
+
         // --- VALIDAÇÃO DE CPF AQUI ---
         const cpfPaiInput = matricula['cpf-pai'] || '';
         const cpfMaeInput = matricula['cpf-mae'] || '';
