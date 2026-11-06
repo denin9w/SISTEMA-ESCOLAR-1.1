@@ -19,6 +19,7 @@ section#ficha {
 }
 
 img.boneco {
+    display:none;
     position: absolute;
     width: 6rem;
     top: 500px;
@@ -26,6 +27,7 @@ img.boneco {
 }
 
 img.moeda {
+    display:none;
     position: absolute;
     z-index: 1;
     right: -2px;
@@ -503,6 +505,7 @@ nav#MCL {
     top: 0;
     z-index: 1000;
     box-sizing: border-box;
+    
 }
 
 nav#MCL a {
@@ -514,6 +517,7 @@ nav#MCL a {
     align-items: center;
     gap: 8px;
     transition: color 0.3s;
+   
 }
 
 nav#MCL a:hover {
