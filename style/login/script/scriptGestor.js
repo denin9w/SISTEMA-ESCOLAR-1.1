@@ -31,7 +31,7 @@ const modalAddAluno     = document.querySelector('#modalAddAlunoGestor');
 const btnFecharModal    = document.querySelector('#btnFecharModalGestor');
 const formAddAluno      = document.querySelector('#formAddAlunoGestor');
 const selectAddTurma    = document.querySelector('#addTurmaGestor');
-
+const listaMatriculasPend = document.querySelector('#listaMatriculasPendentes');
 let gestorLogado = null;
 
 const TURMAS = [
@@ -68,6 +68,7 @@ async function iniciarGestor() {
     preencherSelects();
     carregarAvisos();
     carregarProfessoresPendentes();
+    carregarMatriculasPendentes();
 }
 
 if (selectTurma) {
@@ -100,7 +101,7 @@ if (inputBusca) {
 async function carregarAlunosPorTurma(turma) {
     cardAlunos.style.display = 'block';
     listaDeAlunos.innerHTML = '<p>Carregando...</p>';
-    const { data, error } = await supabaseClient.from('alunos').select('id, nome, status, turma, pagamentos').eq('turma', turma).order('nome', { ascending: true });
+    const { data, error } = await supabaseClient.from('alunos').select('id, nome, status, turma, pagamentos').eq('turma', turma).eq('autorizado', true).order('nome', { ascending: true });
     renderizarListaAlunos(data, error);
 }
 
@@ -112,7 +113,7 @@ async function pesquisarGlobal(termo) {
 }
 
 function renderizarListaAlunos(data, error) {
-    if (error) { console.error(error); listaDeAlunos.innerHTML = '<p>Erro ao carregar.</p>'; return; }
+    if (error) { console.error(error); listaDeAlunos.innerHTML = '  <p>Erro ao carregar.</p>'; return; }
     listaDeAlunos.innerHTML = '';
     if (!data || data.length === 0) return listaDeAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>';
 
@@ -637,6 +638,54 @@ async function carregarProfessoresPendentes() {
             const { error } = await supabaseClient.from('usuarios').update({ autorizado: true }).eq('id', btn.dataset.id);
             if (error) alert("Erro ao autorizar.");
             else carregarProfessoresPendentes();
+        });
+    });
+}
+
+// --- MATRÍCULAS PENDENTES ---
+async function carregarMatriculasPendentes() {
+    if (!listaMatriculasPend) return;
+    
+    const { data, error } = await supabaseClient
+        .from('alunos')
+        .select('id, nome, turma, nome_pai, cpf_pai')
+        .eq('autorizado', false)
+        .eq('status', 'Pendente');
+
+    if (error) { console.error(error); return; }
+
+    listaMatriculasPend.innerHTML = '';
+    if (!data || data.length === 0) {
+        listaMatriculasPend.innerHTML = '<p>Nenhuma matrícula pendente.</p>';
+        return;
+    }
+
+    data.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'aviso-item';
+        div.innerHTML = `
+            <strong>${a.nome}</strong> (${labelTurma(a.turma)})<br>
+            Pai/Mãe: ${a.nome_pai || 'Não informado'}<br>
+            <button class="btn-mini btn-autorizar-matricula" data-id="${a.id}">Aprovar Matrícula</button>
+        `;
+        listaMatriculasPend.appendChild(div);
+    });
+
+    listaMatriculasPend.querySelectorAll('.btn-autorizar-matricula').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm("Aprovar esta matrícula? O número será gerado automaticamente.")) return;
+            
+            const { error } = await supabaseClient
+                .from('alunos')
+                .update({ autorizado: true, status: 'Ativa' })
+                .eq('id', btn.dataset.id);
+                
+            if (error) {
+                alert("Erro ao aprovar: " + error.message);
+            } else {
+                alert("Matrícula aprovada! Número gerado.");
+                carregarMatriculasPendentes();
+            }
         });
     });
 }

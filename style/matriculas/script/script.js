@@ -1,3 +1,4 @@
+// --- script matriculas ---
 // --- CONTROLE DE ETAPAS DO FORMULÁRIO ---
 const etapa1 = document.querySelector('.etapa1');
 const etapa2 = document.querySelector('.etapa2');
@@ -127,7 +128,8 @@ if (formulario) {
             responsavel: tipoResponsavel,
             responsavel_outro: responsavelOutro,
 
-            status: 'Ativa',
+            status: 'Pendente',
+            autorizado: false,
             notas: {}
         };
 
@@ -176,6 +178,18 @@ if (formulario) {
         formulario.reset();
         voltar();
         
-        alert(`Matrícula finalizada com sucesso!\nO número de matrícula do aluno é: ${matriculaGerada}`);
+               // --- MOSTRA O MODAL DE SUCESSO (Em vez do alert) ---
+        const modal = document.getElementById('modalSucessoMatricula');
+        if (modal) {
+            modal.style.display = 'flex';
+            
+            // Configura o botão de fechar
+            document.getElementById('btnFecharModalSucesso').onclick = () => {
+                modal.style.display = 'none';
+            };
+        } else {
+            // Fallback caso o modal não exista no HTML
+            alert("Matrícula enviada com sucesso! Aguarde a aprovação do gestor.");
+        }
     });
 }

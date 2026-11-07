@@ -1,3 +1,4 @@
+// --- script login ---
 // --- CONFIGURAÇÃO DO SUPABASE ---
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_iMAadQ-9tSFXgNPoUApsEQ_eDpd-gf1";
@@ -74,10 +75,10 @@ async function entrar(){
         }
 
         // 2) Lógica para Responsável
-        if (tipoSelecionado === "responsavel") {
+              if (tipoSelecionado === "responsavel") {
             const { data: alunos, error: alunoError } = await supabaseClient
                 .from('alunos')
-                .select('id, nome, status')
+                .select('id, nome, status, autorizado') // Adicionamos o autorizado
                 .eq('auth_id', authData.user.id)
                 .limit(1);
 
@@ -85,6 +86,14 @@ async function entrar(){
 
             if (alunos && alunos.length > 0) {
                 const aluno = alunos[0];
+                
+                // NOVO: Verifica se a matrícula foi aprovada
+                if (aluno.autorizado === false) {
+                    alert("A matrícula do seu filho ainda está em análise pelo gestor. Aguarde a aprovação.");
+                    await supabaseClient.auth.signOut();
+                    return;
+                }
+
                 if (aluno.status && aluno.status !== 'Ativa') {
                     alert(`Acesso indisponível: aluno "${aluno.status}".`);
                     await supabaseClient.auth.signOut();
@@ -97,6 +106,7 @@ async function entrar(){
                 alert("Nenhum aluno encontrado para este responsável.");
                 await supabaseClient.auth.signOut();
             }
+        
         
         // 3) Lógica para Professor/Gestor
         } else {
