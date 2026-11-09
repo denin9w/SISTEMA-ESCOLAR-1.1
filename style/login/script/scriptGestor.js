@@ -648,7 +648,7 @@ async function carregarMatriculasPendentes() {
     
     const { data, error } = await supabaseClient
         .from('alunos')
-        .select('id, nome, turma, nome_pai, cpf_pai')
+        .select('id, nome, turma, nome_pai, solicitou_visita') // Puxa o campo de visita
         .eq('autorizado', false)
         .eq('status', 'Pendente');
 
@@ -663,10 +663,17 @@ async function carregarMatriculasPendentes() {
     data.forEach(a => {
         const div = document.createElement('div');
         div.className = 'aviso-item';
+        
+        // Se o pai pediu visita, mostra um aviso em vermelho
+        const avisoVisita = a.solicitou_visita 
+            ? `<div style="color: #dc3545; font-weight: bold; margin: 5px 0; font-size: 0.85rem;"><i class="fa-solid fa-bell"></i> Solicitou Visita à Escola!</div>` 
+            : '';
+
         div.innerHTML = `
             <strong>${a.nome}</strong> (${labelTurma(a.turma)})<br>
             Pai/Mãe: ${a.nome_pai || 'Não informado'}<br>
-            <button class="btn-mini btn-autorizar-matricula" data-id="${a.id}">Aprovar Matrícula</button>
+            ${avisoVisita}
+            <button class="btn-mini btn-autorizar-matricula" data-id="${a.id}" style="margin-top: 8px;">Aprovar Matrícula</button>
         `;
         listaMatriculasPend.appendChild(div);
     });
@@ -683,13 +690,12 @@ async function carregarMatriculasPendentes() {
             if (error) {
                 alert("Erro ao aprovar: " + error.message);
             } else {
-                alert("Matrícula aprovada! Número gerado.");
+                alert("Matrícula aprovada! O responsável já pode acessar os documentos.");
                 carregarMatriculasPendentes();
             }
         });
     });
 }
-
 // ============================================================
 // LÓGICA DA ÁREA FINANCEIRA GLOBAL
 // ============================================================

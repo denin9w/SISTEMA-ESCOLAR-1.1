@@ -16,6 +16,7 @@
             <h2>Uma escola de Gerações</h2>
         </header>
     </section>
+    
     <nav id="MCL">
         <a href="index.html">Inicio <i class="fa-solid fa-home"></i></a>
         <a href="matricula.html">Matriculas <i class="fa-solid fa-graduation-cap"></i></a>
@@ -25,7 +26,6 @@
     <img class="bonecoO" src="imagens/boneco1.png" alt="Boneco Azul">
     <img class="moedaO"  src="imagens/moeda.png"   alt="Moeda">
     
-
     <section id="ficha">
 
         <div class="elemento-onput">
@@ -33,139 +33,164 @@
             <img class="moeda"  src="imagens/moeda.png"   alt="Moeda">
         </div>
 
-        <div class="text-banerL">
-            <h1>Bem vindo à Área do Responsável</h1>
-            <p id="alunoLogadoNome" style="text-align:center; font-weight:bold; color:var(--titlecor); margin-top:10px;"></p>
-            <h2>Visualize e solicite seus documentos</h2>
-        </div>
-
-        <div id="documentos">
-            <div class="documentos-itens">
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Transferência" id="itransferencia">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
-                        <span class="texto-icone">Transferência</span>
-                        <button class="btn-visualizar" type="button" data-doc="Transferência">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Ficha Individual" id="ificha-Individual">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-clipboard-list"></i></span>
-                        <span class="texto-icone">Ficha Individual</span>
-                        <button class="btn-visualizar" type="button" data-doc="Ficha Individual">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Bolsa Família" id="ibolsa-Familia">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-file-lines"></i></span>
-                        <span class="texto-icone">Bolsa Família</span>
-                        <button class="btn-visualizar" type="button" data-doc="Bolsa Família">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Boletim" id="iBoletim">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-regular fa-file-pdf"></i></span>
-                        <span class="texto-icone">Boletim</span>
-                        <button class="btn-visualizar" type="button" data-doc="Boletim">Baixar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Declaração de Quitação Simples" id="ideclaracao-quitacao-simples">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-file-invoice-dollar"></i></span>
-                        <span class="texto-icone">Quitação Simples</span>
-                        <button class="btn-visualizar" type="button" data-doc="Declaração de Quitação Simples">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Declaração de Quitação Tabela" id="ideclaracao-quitacao-tabela">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-table"></i></span>
-                        <span class="texto-icone">Quitação Tabela</span>
-                        <button class="btn-visualizar" type="button" data-doc="Declaração de Quitação Tabela">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Declaração de Matrícula" id="ideclaracao-matricula">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-id-card"></i></span>
-                        <span class="texto-icone">Declaração de Matrícula</span>
-                        <button class="btn-visualizar" type="button" data-doc="Declaração de Matrícula">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Declaração Provisória" id="iprovissoria">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-file-circle-exclamation"></i></span>
-                        <span class="texto-icone">Provisória</span>
-                        <button class="btn-visualizar" type="button" data-doc="Declaração Provisória">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Recibo" id="irecibo">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-receipt"></i></span>
-                        <span class="texto-icone">Recibo</span>
-                        <button class="btn-visualizar" type="button" data-doc="Recibo">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Recibo de Pagamento" id="irecibo-pagamento">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-money-check-dollar"></i></span>
-                        <span class="texto-icone">Recibo de Pagamento</span>
-                        <button class="btn-visualizar" type="button" data-doc="Recibo de Pagamento">Visualizar</button>
-                    </div>
-                </label>
-
-                <label class="opçao-card">
-                    <input type="checkbox" name="Carnê" id="icarne">
-                    <div class="conteudo-card">
-                        <span class="icone"><i class="fa-solid fa-barcode"></i></span>
-                        <span class="texto-icone">Carnê</span>
-                        <button class="btn-visualizar" type="button" data-doc="Carnê">Visualizar</button>
-                    </div>
-                </label>
-
+        <!-- ========================================== -->
+        <!-- 1. ÁREA DE MATRÍCULA PENDENTE              -->
+        <!-- ========================================== -->
+        <div id="areaPendente" style="display: none; width: 100%; max-width: 600px; margin: 40px auto; padding: 40px 20px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center;">
+            
+            <div style="background: #fffbeb; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+                <i class="fa-solid fa-hourglass-half" style="font-size: 36px; color: #f59e0b;"></i>
             </div>
 
-            <button class="input-br" id="btnSolicitar" type="button">Solicitar</button>
-            <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
+            <h1 style="color: var(--titlecor); font-size: 1.8rem; margin-bottom: 15px;">Matrícula em Análise</h1>
+            
+            <p style="font-size: 1rem; color: #475569; line-height: 1.6; margin-bottom: 30px;">
+                Olá, responsável! A matrícula do aluno <strong id="nomeAlunoPendente"></strong> foi recebida com sucesso e está aguardando a aprovação do gestor(a) da escola.
+                <br><br>
+                Você receberá acesso à área de documentos assim que a matrícula for ativada.
+            </p>
+
+            <button id="btnSolicitarVisita" class="input-br" style="background: #f59e0b; max-width: 350px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fa-solid fa-calendar-check"></i> Solicitar Visita à Escola
+            </button>
         </div>
 
-       
+        <!-- ========================================== -->
+        <!-- 2. ÁREA ATIVA (DOCUMENTOS)                 -->
+        <!-- ========================================== -->
+        <div id="areaAtiva" style="display: none; width: 100%;">
+            <div class="text-banerL">
+                <h1>Bem vindo à Área do Responsável</h1>
+                <p id="alunoLogadoNome" style="text-align:center; font-weight:bold; color:var(--titlecor); margin-top:10px;"></p>
+                <h2>Visualize e solicite seus documentos</h2>
+            </div>
+
+            <div id="documentos">
+                <div class="documentos-itens">
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Transferência" id="itransferencia">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
+                            <span class="texto-icone">Transferência</span>
+                            <button class="btn-visualizar" type="button" data-doc="Transferência">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Ficha Individual" id="ificha-Individual">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-clipboard-list"></i></span>
+                            <span class="texto-icone">Ficha Individual</span>
+                            <button class="btn-visualizar" type="button" data-doc="Ficha Individual">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Bolsa Família" id="ibolsa-Familia">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-file-lines"></i></span>
+                            <span class="texto-icone">Bolsa Família</span>
+                            <button class="btn-visualizar" type="button" data-doc="Bolsa Família">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Boletim" id="iBoletim">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-regular fa-file-pdf"></i></span>
+                            <span class="texto-icone">Boletim</span>
+                            <button class="btn-visualizar" type="button" data-doc="Boletim">Baixar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Declaração de Quitação Simples" id="ideclaracao-quitacao-simples">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+                            <span class="texto-icone">Quitação Simples</span>
+                            <button class="btn-visualizar" type="button" data-doc="Declaração de Quitação Simples">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Declaração de Quitação Tabela" id="ideclaracao-quitacao-tabela">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-table"></i></span>
+                            <span class="texto-icone">Quitação Tabela</span>
+                            <button class="btn-visualizar" type="button" data-doc="Declaração de Quitação Tabela">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Declaração de Matrícula" id="ideclaracao-matricula">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-id-card"></i></span>
+                            <span class="texto-icone">Declaração de Matrícula</span>
+                            <button class="btn-visualizar" type="button" data-doc="Declaração de Matrícula">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Declaração Provisória" id="iprovissoria">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-file-circle-exclamation"></i></span>
+                            <span class="texto-icone">Provisória</span>
+                            <button class="btn-visualizar" type="button" data-doc="Declaração Provisória">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Recibo" id="irecibo">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-receipt"></i></span>
+                            <span class="texto-icone">Recibo</span>
+                            <button class="btn-visualizar" type="button" data-doc="Recibo">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Recibo de Pagamento" id="irecibo-pagamento">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-money-check-dollar"></i></span>
+                            <span class="texto-icone">Recibo de Pagamento</span>
+                            <button class="btn-visualizar" type="button" data-doc="Recibo de Pagamento">Visualizar</button>
+                        </div>
+                    </label>
+
+                    <label class="opçao-card">
+                        <input type="checkbox" name="Carnê" id="icarne">
+                        <div class="conteudo-card">
+                            <span class="icone"><i class="fa-solid fa-barcode"></i></span>
+                            <span class="texto-icone">Carnê</span>
+                            <button class="btn-visualizar" type="button" data-doc="Carnê">Visualizar</button>
+                        </div>
+                    </label>
+
+                </div>
+
+                <button class="input-br" id="btnSolicitar" type="button">Solicitar</button>
+                <a class="back" href="index.html">Clique aqui para voltar à página inicial</a>
+            </div>
+        </div>
+
     </section>
-     <footer>
-            <img src="imagens/logoceje.png" alt="logo da escola">
-            <div class="text-footer">
-                <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
-                <p>© 2008-2026 Companyend</p>
-                <p>Rua Clementino Ricardo de Souza, 134 — Severiano Moraes Filho - Fone: (87) 98114-9883</p>
-                <p>CEP: 552900 — Garanhuns — Pernambuco</p>
-        
-                <!-- NOVO LINK DO GOOGLE MAPS -->
-                <a href="https://maps.app.goo.gl/kVnhnifLVjHVQg247" target="_blank" class="link-mapa">
-                    <i class="fa-solid fa-location-dot"></i> Ver localização no Google Maps
-                </a>
-        
-            </div>
-            <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
-            <img class="moeda" src="imagens/moeda.png" alt="Moeda">
-        </footer>
+
+    <footer>
+        <img src="imagens/logoceje.png" alt="logo da escola">
+        <div class="text-footer">
+            <h1>CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
+            <p>© 2008-2026 Companyend</p>
+            <p>Rua Clementino Ricardo de Souza, 134 — Severiano Moraes Filho - Fone: (87) 98114-9883</p>
+            <p>CEP: 552900 — Garanhuns — Pernambuco</p>
+    
+            <a href="https://maps.app.goo.gl/kVnhnifLVjHVQg247" target="_blank" class="link-mapa">
+                <i class="fa-solid fa-location-dot"></i> Ver localização no Google Maps
+            </a>
+        </div>
+        <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
+        <img class="moeda" src="imagens/moeda.png" alt="Moeda">
+    </footer>
 
     <!-- Carrega modelos e Supabase -->
     <script src="documentos/html/templates-docs.js"></script>

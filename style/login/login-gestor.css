@@ -300,66 +300,80 @@ div.text-baner h1 {
    ============================================================ */
 footer {
     width: 100%;
-    max-height: 220px; /* Mantém o limite */
-    box-sizing: border-box;
     background-color: var(--fundo-card);
     color: var(--titlecor);
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    
-    gap: 20px;
-    padding: 15px 30px;
-    margin-top: auto;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 1;
+    flex-direction: column;
+    align-items: center;      
+    text-align: center;       
+    gap: 15px;
+    padding: 40px 15px 30px 15px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    
+    grid-column: 1 / -1 !important; 
+    position: relative;
+    z-index: 10;
 }
 
-/* Mantém a logo da escola, mas com um tamanho menor */
-footer > img:first-child {
-    width: 90px; /* Reduzido para sobrar mais espaço para o texto */
-    height: auto;
-    object-fit: contain;
+body > footer, 
+main + footer,
+section > footer {
     flex-shrink: 0;
 }
 
-/* Container do Texto */
+footer > img:first-child {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
+}
+
 footer div.text-footer {
-    color: var(--titlecor);
-    flex: 1; 
-    min-width: 0; /* Permite encolher no flexbox */
-             
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 4px; /* Menos espaço entre as linhas */
+    align-items: center;
+    gap: 5px;
+    width: 100%;
 }
 
 footer div.text-footer h1 {
     margin: 0;
-    font-size: 1rem; /* Fonte do título um pouco menor */
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.2rem;
+    color: var(--titlecor);
+    white-space: normal;
 }
 
-/* Texto do endereço e CNPJ - Fonte bem pequena para caber tudo */
 footer div.text-footer p {
     margin: 0;
-    font-size: 0.68rem; /* Fonte reduzida */
-    line-height: 1.2;
-    color: rgba(0, 0, 0, 0.7);
-    white-space: pre-line;
-    overflow-wrap: break-word;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #555;
+    white-space: normal;
 }
 
-/* ============================================================
-   ESCONDE OS BONECOS DO FOOTER (Conforme sua solicitação)
-   ============================================================ */
-footer img.boneco,
-footer img.moeda {
+footer div.text-footer a.link-mapa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: rgba(0, 119, 255, 0.1);
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: var(--destaque);
+    transition: 0.3s;
+}
+
+footer div.text-footer a.link-mapa:hover {
+    background: rgba(0, 119, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+footer img.boneco, footer img.moeda {
     display: none !important;
 }
 

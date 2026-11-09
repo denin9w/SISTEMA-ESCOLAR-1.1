@@ -60,8 +60,6 @@ if (formulario) {
             return; // Para o envio aqui
         }
 
-
-
         // --- VALIDAÇÃO DE CPF AQUI ---
         const cpfPaiInput = matricula['cpf-pai'] || '';
         const cpfMaeInput = matricula['cpf-mae'] || '';
@@ -92,7 +90,7 @@ if (formulario) {
         const cpfPai = (matricula['cpf-pai'] || '').trim();
         const cpfMae = (matricula['cpf-mae'] || '').trim();
 
-        // Monta o objeto do aluno (O numero_matricula não é enviado, o banco gera automaticamente)
+        // Monta o objeto do aluno
         const novoAluno = {
             nome: matricula.nome,
             data_nascimento: matricula['data-nascimento'] || null,
@@ -133,27 +131,47 @@ if (formulario) {
             notas: {}
         };
 
-        // --- CRIA A CONTA DO RESPONSÁVEL NO AUTH (TRATANDO DUPLICIDADE) ---
-        const cpfResponsavel = cpfPai || cpfMae;
-        if (cpfResponsavel) {
-            const emailAuth = `${cpfResponsavel.replace(/\D/g, '')}@ceje.local`;
-            const senhaAuth = cpfResponsavel.replace(/\D/g, '');
+        // --- CRIA AS CONTAS DO PAI E DA MÃE NO AUTH ---
+
+        // 1. Cria a conta para o Pai (se preenchido)
+        if (cpfPaiLimpo) {
+            const emailPai = `${cpfPaiLimpo}@ceje.local`;
+            const senhaPai = cpfPaiLimpo;
             
-            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                email: emailAuth,
-                password: senhaAuth,
+            const { data: authPai, error: errPai } = await supabaseClient.auth.signUp({
+                email: emailPai,
+                password: senhaPai,
             });
             
-            if (authData && authData.user) {
-                novoAluno.auth_id = authData.user.id; 
-            } else if (authError && (authError.message.includes("already registered") || authError.message.includes("User already exists"))) {
-                const { data: loginData } = await supabaseClient.auth.signInWithPassword({
-                    email: emailAuth,
-                    password: senhaAuth,
+            if (authPai && authPai.user) {
+                novoAluno.auth_id = authPai.user.id; 
+            } else if (errPai && (errPai.message.includes("already registered") || errPai.message.includes("User already exists"))) {
+                const { data: loginPai } = await supabaseClient.auth.signInWithPassword({
+                    email: emailPai,
+                    password: senhaPai,
                 });
-                if (loginData && loginData.user) {
-                    novoAluno.auth_id = loginData.user.id;
-                }
+                if (loginPai && loginPai.user) novoAluno.auth_id = loginPai.user.id;
+            }
+        }
+
+        // 2. Cria a conta para a Mãe (se preenchido)
+        if (cpfMaeLimpo) {
+            const emailMae = `${cpfMaeLimpo}@ceje.local`;
+            const senhaMae = cpfMaeLimpo;
+            
+            const { data: authMae, error: errMae } = await supabaseClient.auth.signUp({
+                email: emailMae,
+                password: senhaMae,
+            });
+            
+            if (authMae && authMae.user) {
+                novoAluno.auth_id_mae = authMae.user.id; 
+            } else if (errMae && (errMae.message.includes("already registered") || errMae.message.includes("User already exists"))) {
+                const { data: loginMae } = await supabaseClient.auth.signInWithPassword({
+                    email: emailMae,
+                    password: senhaMae,
+                });
+                if (loginMae && loginMae.user) novoAluno.auth_id_mae = loginMae.user.id;
             }
         }
 
@@ -174,21 +192,17 @@ if (formulario) {
             return;
         }
 
-        const matriculaGerada = alunoInserido[0].numero_matricula;
         formulario.reset();
         voltar();
         
-               // --- MOSTRA O MODAL DE SUCESSO (Em vez do alert) ---
+        // --- MOSTRA O MODAL DE SUCESSO ---
         const modal = document.getElementById('modalSucessoMatricula');
         if (modal) {
             modal.style.display = 'flex';
-            
-            // Configura o botão de fechar
             document.getElementById('btnFecharModalSucesso').onclick = () => {
                 modal.style.display = 'none';
             };
         } else {
-            // Fallback caso o modal não exista no HTML
             alert("Matrícula enviada com sucesso! Aguarde a aprovação do gestor.");
         }
     });

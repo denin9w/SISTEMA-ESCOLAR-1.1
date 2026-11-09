@@ -75,10 +75,10 @@ async function entrar(){
         }
 
         // 2) Lógica para Responsável
-              if (tipoSelecionado === "responsavel") {
+            if (tipoSelecionado === "responsavel") {
             const { data: alunos, error: alunoError } = await supabaseClient
                 .from('alunos')
-                .select('id, nome, status, autorizado') // Adicionamos o autorizado
+                .select('id, nome')
                 .eq('auth_id', authData.user.id)
                 .limit(1);
 
@@ -87,23 +87,12 @@ async function entrar(){
             if (alunos && alunos.length > 0) {
                 const aluno = alunos[0];
                 
-                // NOVO: Verifica se a matrícula foi aprovada
-                if (aluno.autorizado === false) {
-                    alert("A matrícula do seu filho ainda está em análise pelo gestor. Aguarde a aprovação.");
-                    await supabaseClient.auth.signOut();
-                    return;
-                }
-
-                if (aluno.status && aluno.status !== 'Ativa') {
-                    alert(`Acesso indisponível: aluno "${aluno.status}".`);
-                    await supabaseClient.auth.signOut();
-                    return;
-                }
+                // NÃO BLOQUEIA MAIS AQUI. O bloqueio é feito na tela do responsável.
                 sessionStorage.setItem("@alunoLogadoId", aluno.id);
                 sessionStorage.setItem("@alunoLogadoNome", aluno.nome);
                 window.location.href = PAGINAS[tipoSelecionado];
             } else {
-                alert("Nenhum aluno encontrado para este responsável.");
+                alert("Nenhum aluno encontrado.");
                 await supabaseClient.auth.signOut();
             }
         
