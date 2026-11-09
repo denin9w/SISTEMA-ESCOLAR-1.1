@@ -3,116 +3,130 @@
 /* ============================================================
    VARIÁVEIS E RESET
    ============================================================ */
-:root{
+:root {
   --fundo-principal: #f5f5f5;
-  --texto:#222222;
-  --texto-inverso:#ffffff;
-  --titlecor:#003869;
-  --btncor:#fd269c;
-  --destaque:#0077ff;
-  --destaque-inverso:#66bbff;
-  --fundo-card:#ffffff;
+  --texto: #222222;
+  --texto-inverso: #ffffff;
+  --titlecor: #003869;
+  --btncor: #fd269c;
+  --destaque: #0077ff;
+  --destaque-inverso: #66bbff;
+  --fundo-card: #ffffff;
 
-  --font-titulos:"Sacramento", cursive, sans-serif;
-  --font-subtitulo:"Teachers", sans-serif;
-  --font-botoes:"Roboto", sans-serif;
+  --font-titulos: "Sacramento", cursive, sans-serif;
+  --font-subtitulo: "Teachers", sans-serif;
+  --font-botoes: "Roboto", sans-serif;
 }
 
-*{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
 
-body{
-  background-color:var(--fundo-principal);  
-  color: var(--texto);
-  font-family:var(--font-subtitulo);
-  line-height: 3em;
+body {
+    background-color: var(--fundo-principal);  
+    color: var(--texto);
+    font-family: var(--font-subtitulo);
+    line-height: 1.6; /* Melhorado para leitura */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-header{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  background-color: var(--fundo-card);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-  padding: 40px 10px;
+main {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Faz o main ocupar o espaço restante */
 }
 
-header h1{
-  font-size: clamp(2.5em, 2vw, 28em);
-  font-family: var(--font-titulos);
-  font-weight: lighter;
-  color: var(--titlecor);
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.349);
+/* ============================================================
+   CABEÇALHO (HEADER) - Mantido como estava
+   ============================================================ */
+header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: var(--fundo-card);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    padding: 40px 10px;
 }
 
-header h2{
-  font-size: 1.2em;
-  font-family: var(--font-subtitulo);
-  font-weight: bold;
-  color: var(--titlecor);
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.349);
+header h1 {
+    font-size: clamp(2.5em, 2vw, 28em);
+    font-family: var(--font-titulos);
+    text-align: center;
+    font-weight: lighter;
+    color: var(--titlecor);
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.349);
 }
 
-main{
-  display: flex;
-  flex-direction: column;
+header h2 {
+    font-size: 1.2em;
+    font-family: var(--font-subtitulo);
+    font-weight: bold;
+    color: var(--titlecor);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.349);
 }
 
-section#ficha{
-  display:flex;
-  flex-direction: column;
-  align-items: center;
-  background: url(../../imagens/fundo.png);
-  background-size: cover;
-  background-repeat: no-repeat;
-  padding: 20px;
+/* ============================================================
+   FICHA / BANNER PRINCIPAL
+   ============================================================ */
+section#ficha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: url(../../imagens/fundo.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding: 20px;
 }
 
-img.boneco{
-  width: 90px;
-  align-self: flex-start;
+img.boneco {
+    width: 90px;
+    align-self: flex-start;
 }
 
-img.moeda{
-  width: 80px;
-  align-self: flex-end;
+img.moeda {
+    width: 80px;
+    align-self: flex-end;
 }
 
-div.text-baner{
-  margin-top: 50px;
-  margin-bottom: 50px;
-  text-align: center;
+div.text-baner {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    text-align: center;
 }
 
-.text-baner h1{
-  font-size: clamp(35px, 2vw, 26px);
-  line-height: normal;
-  color:var(--destaque);
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.349);
-  margin-bottom: 10px;
+.text-baner h1 {
+    font-size: clamp(35px, 2vw, 26px);
+    line-height: normal;
+    color: var(--destaque);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.349);
+    margin-bottom: 10px;
 }
 
-.text-baner h2{
-  font-size: clamp(18px, 2vw, 26px);
-  line-height: normal;
-  color:var(--btncor);
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.349);
+.text-baner h2 {
+    font-size: clamp(18px, 2vw, 26px);
+    line-height: normal;
+    color: var(--btncor);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.349);
 }
 
+/* ============================================================
+   MENU DE NAVEGAÇÃO (NAV)
+   ============================================================ */
 nav#MCL {
     display: flex;
-    justify-content: flex-end; /* Joga os links para a direita no Desktop */
+    justify-content: flex-end;
     align-items: center;
-    gap: 30px; /* Espaçamento elegante entre os links */
+    gap: 30px;
     background-color: var(--fundo-card);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     height: 60px;
-    padding: 0 40px; /* Respiro nas laterais */
+    padding: 0 40px;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -126,163 +140,166 @@ nav#MCL a {
     color: var(--titlecor);
     display: flex;
     align-items: center;
-    gap: 8px; /* Espaço entre o texto e o ícone */
+    gap: 8px;
     transition: color 0.3s ease, transform 0.2s ease;
 }
 
 nav#MCL a:hover {
     color: var(--destaque-inverso);
-    transform: translateY(-2px); /* Efeito sutil de subir ao passar o mouse */
+    transform: translateY(-2px);
 }
 
 /* ============================================================
    SOBRE A ESCOLA
    ============================================================ */
-#sobre{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
+#sobre {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    padding: 40px 20px;
 }
 
-#sobre h1{
-  font-family: var(--font-titulos);
-  font-size: clamp(30px, 2.5vw, 50px);
-  text-align: center;
-  color: var(--titlecor);
-  padding: 20px;
-  line-height: 1.2;
+#sobre h1 {
+
+    font-family: var(--font-titulos);
+    font-size: clamp(30px, 2.5vw, 50px);
+    background-image: linear-gradient(to right, var(--destaque), #fd269cbe);
+    color: white;
+    font-weight:lighter;
+    text-align: center;
+    border-radius: 8px;
+    padding: 20px;
+    line-height: 1.2;
+    margin-bottom: 20px;
 }
 
-#sobre p{
-  font-size: 1.1em;
-  text-align: justify;
-  line-height: 1.6;
-  margin-bottom: 20px;
-  max-width: 800px;
+#sobre p {
+    font-size: 1.1em;
+    text-align: justify;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    max-width: 800px;
 }
 
-#social{
+#social {
     display: flex;
     gap: 15px;
+    margin-top: 10px;
 }
 
-#social a{
-  font-size: 2em;
-  color: var(--btncor);
-  transition: 0.3s;
+#social a {
+    font-size: 2em;
+    color: var(--btncor);
+    transition: 0.3s;
 }
 
-#social a:hover{
-  color: var(--titlecor);
-  transform: scale(1.1);
+#social a:hover {
+    color: var(--titlecor);
+    transform: scale(1.1);
 }
 
 /* ============================================================
-   SKILLS / PROJETOS (MOBILE FIRST)
+   CARROSSEL DE PROJETOS (INTEGRADO AO TEMA)
    ============================================================ */
-#skill-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 30px 15px;
-    background-color: #f8fafc;
-}
-
-.skill-1, .skill-2, .projetos-card {
+.carrossel-container {
     width: 100%;
-    background-color: #ffffff;
-    border-radius: 20px;
-    padding: 30px 20px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.skill-1 img, .skill-2 img, .projetos-conteudo-padrao img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 20px;
-    border: 5px solid #f1f5f9;
-}
-
-.skill-1 h1, .skill-2 h1, .projetos-conteudo-padrao h1 {
-    font-size: 1.8rem;
-    color: var(--titlecor);
-    margin-bottom: 15px;
-    font-family: var(--font-titulos);
-    font-weight: 600;
-    line-height: 1.2;
-}
-
-.skill-1 p, .skill-2 p, .projetos-conteudo-padrao p {
-    font-size: 1rem;
-    color: #475569;
-    line-height: 1.6;
-}
-
-/* Mobile: O Card de Projetos já aparece aberto */
-.projetos-card {
-    border: 2px solid var(--destaque);
-}
-
-.projetos-conteudo-padrao {
-    display: none; /* Esconde a capa no celular */
-}
-
-.projetos-hover-painel {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-.projetos-hover-painel h2 {
-    color: var(--destaque);
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 600;
-}
-
-.projeto-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    background: #f8fafc;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    text-align: left;
-}
-
-.projeto-item img {
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    object-fit: cover;
-}
-
-.projeto-item h3 {
-    margin: 0 0 5px 0;
-    font-size: 1rem;
-    color: var(--titlecor);
-    line-height: 1.2;
-}
-
-.projeto-item p {
+    min-height: 650px; /* Aumenta a altura mínima no mobile */
+    height: auto;      /* Permite crescer conforme o conteúdo */
+    position: relative;
+    overflow: hidden;
+    background-color: var(--titlecor);
     margin: 0;
-    font-size: 0.85rem;
-    color: #64748b;
-    line-height: 1.3;
 }
+
+.carrossel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 60px;
+    box-sizing: border-box;
+}
+
+.carrossel-slide.ativo {
+    opacity: 1;
+    z-index: 2;
+}
+
+.slide-conteudo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    gap: 30px;
+}
+
+.slide-texto {
+    flex: 1;
+    color: white;
+}
+
+.slide-texto h1 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    margin-bottom: 15px;
+    color: var(--destaque-inverso); /* Azul claro */
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.slide-texto p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #f1f5f9;
+}
+
+.slide-imagem {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* Botões (Setas) */
+.carrossel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: var(--titlecor);
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.carrossel-btn:hover {
+    background: var(--destaque);
+    color: white;
+    scale: 1.1;
+}
+
+.btn-prev { left: 10px; }
+.btn-next { right: 10px; }
 
 /* ============================================================
    SEÇÃO DE AVALIAÇÕES
@@ -417,7 +434,7 @@ nav#MCL a:hover {
 }
 
 /* ============================================================
-   FOOTER (PADRÃO CENTRALIZADO E À PROVA DE GRID)
+   FOOTER (PADRÃO CENTRALIZADO)
    ============================================================ */
 footer {
     width: 100%;
@@ -431,16 +448,9 @@ footer {
     padding: 40px 15px 30px 15px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    
-    grid-column: 1 / -1 !important; 
+    margin-top: auto;
     position: relative;
     z-index: 10;
-}
-
-body > footer, 
-main + footer,
-section > footer {
-    flex-shrink: 0;
 }
 
 footer > img:first-child {
