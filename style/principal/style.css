@@ -25,20 +25,24 @@
 }
 
 body {
-    background-color: var(--fundo-principal);  
+   background: linear-gradient(135deg, rgb(0, 56, 105) 100%, rgba(0, 56, 105, 0.85) 50%, rgba(0, 56, 105, 0.6) 100%);
     color: var(--texto);
     font-family: var(--font-subtitulo);
     line-height: 1.6; /* Melhorado para leitura */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    
 }
+
+
 
 main {
     display: flex;
     flex-direction: column;
     flex: 1; /* Faz o main ocupar o espaço restante */
 }
+
 
 /* ============================================================
    CABEÇALHO (HEADER) - Mantido como estava
@@ -163,7 +167,7 @@ nav#MCL a:hover {
     justify-content: center;
     overflow: hidden;
     padding: 20px 20px;
-    margin: 40px 0;
+  
 }
 
 /* Imagem de Fundo */
@@ -405,6 +409,7 @@ nav#MCL a:hover {
     width: 90%;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
 }
+
 
 .avaliacao-info h2 {
     color: #222;
