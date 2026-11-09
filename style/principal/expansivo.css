@@ -14,58 +14,134 @@
         margin: auto;
     }
      
-    div#sobre {
-        width: 100vw;
-        justify-self: center;
+    /* ============================================================
+       SOBRE A ESCOLA (Desktop)
+       ============================================================ */
+    #sobre {
+        min-height: 600px;
+    }
+    
+    .sobre-conteudo {
+        padding: 60px;
+        max-width: 900px;
     }
 
-    #sobre h1 {
-        width: 100vw;
-        text-align: center;
-        background-image: linear-gradient(to right, var(--destaque), #fd269cd5);
-        color: white;
-        font-weight:lighter;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
+    .sobre-conteudo p {
+        font-size: 1.2rem;
     }
 
     /* ============================================================
-       CARROSSEL (Desktop)
+       CARROSSEL DE PROJETOS (Desktop)
        ============================================================ */
     .carrossel-container {
         height: 600px; 
     }
+
+    /* Ajuste da imagem de fundo para focar no topo e centro */
+    .slide-bg {
+        object-fit: cover;
+        object-position: top center;
+    }
     
-    /* No desktop, o texto fica à esquerda e a imagem à direita */
+    /* Configuração das Setas */
+    .carrossel-btn {
+        display: flex !important; 
+        position: absolute;
+        top: 50%; /* Centraliza verticalmente */
+        transform: translateY(-50%);
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255,255,255,0.5);
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        z-index: 10;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        backdrop-filter: blur(5px);
+    }
+
+    .carrossel-btn:hover {
+        background: #ffcc00;
+        color: #003869;
+        border-color: #ffcc00;
+    }
+
+    .btn-prev { left: 30px; }
+    .btn-next { right: 30px; }
+
+    /* Ajuste do Conteúdo (Texto) */
     .slide-conteudo {
-        flex-direction: row;
         text-align: left;
-        padding: 0 80px;
+        flex-direction: row;
+        max-width: 1200px;
+        margin: 0 auto;
+        
+        /* 30px (seta) + 60px (largura da seta) + 20px (respiro) = 110px */
+        padding-left: 110px; 
+        padding-right: 110px;
+        align-items: center;
+    }
+
+    .slide-texto {
+        max-width: 700px;
     }
     
     .slide-texto h1 {
         font-size: 4.5rem;
-        line-height: 1;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        color: #ffcc00;
+        text-transform: uppercase;
+        font-weight: 900;
+        font-family: var(--font-botoes);
+        letter-spacing: 2px;
     }
 
     .slide-texto p {
-        font-size: 1.2rem;
-    }
-    
-    .slide-imagem {
-        width: 450px;
-        height: 350px;
-    }
-    
-    .carrossel-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+        line-height: 1.6;
+        color: #f1f5f9;
+        margin-bottom: 30px;
     }
 
-    .btn-prev { left: 20px; }
-    .btn-next { right: 20px; }
+    /* Botão (Call to Action) */
+    .btn-slide {
+        display: inline-block;
+        background-color: #ffcc00;
+        color: #003869;
+        font-weight: 800;
+        font-size: 0.95rem;
+        padding: 15px 30px;
+        text-decoration: none;
+        text-transform: uppercase;
+        border-radius: 4px;
+        transition: 0.3s;
+        font-family: var(--font-botoes);
+        letter-spacing: 1px;
+        
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease 0.6s, background-color 0.3s;
+    }
+
+    .btn-slide:hover {
+        background-color: #fff;
+        color: #003869;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Animação quando o slide fica ativo */
+    .carrossel-slide.ativo .slide-texto h1,
+    .carrossel-slide.ativo .slide-texto p,
+    .carrossel-slide.ativo .btn-slide {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
     /* ============================================================
        AVALIAÇÕES (Desktop)
