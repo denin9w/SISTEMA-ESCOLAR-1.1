@@ -1,11 +1,4 @@
 // --- script matriculas ---
-// --- CONTROLE DE ETAPAS DO FORMULÁRIO ---
-const etapa1 = document.querySelector('.etapa1');
-const etapa2 = document.querySelector('.etapa2');
-const btnproximo = document.querySelector('#btnProximo');
-const btnvoltar = document.querySelector('#btnVoltar');
-const btnfinalizar = document.querySelector('#btnFinalizar');
-const formulario = document.querySelector("#formulario");
 
 // --- CONFIGURAÇÃO DO SUPABASE ---
 const SUPABASE_URL = "https://glnfbataoyvsnqnfkvvb.supabase.co";
@@ -20,28 +13,89 @@ scriptSupabase.onload = () => {
 };
 document.head.appendChild(scriptSupabase);
 
-function proximo(){
-    if (!etapa1 || !etapa2) return;
-    etapa1.style.display = 'none';
-    etapa2.style.display = 'block';
-    if (btnproximo) btnproximo.style.display = 'none';
-    if (btnfinalizar) btnfinalizar.style.display = 'block';
-    if (btnvoltar) btnvoltar.style.display = 'block';
+// ============================================================
+// CONTROLE DE ETAPAS (NOVO)
+// ============================================================
+const etapas = document.querySelectorAll('.etapa');
+const btnProximo = document.getElementById('btnProximo');
+const btnVoltar = document.getElementById('btnVoltar');
+const btnFinalizar = document.getElementById('btnFinalizar');
+const indicadorEtapa = document.getElementById('indicadorEtapa');
+const barraProgressoFill = document.getElementById('barraProgressoFill');
+const formulario = document.querySelector("#formulario");
+
+let etapaAtual = 0;
+
+function atualizarInterface() {
+    if (etapas.length === 0) return;
+
+    // Mostra apenas a etapa atual
+    etapas.forEach((etapa, index) => {
+        etapa.classList.toggle('ativa', index === etapaAtual);
+    });
+
+    // Atualiza o texto e a barra de progresso
+    if (indicadorEtapa) indicadorEtapa.textContent = `Etapa ${etapaAtual + 1} de ${etapas.length}`;
+    if (barraProgressoFill) barraProgressoFill.style.width = `${((etapaAtual + 1) / etapas.length) * 100}%`;
+
+    // Mostra/Esconde os botões corretos
+    if (btnVoltar) btnVoltar.style.display = etapaAtual === 0 ? 'none' : 'block';
+    
+    if (etapaAtual === etapas.length - 1) {
+        if (btnProximo) btnProximo.style.display = 'none';
+        if (btnFinalizar) btnFinalizar.style.display = 'block';
+    } else {
+        if (btnProximo) btnProximo.style.display = 'block';
+        if (btnFinalizar) btnFinalizar.style.display = 'none';
+    }
 }
 
-function voltar(){
-    if (!etapa1 || !etapa2) return;
-    etapa1.style.display = 'block';
-    etapa2.style.display = 'none';
-    if (btnproximo) btnproximo.style.display = 'block';
-    if (btnfinalizar) btnfinalizar.style.display = 'none';
-    if (btnvoltar) btnvoltar.style.display = 'none';
+if (btnProximo) {
+    btnProximo.addEventListener('click', () => {
+        // Validação dos campos obrigatórios da etapa atual
+        const camposObrigatorios = etapas[etapaAtual].querySelectorAll('[required]');
+        let formValido = true;
+        
+        camposObrigatorios.forEach(campo => {
+            if (!campo.value || (campo.type === 'radio' && !document.querySelector(`input[name="${campo.name}"]:checked`))) {
+                formValido = false;
+                campo.style.borderColor = 'red';
+            } else {
+                campo.style.borderColor = '#ccc';
+            }
+        });
+
+        if (!formValido) {
+            alert("⚠️ Por favor, preencha todos os campos obrigatórios desta etapa.");
+            return;
+        }
+
+        if (etapaAtual < etapas.length - 1) {
+            etapaAtual++;
+            atualizarInterface();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo ao mudar de etapa
+        }
+    });
 }
 
-window.proximo = proximo;
-window.voltar = voltar;
+if (btnVoltar) {
+    btnVoltar.addEventListener('click', () => {
+        if (etapaAtual > 0) {
+            etapaAtual--;
+            atualizarInterface();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+}
 
-// --- FINALIZAR MATRÍCULA ---
+// Inicializa a primeira etapa ao carregar
+if (etapas.length > 0) {
+    atualizarInterface();
+}
+
+// ============================================================
+// ENVIO DO FORMULÁRIO (MANTIDO DO ORIGINAL E BLINDADO)
+// ============================================================
 if (formulario) {
     formulario.addEventListener("submit", async function(event) {
         event.preventDefault();
@@ -57,7 +111,7 @@ if (formulario) {
         // --- VALIDAÇÃO DA DATA DE NASCIMENTO ---
         if (!matricula['data-nascimento'] || matricula['data-nascimento'].trim() === '') {
             alert("⚠️ Por favor, preencha a Data de Nascimento do aluno antes de finalizar.");
-            return; // Para o envio aqui
+            return;
         }
 
         // --- VALIDAÇÃO DE CPF AQUI ---
@@ -77,9 +131,9 @@ if (formulario) {
         }
         // --- FIM DA VALIDAÇÃO ---
 
-        if (btnfinalizar) {
-            btnfinalizar.disabled = true;
-            btnfinalizar.textContent = "Salvando dados...";
+        if (btnFinalizar) {
+            btnFinalizar.disabled = true;
+            btnFinalizar.textContent = "Salvando dados...";
         }
 
         const tipoResponsavel = matricula.responsavel || '';
@@ -181,9 +235,9 @@ if (formulario) {
             .insert([novoAluno])
             .select();
 
-        if (btnfinalizar) {
-            btnfinalizar.disabled = false;
-            btnfinalizar.textContent = "Finalizar matrícula";
+        if (btnFinalizar) {
+            btnFinalizar.disabled = false;
+            btnFinalizar.textContent = "Finalizar matrícula";
         }
 
         if (error) {
@@ -193,7 +247,10 @@ if (formulario) {
         }
 
         formulario.reset();
-        voltar();
+        
+        // Volta para a primeira etapa após salvar
+        etapaAtual = 0;
+        atualizarInterface();
         
         // --- MOSTRA O MODAL DE SUCESSO ---
         const modal = document.getElementById('modalSucessoMatricula');

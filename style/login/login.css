@@ -209,13 +209,14 @@ main#login-main img.moeda {
 
     /* Deixa os links normais, sem fundo extra */
     nav#MCL a {
-        color: var(--titlecor);
+        color: var(--texto);
         background-color: transparent; /* Remove aquele fundo que eu tinha colocado */
         padding: 0;
     }
 
     nav#MCL a:hover {
-        color: var(--destaque);
+        color:rgba(165, 42, 42, 0.793);
+        transform: translateY(-2px);
     }
 
     /* HEADER (Esquerda) - Agora ele fica transparente para mostrar a imagem do body */
@@ -302,6 +303,9 @@ main#login-main img.moeda {
         margin-top: 15px;
     }
 
+    #linkCadastroProf a:hover {
+        color: var(--destaque);
+    }
     /* FOOTER */
     footer {
         grid-column: 1 / -1;
