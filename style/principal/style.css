@@ -78,7 +78,7 @@ header h2 {
 /* ============================================================
    FICHA / BANNER PRINCIPAL
    ============================================================ */
-section#ficha {
+/* section#ficha {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -117,14 +117,14 @@ div.text-baner {
     line-height: normal;
     color: var(--btncor);
     text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.349);
-}
+}*/
 
 /* ============================================================
    MENU DE NAVEGAÇÃO (NAV)
    ============================================================ */
 nav#MCL {
     display: flex;
-    justify-content: flex-end;
+    justify-content:center;
     align-items: center;
     gap: 30px;
     background-color: var(--fundo-card);
@@ -136,21 +136,40 @@ nav#MCL {
     z-index: 1000;
     width: 100%;
 }
+header img.sobre-logo {
+    width: 100px;
+    height: auto;
+    align-self: center;
+    justify-self: center;
+    z-index: 10;
+
+}
+nav#MCL a.projetos{
+    display: none;
+}
 
 nav#MCL a {
     text-decoration: none;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--titlecor);
+    color: var(--texto);
     display: flex;
     align-items: center;
     gap: 8px;
     transition: color 0.3s ease, transform 0.2s ease;
+    z-index: 10;
 }
 
 nav#MCL a:hover {
-    color: var(--destaque-inverso);
+    color:rgba(165, 42, 42, 0.793);
     transform: translateY(-2px);
+}
+nav#MCL::before{
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgb(213, 236, 8) 0%, rgba(198, 191, 2, 0.85) 50%, rgba(194, 187, 2, 0.907) 100%);
+    z-index: 1;
 }
 
 /* ============================================================
