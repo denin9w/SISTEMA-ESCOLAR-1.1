@@ -193,65 +193,77 @@
     </footer>
 
     <!-- Carrega modelos e Supabase -->
+
+        <!-- BIBLIOTECAS PARA GERAR O WORD (.docx) -->
+    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3/build/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <!-- SCRIPTS DO SISTEMA -->
+
+
     <script src="documentos/html/templates-docs.js"></script>
     <script src="style/login/script/scriptResponsavel.js"></script>
 
     <!-- Visualização / download dos documentos -->
     <script>
-    (function () {
-        function abrirDocHTML(nomeDoc) {
-        const alunoId = sessionStorage.getItem("@alunoLogadoId");
-            if (!alunoId) { alert("Sessão expirada."); return; }
+        (function () {
+            function abrirDocHTML(nomeDoc) {
+                const alunoId = sessionStorage.getItem("@alunoLogadoId");
+                if (!alunoId) { alert("Sessão expirada."); return; }
 
-            if (!window.supabaseClient) {
-                alert("Aguarde, conectando ao banco...");
-                return;
-            }
-            window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
-                .then(({ data, error }) => {
-                    if (error || !data) { alert("Erro ao carregar dados do aluno."); return; }
-                    const fn = DOCUMENTOS_HTML[nomeDoc];
-                    if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
-                    const html = fn(data);
-                    const win = window.open('', '_blank');
-                    win.document.write(html);
-                    win.document.close();
-                })
-                .catch(e => { console.error(e); alert("Erro ao abrir documento."); });
-        }
-
-        function baixarBoletim(nomeDoc) {
-            const alunoId = sessionStorage.getItem("@alunoLogadoId");
-            if (!alunoId) { alert("Sessão expirada."); return; }
-            window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
-                .then(({ data, error }) => {
-                    if (error || !data) { alert("Erro ao carregar dados."); return; }
-                    const fn = DOCUMENTOS_HTML[nomeDoc];
-                    if (!fn) return alert("Modelo não encontrado.");
-                    const html = fn(data);
-                    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Boletim-${data.nome.replace(/\s+/g,'_')}.doc`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                });
-        }
-
-        document.querySelectorAll('.btn-visualizar').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const nomeDoc = btn.dataset.doc;
-                if (nomeDoc === 'Boletim') {
-                    baixarBoletim(nomeDoc);
-                } else {
-                    abrirDocHTML(nomeDoc);
+                if (!window.supabaseClient) {
+                    alert("Aguarde, conectando ao banco...");
+                    return;
                 }
+                window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
+                    .then(({ data, error }) => {
+                        if (error || !data) { alert("Erro ao carregar dados do aluno."); return; }
+                        const fn = DOCUMENTOS_HTML[nomeDoc];
+                        if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
+                        const html = fn(data);
+                        const win = window.open('', '_blank');
+                        win.document.write(html);
+                        win.document.close();
+                    })
+                    .catch(e => { console.error(e); alert("Erro ao abrir documento."); });
+            }
+
+            // NOVA FUNÇÃO: Baixar Boletim em Word (.docx)
+            async function baixarBoletimWord(nomeDoc) {
+                const alunoId = sessionStorage.getItem("@alunoLogadoId");
+                if (!alunoId) { alert("Sessão expirada."); return; }
+                
+                const { data: aluno, error } = await window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
+                if (error || !aluno) return alert("Erro ao carregar dados.");
+
+                // Chama a função docBoletim que agora gera o arquivo Word
+                const docBlob = await docBoletim(aluno);
+                if (!docBlob) return;
+
+                const url = URL.createObjectURL(docBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Boletim-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            document.querySelectorAll('.btn-visualizar').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const nomeDoc = btn.dataset.doc;
+                    
+                    if (nomeDoc === 'Boletim') {
+                        // Agora o botão "Baixar" do boletim chama a função do Word
+                        await baixarBoletimWord(nomeDoc);
+                    } else {
+                        abrirDocHTML(nomeDoc);
+                    }
+                });
             });
-        });
-    })();
+        })();
     </script>
 
     <!-- Botão Sair -->

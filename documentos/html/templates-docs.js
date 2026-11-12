@@ -196,91 +196,117 @@ function docBolsaFamilia(a) {
     </html>`;
 }
 
-function docBoletim(a) {
-    const materias = [
-        { nome: 'Português', id: 'portugues' }, { nome: 'História', id: 'historia' },
-        { nome: 'Geografia', id: 'geografia' }, { nome: 'Ciências', id: 'ciencias' },
-        { nome: 'Matemática', id: 'matematica' }, { nome: 'Educação Física', id: 'ed_fisica' },
-        { nome: 'Inglês', id: 'ingles' }, { nome: 'Arte', id: 'arte' },
-        { nome: 'Cidadania', id: 'etica' }
-    ];
-    
-    let linhas = '';
-    materias.forEach(mat => {
-        // Usando a nova função formatarNotaDoc
-        const b1 = formatarNotaDoc(a[`b1_${mat.id}`]); 
-        const b2 = formatarNotaDoc(a[`b2_${mat.id}`]);
-        const b3 = formatarNotaDoc(a[`b3_${mat.id}`]); 
-        const b4 = formatarNotaDoc(a[`b4_${mat.id}`]);
-        const mdf = formatarNotaDoc(a[`mdf_${mat.id}`]); 
-        const st = a[`status_${mat.id}`] || '-';
+async function docBoletim(a) {
+    try {
+        const response = await fetch('documentos/modelos/boletim.docx');
+        if (!response.ok) throw new Error("Arquivo modelo não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
 
-        linhas += `<tr>
-            <td style="border: 1px solid #000; padding: 4px;">${mat.nome}</td>
-            <td style="border: 1px solid #000; padding: 4px;"><strong>${b1}</strong></td>
-            <td style="border: 1px solid #000; padding: 4px;">${b2}</td>
-            <td style="border: 1px solid #000; padding: 4px;">${b3}</td>
-            <td style="border: 1px solid #000; padding: 4px;">${b4}</td>
-            <td style="border: 1px solid #000; padding: 4px;"><strong>${mdf}</strong></td>
-            <td style="border: 1px solid #000; padding: 4px;"><strong>${st}</strong></td>
-        </tr>`;
-    });
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, {
+            paragraphLoop: true,
+            linebreaks: true,
+        });
 
-    return `<!DOCTYPE html>
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-        <meta charset="UTF-8">
-        <title>Boletim — ${a.nome}</title>
-        ${CSS_GLOBAL}
-        <style> @page { size: A4 landscape; margin: 1.5cm; } .doc-container { max-width: 1000px; } </style>
-    </head>
-    <body>
-        <div class="doc-container">
-            <table style="width: 100%; border-collapse: collapse; border: none;">
-                <tr>
-                    <td style="border: none; padding: 0;">
-                        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 5px;">
-                            <tr>
-                                <td style="width: 120px; text-align: center; border-right: 1px solid #000; padding: 5px;">
-                                    <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 80px;"><br>
-                                    <div style="font-size: 7pt; margin-top: 5px;">UMA ESCOLA DE GERAÇÕES</div>
-                                </td>
-                                <td style="padding: 10px; text-align: left; font-family: Arial, sans-serif;">
-                                    <h2 style="margin: 0; font-size: 14pt; font-weight: bold;">ESCOLA CENTRO EDUCACIONAL JARDIM DO ÉDEN</h2>
-                                    <h3 style="margin: 2px 0; font-size: 11pt; font-weight: bold;">EDUCAÇÃO INFANTIL E ENSINO FUNDAMENTAL DO 1º AO 9º ANO</h3>
-                                    <h3 style="margin: 2px 0; font-size: 12pt; font-weight: bold;">BOLETIM DE NOTAS <span style="margin-left: 20px;">${new Date().getFullYear()}</span></h3>
-                                    <div style="font-size: 11pt; font-weight: bold; margin-top: 5px;">
-                                        Nome: <u>${up(a.nome)}</u> &nbsp;&nbsp; Turma: <u>ÚNICA</u> &nbsp;&nbsp; Série: <u>${labelTurma(a.turma)}</u>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+        const dados = {
+            NOME_ALUNO: up(a.nome),
+            TURMA: labelTurma(a.turma),
+            ANO_ATUAL: new Date().getFullYear()
+        };
 
-                        <div class="table-responsive">
-                            <table style="width: 100%; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; font-size: 11pt;">
-                                <thead>
-                                    <tr>
-                                        <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 25%;">Disciplina</th>
-                                        <th colspan="4" style="border: 1px solid #000; padding: 5px;">Unidade</th>
-                                        <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 12%;">MÉDIA<br>FINAL</th>
-                                        <th rowspan="2" style="border: 1px solid #000; padding: 5px; width: 15%;">RESULTADO</th>
-                                    </tr>
-                                    <tr>
-                                        <th style="border: 1px solid #000; padding: 5px;">1º Bimestre</th>
-                                        <th style="border: 1px solid #000; padding: 5px;">2º Bimestre</th>
-                                        <th style="border: 1px solid #000; padding: 5px;">3º Bimestre</th>
-                                        <th style="border: 1px solid #000; padding: 5px;">4º Bimestre</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${linhas}</tbody>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </body>
-    </html>`;
+        // Mapeamento das siglas curtas
+        const materias = [
+            { id: 'portugues', sigla: 'P' },
+            { id: 'historia', sigla: 'H' },
+            { id: 'geografia', sigla: 'G' },
+            { id: 'ciencias', sigla: 'C' },
+            { id: 'matematica', sigla: 'M' },
+            { id: 'ed_fisica', sigla: 'EF' },
+            { id: 'ingles', sigla: 'I' },
+            { id: 'arte', sigla: 'A' },
+            { id: 'etica', sigla: 'E' }
+        ];
+        
+        materias.forEach(mat => {
+            dados[`B1_${mat.sigla}`] = formatarNotaDoc(a[`b1_${mat.id}`]);
+            dados[`B2_${mat.sigla}`] = formatarNotaDoc(a[`b2_${mat.id}`]);
+            dados[`B3_${mat.sigla}`] = formatarNotaDoc(a[`b3_${mat.id}`]);
+            dados[`B4_${mat.sigla}`] = formatarNotaDoc(a[`b4_${mat.id}`]);
+            dados[`MDF_${mat.sigla}`] = formatarNotaDoc(a[`mdf_${mat.id}`]);
+            dados[`S_${mat.sigla}`] = a[`status_${mat.id}`] || '-';
+        });
+
+        doc.setData(dados);
+        doc.render();
+
+        const out = doc.getZip().generate({
+            type: "blob",
+            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+
+        return out;
+
+    } catch (error) {
+        console.error("Erro ao gerar boletim Word:", error);
+        alert("Erro ao gerar o boletim. Verifique se o arquivo boletim.docx está na pasta correta e se as tags não têm erro de digitação.");
+        return null;
+    }
+}
+async function docBoletimTurma(alunos) {
+    try {
+        const response = await fetch('documentos/modelos/boletim_turma.docx');
+        if (!response.ok) throw new Error("Arquivo boletim_turma.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, {
+            paragraphLoop: true,
+            linebreaks: true,
+        });
+
+        // Monta a lista com as tags exatas
+        const listaAlunos = alunos.map(aluno => {
+            const item = {
+                NOME_ALUNO: up(aluno.nome),
+                TURMA: labelTurma(aluno.turma),
+                ANO_ATUAL: new Date().getFullYear()
+            };
+
+            const materias = [
+                { id: 'portugues', sigla: 'P' }, { id: 'historia', sigla: 'H' },
+                { id: 'geografia', sigla: 'G' }, { id: 'ciencias', sigla: 'C' },
+                { id: 'matematica', sigla: 'M' }, { id: 'ed_fisica', sigla: 'EF' },
+                { id: 'ingles', sigla: 'I' }, { id: 'arte', sigla: 'A' },
+                { id: 'etica', sigla: 'E' }
+            ];
+            
+            materias.forEach(mat => {
+                item[`B1_${mat.sigla}`] = formatarNotaDoc(aluno[`b1_${mat.id}`]);
+                item[`B2_${mat.sigla}`] = formatarNotaDoc(aluno[`b2_${mat.id}`]);
+                item[`B3_${mat.sigla}`] = formatarNotaDoc(aluno[`b3_${mat.id}`]);
+                item[`B4_${mat.sigla}`] = formatarNotaDoc(aluno[`b4_${mat.id}`]);
+                item[`MDF_${mat.sigla}`] = formatarNotaDoc(aluno[`mdf_${mat.id}`]);
+                item[`S_${mat.sigla}`] = aluno[`status_${mat.id}`] || '-';
+            });
+
+            return item;
+        });
+
+        // A sintaxe correta para a versão nova do docxtemplater é passar os dados no render()
+        doc.render({ alunos: listaAlunos });
+
+        const out = doc.getZip().generate({
+            type: "blob",
+            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+
+        return out;
+
+    } catch (error) {
+        console.error("Erro ao gerar boletim da turma:", error);
+        alert("Erro ao gerar o boletim da turma: " + error.message);
+        return null;
+    }
 }
 
 function docTransferencia(a) {

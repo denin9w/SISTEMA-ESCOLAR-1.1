@@ -66,15 +66,8 @@
     }
 
     /* FOOTER - Força ficar na última linha, sem sobrepor */
-    footer {
-        grid-column: 1 / -1;
-        grid-row: 3 / span 1;
-        width: 100%;
-        padding: 40px 15px;
-        /* Se o conteúdo da main for muito grande, o footer desce junto */
-        position: relative; 
-        z-index: 10;
-    }
+    
+ 
     
 
     /* Demais regras (abas, card, texto) */

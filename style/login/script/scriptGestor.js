@@ -113,9 +113,22 @@ async function pesquisarGlobal(termo) {
 }
 
 function renderizarListaAlunos(data, error) {
-    if (error) { console.error(error); listaDeAlunos.innerHTML = '  <p>Erro ao carregar.</p>'; return; }
+    if (error) { 
+        console.error(error); 
+        listaDeAlunos.innerHTML = '<p>Erro ao carregar.</p>'; 
+        return; 
+    }
+
     listaDeAlunos.innerHTML = '';
-    if (!data || data.length === 0) return listaDeAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>';
+    if (!data || data.length === 0) {
+        listaDeAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>';
+        return;
+    }
+
+    // ORDENAÇÃO ALFABÉTICA INTELIGENTE (Resolve o problema do "10" vir antes do "2")
+    data.sort((a, b) => {
+        return a.nome.localeCompare(b.nome, 'pt-BR', { numeric: true, sensitivity: 'base' });
+    });
 
     data.forEach(aluno => {
         const a = document.createElement('button');
@@ -123,7 +136,9 @@ function renderizarListaAlunos(data, error) {
         a.dataset.nome = aluno.nome;
         a.dataset.id = aluno.id;
         const statusTag = aluno.status !== 'Ativa' ? ` [${aluno.status}]` : '';
-        a.innerHTML = `${aluno.nome}${statusTag} <br><small style="color:#666;font-weight:normal;">${labelTurma(aluno.turma)}</small>`;
+        const turmaTag = labelTurma(aluno.turma);
+        a.innerHTML = `${aluno.nome}${statusTag} <br><small style="color:#666;font-weight:normal;">${turmaTag}</small>`;
+        
         a.addEventListener('click', () => {
             document.querySelectorAll('.btn-aluno').forEach(b => b.style.borderColor = '#eee');
             a.style.borderColor = 'var(--destaque)';
@@ -132,7 +147,6 @@ function renderizarListaAlunos(data, error) {
         listaDeAlunos.appendChild(a);
     });
 }
-
 if (btnAddAlunoGestor) {
     btnAddAlunoGestor.addEventListener('click', () => {
         modalAddAluno.style.display = 'flex';
@@ -512,8 +526,100 @@ function abrirModalFinanceiro(aluno) {
 // --- GERAR DOCUMENTOS PADRÃO ---
 function mostrarAcoesDocumento(alunoId, nomeDoc) {
     supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
-        .then(({ data: aluno, error }) => {
+        .then(async ({ data: aluno, error }) => {
             if (error || !aluno) { alert("Erro ao carregar aluno."); return; }
+
+            if (nomeDoc === 'Boletim') {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML = `
+                    <div class="modal-content" style="text-align: center; max-width: 400px;">
+                        <h2 style="justify-content: center; margin-bottom: 10px;">Boletim</h2>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Escolha o tipo de download:</p>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button id="btnSoAluno" class="btn-primario" style="background: #28a745; width: 100%;">
+                                <i class="fa-solid fa-user"></i> Apenas este Aluno
+                            </button>
+                            <button id="btnTurmaInteira" class="btn-primario" style="background: var(--destaque); width: 100%;">
+                                <i class="fa-solid fa-users"></i> Turma Completa
+                            </button>
+                        </div>
+                        <button id="btnFecharOpcoes" class="btn-cancelar" style="width: 100%; margin-top: 15px;">Fechar</button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                // Baixar apenas o aluno (MANTIDO)
+                overlay.querySelector('#btnSoAluno').onclick = async () => {
+                    overlay.remove();
+                    const docBlob = await docBoletim(aluno);
+                    if (!docBlob) return;
+                    const url = URL.createObjectURL(docBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Boletim-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                // Baixar Turma Completa (BLINDADO)
+                overlay.querySelector('#btnTurmaInteira').onclick = async () => {
+                    overlay.remove();
+                    
+                    console.log("--- INICIANDO TESTE TURMA COMPLETA ---");
+                    console.log("Aluno selecionado:", aluno.nome);
+                    console.log("Turma do aluno:", aluno.turma);
+
+                    if (!aluno.turma) {
+                        return alert("O aluno selecionado não possui uma turma cadastrada.");
+                    }
+
+                    try {
+                        // Busca os alunos na tabela
+                        const { data: alunosTurma, error: errTurma } = await supabaseClient
+                            .from('alunos')
+                            .select('*')
+                            .eq('turma', aluno.turma)
+                            .eq('autorizado', true); // Filtro de autorizado
+
+                        if (errTurma) {
+                            console.error("Erro do Supabase ao buscar:", errTurma);
+                            return alert("Erro de permissão no banco de dados ao buscar a turma.");
+                        }
+
+                        console.log("Alunos encontrados no banco:", alunosTurma);
+
+                        if (!alunosTurma || alunosTurma.length === 0) {
+                            return alert("Nenhum aluno encontrado com esta turma e autorizado = true.");
+                        }
+
+                        console.log("Chamando a função do Word...");
+                        const docBlob = await docBoletimTurma(alunosTurma);
+                        
+                        if (!docBlob) {
+                            console.error("A função do Word retornou erro.");
+                            return alert("Erro ao gerar o arquivo Word. Verifique o modelo boletim_turma.docx.");
+                        }
+
+                        console.log("Word gerado com sucesso! Baixando...");
+                        const url = URL.createObjectURL(docBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `Boletins-${labelTurma(aluno.turma).replace(/\s+/g,'_')}.docx`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+
+                    } catch (err) {
+                        console.error("Erro catch:", err);
+                        alert("Erro inesperado: " + err.message);
+                    }
+                };
+
+                overlay.querySelector('#btnFecharOpcoes').onclick = () => overlay.remove();
+                return;
+            }
+
+            // Outros documentos (mantidos)
             const fn = DOCUMENTOS_HTML[nomeDoc];
             if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
 

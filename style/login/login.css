@@ -47,14 +47,17 @@ main#login-main {
     background-size: cover;
     background-attachment: fixed;
     position: relative;
+    background: url(../../imagens/fundo.png);
     width: 100%;
+    height: 100vh;
 }
 
 main#login-main::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.126);
+    
     z-index: 1;
 }
 
@@ -229,7 +232,7 @@ main#login-main img.moeda {
         grid-row: 2 / span 1;
         background: transparent; /* Tira a imagem daqui */
         position: relative;
-        height: 100%;
+        height: 100vh;
         box-shadow: none;
     }
 
@@ -245,7 +248,7 @@ main#login-main img.moeda {
     }
 
     .text-fixo h1 {
-        font-size: 3.5rem;
+        font-size: 5rem;
         color: var(--titlecor) !important;
     }
 
@@ -313,4 +316,7 @@ main#login-main img.moeda {
         width: 100%;
         z-index: 10;
         position: relative;
+    }
+    footer h1{
+        font-size: 1rem !important;
     }
