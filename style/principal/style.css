@@ -25,7 +25,6 @@
 }
 
 body {
-   background: linear-gradient(135deg, rgb(0, 56, 105) 100%, rgba(0, 56, 105, 0.85) 50%, rgba(0, 56, 105, 0.6) 100%);
     color: var(--texto);
     font-family: var(--font-subtitulo);
     line-height: 1.6; /* Melhorado para leitura */
