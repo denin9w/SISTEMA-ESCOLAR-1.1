@@ -12,6 +12,7 @@ body {
   font-family:var(--font-subtitulo);
   line-height: 3em;
 }
+
 section#header {
   width: 100vw;
   display: flex;
@@ -23,68 +24,67 @@ section#header {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
   padding: 40px 10px; 
 } 
- header.text-fixo {
+
+header.text-fixo {
     width: 100%;
-    justify-content: t;
-    align-items: top;
     background: transparent;
     padding: 20px;
-    
-    /* A MÁGICA ACONTECE AQUI: */
     box-shadow: none;
-  }
-
-
+}
 
 /* CONTEÚDO PRINCIPAL */
 section#ficha {
   display: flex;
   flex-direction: column;
   flex: 1;
-
   position: relative;
-  padding: 0 !important; /* REMOVE QUALQUER ESPAÇO INTERNO */
+  padding: 0 !important;
   margin: 0 !important;
 }
 
-/* CABEÇALHO DO RESPONSÁVEL */
+/* ============================================================
+   BANNER DO ALUNO (AQUI ESTÁ A ALTERAÇÃO)
+   ============================================================ */
 div.text-banerL {
   width: 100%;
-  margin: 0 !important; /* REMOVE MARGENS */
-  padding: 0 !important; /* REMOVE PADDING */
-  padding: 20px;
-  border-bottom: 2px solid var(--destaque); /* Mantém a linha azul embaixo */
+  max-width: 800px;
+  margin: 20px auto;
+  background: linear-gradient(135deg, var(--titlecor) 0%, var(--destaque) 100%);
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 119, 255, 0.2);
+  color: white;
 }
 
 div.text-banerL h1 {
-  background-color: var(--fundo-card); /* Tira o fundo azul */
-  color: var(--titlecor); /* Texto azul escuro */
-  text-align: center;
+  color: white;
   font-size: 1.8rem;
-  padding: 20px 10px 5px 10px; /* Respiro interno apenas no texto */
-  margin: 0;
+  margin: 0 0 10px 0;
+  padding: 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
 div.text-banerL h2 {
-  text-align: center;
-  font-size: 1.2rem;
-  color: var(--texto);
+  font-size: 1.1rem;
+  color: #e2e8f0;
   margin: 0;
-  padding: 5px 10px 20px 10px;
+  padding: 0;
+  font-weight: 400;
 }
 
 #alunoLogadoNome {
-  display: block;
-  text-align: center;
+  display: inline-block;
+  background-color: #ffffff;
+  color: var(--titlecor);
+  padding: 8px 20px;
+  border-radius: 30px;
   font-weight: bold;
-  font-size: 1rem;
-  color: var(--destaque);
-  margin: 0;
-  padding-bottom: 20px; /* Espaço para o texto não colar na borda azul */
+  font-size: 1.1rem;
+  margin-top: 20px;
+  line-height: 1.5;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
-
-
 
 /* NAVBAR GLOBAL */
 nav#MCL {
@@ -113,13 +113,13 @@ nav#MCL a {
 }
 
 nav#MCL a:hover {
-  color:rgba(165, 42, 42, 0.793);
+  color: rgba(165, 42, 42, 0.793);
   transform: translateY(-2px);
 }
 
-/* CONTEÚDO PRINCIPAL */
-
-
+/* ============================================================
+   IMAGENS E DOCUMENTOS
+   ============================================================ */
 img.bonecoO {
   position: absolute;
   z-index: 1;
@@ -138,49 +138,6 @@ img.moedaO {
 
 div.elemento-onput { display: none; }
 
-/* CABEÇALHO DO RESPONSÁVEL */
-/* ============================================================
-   CABEÇALHO DO RESPONSÁVEL (Limpo e Moderno)
-   ============================================================ */
-div.text-banerL {
-  width: 100%;
-  background-color: var(--fundo-card);
-  border-bottom: 2px solid #e2e8f0; /* Linha cinza sutil em vez de azul forte */
-  padding: 30px 20px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-  
-}
-
-div.text-banerL h1 {
-  background: transparent; /* Remove o fundo azul */
-  color: var(--titlecor); /* Texto na cor principal (azul escuro) */
-  font-size: 1.8rem;
-  padding: 0;
-  margin-bottom: 10px;
-  margin-top: 20px;
-}
-
-div.text-banerL h2 {
-  font-size: 1.1rem;
-  color: #64748b; /* Cinza chique para o subtítulo */
-  margin: 0;
-  padding: 0;
-  font-weight: 400;
-}
-
-#alunoLogadoNome {
-  display: inline-block;
-  background-color: #e0f2fe; /* Fundo azul clarinho para o nome do aluno */
-  color: var(--destaque);
-  padding: 6px 15px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  margin-top: 10px;
-
-}
-
 /* ÁREA DE DOCUMENTOS */
 div#documentos {
   display: flex;
@@ -191,19 +148,15 @@ div#documentos {
   padding: 20px;
 }
 
-/* ============================================================
-   GRID DE DOCUMENTOS (RESPONSIVO E SEM ESPAÇOS VAZIOS)
-   ============================================================ */
+/* GRID DE DOCUMENTOS */
 div.documentos-itens {
   display: grid;
-  /* Mágica aqui: Cria colunas de no mínimo 220px, 
-     preenchendo o espaço automaticamente */
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
   gap: 20px;
   width: 100%;
   max-width: 1200px;
   margin-top: 30px;
-  justify-content: center; /* Centraliza o grid */
+  justify-content: center;
 }
 
 /* CARDS DE DOCUMENTOS */
@@ -212,12 +165,12 @@ div.documentos-itens {
 }
 
 .conteudo-card {
-  width: 100%; /* Ocupa todo o espaço da coluna do Grid */
+  width: 100%;
   max-width: 100%;
-  height: 100%; /* Garante que todos os cards fiquem com a mesma altura */
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Empurra o botão para baixo */
+  justify-content: space-between;
   align-items: center;
   padding: 25px 20px;
   border: 2px solid #e2e8f0;
@@ -273,29 +226,24 @@ div.documentos-itens {
     display: inline-block;
     margin-top: 15px;
     padding: 8px 20px;
-    background-color: var(--destaque); /* Cor azul do seu sistema */
+    background-color: var(--destaque);
     color: #ffffff;
     border: none;
-    border-radius: 25px; /* Bordas bem arredondadas */
+    border-radius: 25px;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: bold;
-    text-decoration: none; /* Remove o sublinhado */
+    text-decoration: none;
     text-align: center;
-    width: 80%; /* Não ocupa o card inteiro, fica mais elegante */
+    width: 80%;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 119, 255, 0.2); /* Sombra suave azul */
+    box-shadow: 0 2px 5px rgba(0, 119, 255, 0.2);
 }
 
 .btn-visualizar:hover {
-    background-color: var(--titlecor); /* Azul escuro ao passar o mouse */
-    transform: translateY(-2px); /* Efeito de subir */
+    background-color: var(--titlecor);
+    transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Ajuste para o botão dentro do card */
-.conteudo-card .btn-visualizar {
-    margin-top: 15px;
 }
 
 a.back {
@@ -316,4 +264,21 @@ a.back:hover {
 footer {
   width: 100%;
   margin-top: auto;
+}
+
+/* ============================================================
+   RESPONSIVO MOBILE
+   ============================================================ */
+@media (max-width: 640px) {
+    div.text-banerL {
+        width: 95%;
+        padding: 30px 15px;
+        margin: 10px auto;
+    }
+    div.text-banerL h1 {
+        font-size: 1.5rem;
+    }
+    #alunoLogadoNome {
+        font-size: 1rem;
+    }
 }

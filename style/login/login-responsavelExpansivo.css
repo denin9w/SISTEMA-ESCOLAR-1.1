@@ -12,32 +12,22 @@
     padding-right: 40px;
   }
 
-  /* 3. Cabeçalho (Capa Esquerda) */
-   /* 3. Cabeçalho (Capa Esquerda) */
+  /* 3. Cabeçalho */
   section#header {
     width: 100%;
-
     position: relative;
     display: flex;
-    align-items: center;     /* Centraliza o texto verticalmente */
+    align-items: center;
     justify-content: center;
-    box-shadow: inset -10px 0 20px rgba(0,0,0,0.05);
-    
-    /* A MÁGICA ACONTECE AQUI: */
-    height: 100%;            /* Ocupa toda a altura disponível da linha do grid */
+    height: 100%; 
     min-height: 100%; 
   }
 
- header.text-fixo {
+  header.text-fixo {
     width: 100%;
-    justify-content: t;
-    align-items: top;
     background: transparent;
     padding: 20px;
-    
-    /* A MÁGICA ACONTECE AQUI: */
     box-shadow: none;
-
   }
 
   .text-fixo h1 {
@@ -54,10 +44,8 @@
     font-weight: 500;
   }
 
-  /* 4. Conteúdo (Direita) */
+  /* 4. Conteúdo */
   section#ficha {
-    grid-column: 2 / -1;
-    grid-row: 2 / span 1;
     width: auto;
     justify-content: center;
     align-items: center;
@@ -69,32 +57,14 @@
     background-attachment: fixed;
   }
 
-  /* Ajuste do cabeçalho azul */
+  /* Ajuste para o banner ficar centralizado e bonito */
   div.text-banerL {
-    background-color: var(--fundo-card);
-    border-bottom: 2px solid var(--destaque);
-    margin-top: 0;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin: 40px auto;
+    padding: 50px 30px;
   }
 
-    /* Ajuste do cabeçalho branco no desktop */
-  div.text-banerL {
-    width: 100%;
-    background-color: var(--fundo-card);
-    border-bottom: 2px solid var(--destaque);
-    margin: 0 !important;
-    padding: 0 !important; /* Tira o padding que estava criando a caixa */
-    box-shadow: none; /* Remove a sombra que dava efeito de flutuação */
-  }
-
-  /* O resto das regras de dentro do text-banerL continua igual */
-
-  div.text-banerL h2 {
-    font-size: 1.2rem;
-    color: var(--texto);
-    margin: 0;
-    padding: 0;
+  div.text-banerL h1 {
+    font-size: 2.5rem;
   }
 
   /* Área de documentos no desktop */
@@ -104,26 +74,16 @@
   }
 
   div.documentos-itens {
-    justify-content: flex-start; /* Alinha os cards à esquerda no desktop */
+    justify-content: flex-start;
   }
 
   /* Ajuste das imagens soltas */
   img.bonecoO {
     display: none;
-    position: fixed;
-    width: 7rem;
-    top: 30%;
-    left: 420px;
-    z-index: 1000;
   }
 
   img.moedaO {
     display: none;
-    position: fixed;
-    right: 2%;
-    bottom: 100px;
-    width: 5rem;
-    z-index:1000;
   }
 
   /* 5. Footer no final */

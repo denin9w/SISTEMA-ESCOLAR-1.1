@@ -1,21 +1,22 @@
+@media screen and (min-width: 790px) {
+    /* Ajuste do Banner do Professor no Desktop */
+    div.text-baner {
+        padding: 50px 30px;
+        margin: 40px auto;
+    }
 
-@media screen and ( min-width: 420px){
-    
-img.boneco{
-    position:absolute;
-    z-index: 1;
-    width: 6rem;
-    top:170px;
-    left:1%;
+    div.text-baner h1 {
+        font-size: 2.5rem;
+    }
 
-}
+    /* Organiza o nome e o link lado a lado no desktop */
+    #topoProfessor {
+        flex-direction: row;
+        gap: 30px;
+    }
 
-img.moeda{
-    position: absolute;
-    z-index: 1;
-    right: 1px;
-    bottom:50px;
-    width:5rem;
-}
-
+    /* Esconde as imagens do boneco e moeda que estavam soltas no fundo */
+    img.boneco, img.moeda {
+        display: none !important;
+    }
 }

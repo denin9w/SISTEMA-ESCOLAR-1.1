@@ -322,9 +322,14 @@ function abrirTelaNotas(aluno) {
     telaNotas.scrollIntoView({ behavior: 'smooth' });
 }
 
+
+
 // --- IMPRIMIR E BAIXAR BOLETIM (ÁREA DO PROFESSOR) ---
 const btnImprimirBoletimProf = document.querySelector('#btnImprimirBoletimProf');
 const btnBaixarBoletimProf = document.querySelector('#btnBaixarBoletimProf');
+
+
+
 
 async function gerarDocumentoBoletimProf() {
     if (!alunoSelecionadoId) return alert("Selecione um aluno primeiro.");

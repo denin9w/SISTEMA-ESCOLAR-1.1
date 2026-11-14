@@ -524,7 +524,71 @@ nav#MCL a:hover {
     color:rgba(165, 42, 42, 0.793);
     transform: translateY(-2px);
 }
+/* ============================================================
+   BANNER DO PROFESSOR (ESTILO DO RESPONSÁVEL)
+   ============================================================ */
+div.text-baner {
 
+    width: 100%;
+    max-width: 90%;
+    margin: 20px auto ;
+    background: linear-gradient(135deg, var(--titlecor) 0%, var(--destaque) 100%);
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 119, 255, 0.2);
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+div.text-baner h1 {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 0 10px 0;
+    padding: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Ajuste do Topo do Professor (Nome e Link) */
+#topoProfessor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding: 0;
+}
+
+#nomeProfessorLogado {
+    display: inline-block;
+    background-color: #ffffff;
+    color: var(--titlecor);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin: 0;
+}
+
+#topoProfessor a.link-cadastro {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: 0.3s;
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+#topoProfessor a.link-cadastro:hover {
+    background-color: white;
+    color: var(--titlecor);
+}
 
 /* ============================================================
    RESPONSIVO
