@@ -132,6 +132,26 @@
                             <label>Cidade de Nascimento:</label>
                             <input type="text" id="addCidadeNascGestor">
                         </div>
+                           <!-- NOVO -->
+                        <div class="input-group">
+                            <label>Estado de Nascimento (UF):</label>
+                            <input type="text" id="addEstadoNascGestor" maxlength="2">
+                        </div>
+                        <div class="input-group">
+                            <label>Turma:</label>
+                            <select id="addTurmaGestor" required>
+                             <!-- opções -->
+                            </select>
+                        </div>
+                        <!-- NOVO -->
+                        <div class="input-group">
+                            <label>Turno:</label>
+                            <select id="addTurnoGestor">
+                                <option value="Manhã">Manhã</option>
+                                <option value="Tarde">Tarde</option>
+                            </select>
+
+
                         <div class="input-group">
                             <label>Turma:</label>
                             <select id="addTurmaGestor" required>
@@ -208,6 +228,62 @@
             </form>
         </div>
     </div>
+        <!-- MODAL DE EDITAR ALUNO -->
+    <div id="modalEditarAluno" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <h2><i class="fa-solid fa-pen-to-square" style="color: #f59e0b;"></i> Editar Dados do Aluno</h2>
+            <form id="formEditarAluno">
+                <input type="hidden" id="editIdAluno">
+                
+                <fieldset class="fieldset-modal">
+                    <legend>Dados Pessoais</legend>
+                    <div class="grid-2col">
+                        <div class="input-group"><label>Nome:</label><input type="text" id="editNome" required></div>
+                        <div class="input-group"><label>Data Nasc:</label><input type="date" id="editDataNasc" required></div>
+                        <div class="input-group"><label>Cidade Nasc:</label><input type="text" id="editCidadeNasc"></div>
+                        <div class="input-group"><label>Estado Nasc (UF):</label><input type="text" id="editEstadoNasc" maxlength="2"></div>
+                        <div class="input-group"><label>Nacionalidade:</label><input type="text" id="editNacionalidade"></div>
+                        <div class="input-group"><label>Sexo:</label>
+                            <select id="editSexo"><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option></select>
+                        </div>
+                        <div class="input-group"><label>Turma:</label><select id="editTurma" required></select></div>
+                        <div class="input-group"><label>Turno:</label>
+                            <select id="editTurno"><option value="Manhã">Manhã</option><option value="Tarde">Tarde</option></select>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="fieldset-modal">
+                    <legend>Documentos e Endereço</legend>
+                    <div class="grid-2col">
+                        <div class="input-group"><label>CPF Aluno:</label><input type="text" id="editCpf"></div>
+                        <div class="input-group"><label>RG:</label><input type="text" id="editRg"></div>
+                        <div class="input-group"><label>Rua:</label><input type="text" id="editRua"></div>
+                        <div class="input-group"><label>Bairro:</label><input type="text" id="editBairro"></div>
+                        <div class="input-group"><label>Nº:</label><input type="text" id="editNumero"></div>
+                        <div class="input-group"><label>Cidade:</label><input type="text" id="editCidade"></div>
+                        <div class="input-group"><label>UF:</label><input type="text" id="editEstado" maxlength="2"></div>
+                        <div class="input-group"><label>CEP:</label><input type="text" id="editCep"></div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="fieldset-modal">
+                    <legend>Filiação</legend>
+                    <div class="grid-2col">
+                        <div class="input-group"><label>Nome do Pai:</label><input type="text" id="editPai"></div>
+                        <div class="input-group"><label>CPF do Pai:</label><input type="text" id="editCpfPai"></div>
+                        <div class="input-group"><label>Nome da Mãe:</label><input type="text" id="editMae"></div>
+                        <div class="input-group"><label>CPF da Mãe:</label><input type="text" id="editCpfMae"></div>
+                    </div>
+                </fieldset>
+                
+                <div class="modal-botoes">
+                    <button type="button" class="btn-cancelar" id="btnFecharModalEditar">Cancelar</button>
+                    <button type="submit" class="btn-salvar" style="background: #f59e0b;">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- SCRIPTS -->
 
@@ -259,5 +335,7 @@
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
         <img class="moeda" src="imagens/moeda.png" alt="Moeda">
     </footer>
+
+
 </body>
 </html>

@@ -200,7 +200,9 @@ if (formAddAluno) {
             sexo: document.querySelector('#addSexoGestor').value,
             nacionalidade: document.querySelector('#addNacionalidadeGestor').value.trim(),
             cidade_nascimento: document.querySelector('#addCidadeNascGestor').value.trim(),
+            estado_nascimento: document.querySelector('#addEstadoNascGestor').value.trim() || null, 
             turma: document.querySelector('#addTurmaGestor').value,
+            turno: document.querySelector('#addTurnoGestor').value,
             
             endereco: document.querySelector('#addRuaGestor').value.trim(),
             bairro: document.querySelector('#addBairroGestor').value.trim(),
@@ -284,13 +286,163 @@ function abrirDocumentos(aluno) {
     
     const btnCarne = document.createElement('button'); btnCarne.className = 'btn-primario'; btnCarne.innerHTML = '<i class="fa-solid fa-barcode"></i> Emitir Carnê'; btnCarne.style.cssText = 'padding: 8px 15px; font-size: 0.8rem;'; btnCarne.onclick = () => abrirModalCarne(aluno);
     const btnFinanceiro = document.createElement('button'); btnFinanceiro.className = 'btn-primario'; btnFinanceiro.innerHTML = '<i class="fa-solid fa-chart-line"></i> Financeiro'; btnFinanceiro.style.cssText = 'padding: 8px 15px; font-size: 0.8rem; background: #28a745;'; btnFinanceiro.onclick = () => abrirModalFinanceiro(aluno);
+
+    // NOVO BOTÃO DE EDITAR
+    const btnEditarDados = document.createElement('button'); 
+    btnEditarDados.className = 'btn-primario'; 
+    btnEditarDados.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar Dados'; 
+    btnEditarDados.style.cssText = 'padding: 8px 15px; font-size: 0.8rem; background: #f59e0b; color: #fff;'; 
+    btnEditarDados.onclick = () => abrirModalEditarAluno(aluno);
     
-    btnGroup.appendChild(btnCarne); btnGroup.appendChild(btnFinanceiro); title.appendChild(btnGroup); documentoporAluno.appendChild(title);
+    btnGroup.appendChild(btnCarne); 
+    btnGroup.appendChild(btnFinanceiro); 
+    btnGroup.appendChild(btnEditarDados); // Adicionando o novo botão
+    title.appendChild(btnGroup); 
+    documentoporAluno.appendChild(title);
+    
+    
 
     docs.forEach(d => {
         const a = document.createElement('a'); a.href = '#'; a.dataset.doc = d.label; a.innerHTML = `<i class="fa-solid ${d.icon}" style="color: var(--titlecor);"></i> ${d.label}`;
         a.addEventListener('click', (ev) => { ev.preventDefault(); mostrarAcoesDocumento(aluno.id, d.label); });
         const div = document.createElement('div'); div.className = 'cdocumentos'; div.appendChild(a); documentoporAluno.appendChild(div);
+    });
+}
+
+// ============================================================
+// FUNÇÕES PARA EDITAR ALUNO
+// ============================================================
+const modalEditarAluno = document.querySelector('#modalEditarAluno');
+const formEditarAluno = document.querySelector('#formEditarAluno');
+const btnFecharModalEditar = document.querySelector('#btnFecharModalEditar');
+
+// Abre o modal e preenche os campos
+// Abre o modal e preenche os campos
+async function abrirModalEditarAluno(aluno) {
+    if (!modalEditarAluno) return;
+    
+    // Mostra um aviso de carregamento
+    modalEditarAluno.style.display = 'flex';
+    const btnSalvar = formEditarAluno.querySelector('.btn-salvar');
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = "Carregando...";
+
+    try {
+        // BUSCA OS DADOS COMPLETOS DO ALUNO NO BANCO
+        const { data: alunoCompleto, error } = await supabaseClient
+            .from('alunos')
+            .select('*')
+            .eq('id', aluno.id)
+            .single();
+
+        if (error || !alunoCompleto) throw new Error("Erro ao buscar dados do aluno.");
+
+        // Preenche os campos com os dados completos
+        document.querySelector('#editIdAluno').value = alunoCompleto.id;
+        document.querySelector('#editNome').value = alunoCompleto.nome || '';
+        document.querySelector('#editDataNasc').value = alunoCompleto.data_nascimento || '';
+        document.querySelector('#editCidadeNasc').value = alunoCompleto.cidade_nascimento || '';
+        document.querySelector('#editEstadoNasc').value = alunoCompleto.estado_nascimento || '';
+        document.querySelector('#editNacionalidade').value = alunoCompleto.nacionalidade || 'Brasileira';
+        document.querySelector('#editSexo').value = alunoCompleto.sexo || 'Masculino';
+        document.querySelector('#editTurno').value = alunoCompleto.turno || 'Manhã';
+        
+        document.querySelector('#editCpf').value = alunoCompleto.cpf || '';
+        document.querySelector('#editRg').value = alunoCompleto.rg || '';
+        document.querySelector('#editRua').value = alunoCompleto.endereco || '';
+        document.querySelector('#editBairro').value = alunoCompleto.bairro || '';
+        document.querySelector('#editNumero').value = alunoCompleto.numero_endereco || '';
+        document.querySelector('#editCidade').value = alunoCompleto.cidade || '';
+        document.querySelector('#editEstado').value = alunoCompleto.estado || '';
+        document.querySelector('#editCep').value = alunoCompleto.cep || '';
+        
+        document.querySelector('#editPai').value = alunoCompleto.nome_pai || '';
+        document.querySelector('#editCpfPai').value = alunoCompleto.cpf_pai || '';
+        document.querySelector('#editMae').value = alunoCompleto.nome_mae || '';
+        document.querySelector('#editCpfMae').value = alunoCompleto.cpf_mae || '';
+
+        // Preenche o select de turmas
+        const selectEditTurma = document.querySelector('#editTurma');
+        selectEditTurma.innerHTML = TURMAS.map(t => `<option value="${t}">${labelTurma(t)}</option>`).join('');
+        selectEditTurma.value = alunoCompleto.turma;
+
+    } catch (err) {
+        console.error(err);
+        alert("Erro ao carregar dados do aluno: " + err.message);
+        modalEditarAluno.style.display = 'none';
+    } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = "Salvar Alterações";
+    }
+}
+// Fecha o modal
+if (btnFecharModalEditar) {
+    btnFecharModalEditar.addEventListener('click', () => {
+        modalEditarAluno.style.display = 'none';
+    });
+}
+
+// Salva as alterações
+if (formEditarAluno) {
+    formEditarAluno.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const id = document.querySelector('#editIdAluno').value;
+        const btnSalvar = formEditarAluno.querySelector('.btn-salvar');
+        
+        btnSalvar.disabled = true;
+        btnSalvar.textContent = "Salvando...";
+
+        const dadosAtualizados = {
+            nome: document.querySelector('#editNome').value.trim(),
+            data_nascimento: document.querySelector('#editDataNasc').value,
+            cidade_nascimento: document.querySelector('#editCidadeNasc').value.trim(),
+            estado_nascimento: document.querySelector('#editEstadoNasc').value.trim().toUpperCase() || null,
+            nacionalidade: document.querySelector('#editNacionalidade').value.trim(),
+            sexo: document.querySelector('#editSexo').value,
+            turno: document.querySelector('#editTurno').value,
+            turma: document.querySelector('#editTurma').value,
+            
+            cpf: document.querySelector('#editCpf').value.trim(),
+            rg: document.querySelector('#editRg').value.trim(),
+            endereco: document.querySelector('#editRua').value.trim(),
+            bairro: document.querySelector('#editBairro').value.trim(),
+            numero_endereco: document.querySelector('#editNumero').value.trim(),
+            cidade: document.querySelector('#editCidade').value.trim(),
+            estado: document.querySelector('#editEstado').value.trim().toUpperCase(),
+            cep: document.querySelector('#editCep').value.trim(),
+            
+            nome_pai: document.querySelector('#editPai').value.trim() || null,
+            cpf_pai: document.querySelector('#editCpfPai').value.trim() || null,
+            nome_mae: document.querySelector('#editMae').value.trim() || null,
+            cpf_mae: document.querySelector('#editCpfMae').value.trim() || null,
+        };
+
+        try {
+            const { error } = await supabaseClient
+                .from('alunos')
+                .update(dadosAtualizados)
+                .eq('id', id);
+
+            if (error) throw error;
+
+            alert("Dados atualizados com sucesso!");
+            modalEditarAluno.style.display = 'none';
+            
+            // Recarrega a lista de alunos para atualizar a tela
+            if (selectTurma.value) {
+                carregarAlunosPorTurma(selectTurma.value);
+            } else {
+                pesquisarGlobal(dadosAtualizados.nome);
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao atualizar dados: " + err.message);
+        } finally {
+            btnSalvar.disabled = false;
+            btnSalvar.textContent = "Salvar Alterações";
+        }
     });
 }
 
@@ -617,7 +769,25 @@ function mostrarAcoesDocumento(alunoId, nomeDoc) {
 
                 overlay.querySelector('#btnFecharOpcoes').onclick = () => overlay.remove();
                 return;
+                
             }
+
+                        // ==========================================
+            // NOVO: LÓGICA PARA O BOLSA FAMÍLIA (WORD)
+            // ==========================================
+            if (nomeDoc === 'Bolsa Família' || nomeDoc === 'Bolsa Familia') {
+                const docBlob = await docBolsaFamilia(aluno);
+                if (!docBlob) return;
+
+                const url = URL.createObjectURL(docBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `BolsaFamilia-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                a.click();
+                URL.revokeObjectURL(url);
+                return;
+            }
+
 
             // Outros documentos (mantidos)
             const fn = DOCUMENTOS_HTML[nomeDoc];

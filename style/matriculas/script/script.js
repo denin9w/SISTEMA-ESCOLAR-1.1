@@ -151,6 +151,8 @@ if (formulario) {
             sexo: matricula.sexo,
             nacionalidade: matricula.nacionalidade,
             cidade_nascimento: matricula['cidade-nascimento'],
+            estado_nascimento: matricula['estado-nascimento'] ? 
+            matricula['estado-nascimento'].toUpperCase() : null,
             endereco: matricula.endereco,
             bairro: matricula.bairro,
             numero_endereco: matricula['numero-endereco'],
@@ -161,6 +163,7 @@ if (formulario) {
             rg: matricula.rg,
             niss: matricula.niss,
             turma: matricula.turma,
+            turno: matricula.turno || null,
             observacao: matricula.observacao,
 
             nome_pai: matricula['nome-pai'],

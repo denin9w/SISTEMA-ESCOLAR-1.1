@@ -487,7 +487,9 @@ footer img.boneco, footer img.moeda {
     font-weight: bold;
     cursor: pointer;
 }
-
+#editTurma, #editTurno, #addTurmaGestor, #addTurnoGestor {
+    text-transform: uppercase;
+}
 /* ============================================================
    RESPONSIVO (Mobile)
    ============================================================ */

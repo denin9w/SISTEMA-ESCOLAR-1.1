@@ -133,67 +133,47 @@ function footerPadrao() {
 // DOCUMENTOS
 // ============================================================
 
-function docBolsaFamilia(a) {
-    const p = dadosPais(a);
-    return `<!DOCTYPE html>
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-        <meta charset="UTF-8">
-        <title>Declaração — ${a.nome}</title>
-        ${CSS_GLOBAL}
-        <style> @page { size: A4; margin: 3cm 2cm; } </style>
-    </head>
-    <body>
-        <div class="doc-container">
-            <table style="width: 100%; border-collapse: collapse; border: none;">
-                <tr>
-                    <td style="border: none; padding: 0;">
-                        <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; margin-bottom: 40px;">
-                            <tr>
-                                <td style="padding: 10px 5px 5px 5px;">
-                                    <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 70px; margin-bottom: 5px;"><br>
-                                    <h1 style="font-size: 18pt; margin: 0; font-family: 'Times New Roman', Times, serif;">CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0 5px 10px 5px; font-size: 9pt; line-height: 1.3;">
-                                    <strong>Rua Clementino Ricardo de Souza 134 – Severiano Moraes Filho fone: (87) 98114-9883</strong><br>
-                                    <strong>Cadastro Escolar P – 459-058 __ CNPJ 05198.663/0001 -86</strong><br>
-                                    <div style="margin-top: 5px;">
-                                        <span style="display:inline-block; width: 150px; text-align:left;">P – Nº 220</span><span style="display:inline-block; width: 200px; text-align:left;">D.O.E. de 22 / 01 / 2004</span>
-                                    </div>
-                                    <div>
-                                        <span style="display:inline-block; width: 150px; text-align:left;">P – Nº 4160</span><span style="display:inline-block; width: 200px; text-align:left;">D.O.E. de 06 / 06 / 2011</span>
-                                    </div>
-                                    <strong>CEP: 552900 __ Garanhuns __ Pernambuco</strong>
-                                </td>
-                            </tr>
-                        </table>
+async function docBolsaFamilia(a) {
+    try {
+        const response = await fetch('documentos/modelos/bolsa_familia.docx');
+        if (!response.ok) throw new Error("Arquivo bolsa_familia.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
 
-                        <div style="text-align: center; font-size: 14pt; font-weight: bold; margin-bottom: 50px;">DECLARAÇÃO</div>
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, {
+            paragraphLoop: true,
+            linebreaks: true,
+        });
 
-                        <div style="display: flex; justify-content: center;">
-                            <div style="width: 100%; text-align: justify; line-height: 2;">
-                                Declaro para os devidos fins que o(a) Estudante <strong>${up(a.nome)}</strong>, filho(a) de 
-                                <strong>${p.pai}</strong> e de <strong>${p.mae}</strong>, nascido(a) em <strong>${dataBR(a.data_nascimento)}</strong>, 
-                                natural de <strong>${up(a.cidade_nascimento || '—')}</strong>, estado <strong>${up(a.estado || '—')}</strong>, 
-                                residente no município de <strong>${up(a.cidade || '—')}</strong>, Estado <strong>${up(a.estado || '—')}</strong>, 
-                                está matriculado(a) nesta Unidade de Ensino no <strong>${labelTurma(a.turma)} do(a) EDUCAÇÃO INFANTIL I MANHÃ</strong>.
-                            </div>
-                        </div>
+              const dados = {
+            NOME: up(a.nome),
+            PAI: a.nome_pai ? up(a.nome_pai) : '_________________________________',
+            MAE: a.nome_mae ? up(a.nome_mae) : '_________________________________',
+            DATA_NASC: dataBR(a.data_nascimento),
+            CIDADE_NASC: up(a.cidade_nascimento || '—'),
+            ESTADO_NASC: up(a.estado_nascimento || '—'),
+            CIDADE: up(a.cidade || '—'),
+            ESTADO: up(a.estado || '—'),
+            // A MÁGICA ESTÁ AQUI: Forçando maiúsculo e usando a labelTurma
+            TURMA: up(labelTurma(a.turma)), 
+            TURNO: up(a.turno || 'NÃO INFORMADO'),
+            DATA_HOJE: dataHojeExtenso()
+        };
 
-                        <div style="text-align: center; margin-top: 80px;">Garanhuns, ${dataHojeExtenso()}.</div>
+        doc.render(dados);
 
-                        <table style="width: 100%; border: none; margin-top: 60px; text-align: center;">
-                            <tr><td style="border: none; border-bottom: 1px solid #000; width: 60%;">&nbsp;</td></tr>
-                            <tr><td style="border: none; padding-top: 5px; font-size: 11pt;">Marcia de Souza<br>DIRETORA</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </body>
-    </html>`;
+        const out = doc.getZip().generate({
+            type: "blob",
+            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+
+        return out;
+
+    } catch (error) {
+        console.error("Erro ao gerar Bolsa Família:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
 async function docBoletim(a) {
@@ -210,7 +190,8 @@ async function docBoletim(a) {
 
         const dados = {
             NOME_ALUNO: up(a.nome),
-            TURMA: labelTurma(a.turma),
+            TURMA: up(labelTurma(a.turma)), // <-- Forçando maiúsculo
+            TURNO: up(a.turno || 'NÃO INFORMADO'), // <-- Forçando maiúsculo
             ANO_ATUAL: new Date().getFullYear()
         };
 
@@ -268,7 +249,8 @@ async function docBoletimTurma(alunos) {
         const listaAlunos = alunos.map(aluno => {
             const item = {
                 NOME_ALUNO: up(aluno.nome),
-                TURMA: labelTurma(aluno.turma),
+                TURMA: up(labelTurma(aluno.turma)), // <-- Forçando maiúsculo
+                TURNO: up(aluno.turno || 'NÃO INFORMADO'), // <-- Forçando maiúsculo
                 ANO_ATUAL: new Date().getFullYear()
             };
 

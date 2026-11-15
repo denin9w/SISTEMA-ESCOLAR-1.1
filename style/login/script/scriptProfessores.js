@@ -112,6 +112,7 @@ if (selectTurma) {
         if (alunos.length === 0) {
             listaAlunosDiv.innerHTML = "<p>Nenhum aluno ativo nesta turma.</p>";
         } else {
+            alunos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { numeric: true, sensitivity: 'base' }));
             alunos.forEach(aluno => {
                 const itemContainer = document.createElement('div');
                 itemContainer.classList.add('aluno-item');
@@ -326,8 +327,6 @@ function abrirTelaNotas(aluno) {
 
 // --- IMPRIMIR E BAIXAR BOLETIM (ÁREA DO PROFESSOR) ---
 const btnImprimirBoletimProf = document.querySelector('#btnImprimirBoletimProf');
-const btnBaixarBoletimProf = document.querySelector('#btnBaixarBoletimProf');
-
 
 
 
@@ -348,7 +347,7 @@ async function gerarDocumentoBoletimProf() {
     return html;
 }
 
-if (btnImprimirBoletimProf) {
+/*if (btnImprimirBoletimProf) {
     btnImprimirBoletimProf.addEventListener('click', async () => {
         const html = await gerarDocumentoBoletimProf();
         if (!html) return;
@@ -358,26 +357,59 @@ if (btnImprimirBoletimProf) {
         win.document.close();
         win.onload = () => { win.print(); };
     });
-}
+}*/
+
+// ============================================================
+// BAIXAR BOLETIM EM WORD (ÁREA DO PROFESSOR)
+// ============================================================
+const btnBaixarBoletimProf = document.querySelector('#btnBaixarBoletimProf');
 
 if (btnBaixarBoletimProf) {
     btnBaixarBoletimProf.addEventListener('click', async () => {
-        const html = await gerarDocumentoBoletimProf();
-        if (!html) return;
+        if (!alunoSelecionadoId) return alert("Selecione um aluno primeiro.");
+        
+        btnBaixarBoletimProf.disabled = true;
+        const textoOriginal = btnBaixarBoletimProf.innerHTML;
+        btnBaixarBoletimProf.innerHTML = "Gerando...";
 
-        const aluno = await supabaseClient.from('alunos').select('nome').eq('id', alunoSelecionadoId).single();
-        const nomeAluno = aluno.data ? aluno.data.nome : 'Aluno';
+        try {
+            const { data: aluno, error } = await supabaseClient
+                .from('alunos')
+                .select('*')
+                .eq('id', alunoSelecionadoId)
+                .single();
 
-        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Boletim-${nomeAluno.replace(/\s+/g,'_')}.doc`;
-        a.click();
-        URL.revokeObjectURL(url);
+            if (error || !aluno) throw new Error("Erro ao buscar dados do aluno.");
+
+            const docBlob = await docBoletim(aluno);
+            if (!docBlob) throw new Error("Erro ao gerar o arquivo Word.");
+
+            // A MÁGICA: Cria o Blob com o tipo MIME correto do Word (.docx)
+            const blobWord = new Blob([docBlob], { 
+                type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+            });
+
+            const url = URL.createObjectURL(blobWord);
+            const a = document.createElement('a');
+            a.href = url;
+            // Garante que o nome termine com .docx
+            a.download = `Boletim-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // Limpa a URL da memória
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao baixar o boletim: " + err.message);
+        } finally {
+            btnBaixarBoletimProf.disabled = false;
+            btnBaixarBoletimProf.innerHTML = textoOriginal;
+        }
     });
 }
-
 
 
 

@@ -132,6 +132,9 @@
 
                     <label for="icidade-nascimento">Cidade de nascimento:</label>
                     <input class="input-aluno" id="icidade-nascimento" name="cidade-nascimento" type="text" placeholder="Lugar onde a criança foi registrada" required>
+                       <!-- NOVO CAMPO AQUI -->
+                    <label for="iestado-nascimento">Estado de Nascimento (UF):</label>
+                    <input class="input-aluno" id="iestado-nascimento" name="estado-nascimento" type="text" placeholder="PE" maxlength="2" required>
                 </fieldset>
             </div>
 
@@ -208,6 +211,12 @@
                             <option value="9ano-a">9º Ano A</option>
                         </optgroup>
                     </select>
+<!-- NOVO CAMPO AQUI -->
+                    <label for="iturno">Turno:</label>
+                    <select name="turno" id="iturno" class="input-aluno" required>
+                        <option value="" selected disabled>Selecione o turno</option>
+                        <option value="Manhã">Manhã</option>
+                        <option value="Tarde">Tarde</option>
 
                     <label for="iobs">Observação:</label>
                     <textarea name="observacao" id="iobs" placeholder="Digite alguma observação sobre o aluno."></textarea>
