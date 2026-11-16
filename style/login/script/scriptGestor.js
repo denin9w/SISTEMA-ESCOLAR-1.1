@@ -153,6 +153,16 @@ if (btnAddAlunoGestor) {
         document.querySelector('#addNomeGestor').focus();
     });
 }
+// --- MOSTRAR/ESCONDER CAMPO OUTRO RESPONSÁVEL ---
+const addResponsavelGestor = document.querySelector('#addResponsavelGestor');
+if (addResponsavelGestor) {
+    addResponsavelGestor.addEventListener('change', (e) => {
+        const divOutro = document.querySelector('#divOutroRespGestor');
+        if (divOutro) {
+            divOutro.style.display = e.target.value === 'outro' ? 'block' : 'none';
+        }
+    });
+}
 
 if (btnFecharModal) {
     btnFecharModal.addEventListener('click', () => {
@@ -218,6 +228,9 @@ if (formAddAluno) {
             nome_mae: document.querySelector('#addMaeGestor').value.trim() || null,
             cpf_mae: document.querySelector('#addCpfMaeGestor').value.trim() || null,
             
+            responsavel: document.querySelector('#addResponsavelGestor').value,
+            responsavel_outro: document.querySelector('#addOutroRespGestor').value.trim() || null,
+
             status: 'Ativa',
             notas: {},
             pagamentos: []
@@ -282,7 +295,7 @@ function abrirDocumentos(aluno) {
     title.style.cssText = 'grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;';
     title.innerHTML = `<span style="font-size: 0.85rem; color: #666; font-style: italic;">Aluno: ${aluno.nome}</span>`;
     const btnGroup = document.createElement('div');
-    btnGroup.style.cssText = 'display: flex; gap: 10px;';
+    btnGroup.style.cssText = 'display: flex; gap: 10px; flex-wrap: wrap; width: 100%; margin-bottom: 15px;';
     
     const btnCarne = document.createElement('button'); btnCarne.className = 'btn-primario'; btnCarne.innerHTML = '<i class="fa-solid fa-barcode"></i> Emitir Carnê'; btnCarne.style.cssText = 'padding: 8px 15px; font-size: 0.8rem;'; btnCarne.onclick = () => abrirModalCarne(aluno);
     const btnFinanceiro = document.createElement('button'); btnFinanceiro.className = 'btn-primario'; btnFinanceiro.innerHTML = '<i class="fa-solid fa-chart-line"></i> Financeiro'; btnFinanceiro.style.cssText = 'padding: 8px 15px; font-size: 0.8rem; background: #28a745;'; btnFinanceiro.onclick = () => abrirModalFinanceiro(aluno);
@@ -681,6 +694,7 @@ function mostrarAcoesDocumento(alunoId, nomeDoc) {
         .then(async ({ data: aluno, error }) => {
             if (error || !aluno) { alert("Erro ao carregar aluno."); return; }
 
+            // Se for Boletim, mantém o menu de Turma Completa
             if (nomeDoc === 'Boletim') {
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
@@ -701,132 +715,61 @@ function mostrarAcoesDocumento(alunoId, nomeDoc) {
                 `;
                 document.body.appendChild(overlay);
 
-                // Baixar apenas o aluno (MANTIDO)
                 overlay.querySelector('#btnSoAluno').onclick = async () => {
                     overlay.remove();
                     const docBlob = await docBoletim(aluno);
                     if (!docBlob) return;
                     const url = URL.createObjectURL(docBlob);
                     const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Boletim-${aluno.nome.replace(/\s+/g,'_')}.docx`;
-                    a.click();
-                    URL.revokeObjectURL(url);
+                    a.href = url; a.download = `Boletim-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                    a.click(); URL.revokeObjectURL(url);
                 };
 
-                // Baixar Turma Completa (BLINDADO)
                 overlay.querySelector('#btnTurmaInteira').onclick = async () => {
                     overlay.remove();
-                    
-                    console.log("--- INICIANDO TESTE TURMA COMPLETA ---");
-                    console.log("Aluno selecionado:", aluno.nome);
-                    console.log("Turma do aluno:", aluno.turma);
-
-                    if (!aluno.turma) {
-                        return alert("O aluno selecionado não possui uma turma cadastrada.");
-                    }
-
-                    try {
-                        // Busca os alunos na tabela
-                        const { data: alunosTurma, error: errTurma } = await supabaseClient
-                            .from('alunos')
-                            .select('*')
-                            .eq('turma', aluno.turma)
-                            .eq('autorizado', true); // Filtro de autorizado
-
-                        if (errTurma) {
-                            console.error("Erro do Supabase ao buscar:", errTurma);
-                            return alert("Erro de permissão no banco de dados ao buscar a turma.");
-                        }
-
-                        console.log("Alunos encontrados no banco:", alunosTurma);
-
-                        if (!alunosTurma || alunosTurma.length === 0) {
-                            return alert("Nenhum aluno encontrado com esta turma e autorizado = true.");
-                        }
-
-                        console.log("Chamando a função do Word...");
-                        const docBlob = await docBoletimTurma(alunosTurma);
-                        
-                        if (!docBlob) {
-                            console.error("A função do Word retornou erro.");
-                            return alert("Erro ao gerar o arquivo Word. Verifique o modelo boletim_turma.docx.");
-                        }
-
-                        console.log("Word gerado com sucesso! Baixando...");
-                        const url = URL.createObjectURL(docBlob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `Boletins-${labelTurma(aluno.turma).replace(/\s+/g,'_')}.docx`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-
-                    } catch (err) {
-                        console.error("Erro catch:", err);
-                        alert("Erro inesperado: " + err.message);
-                    }
+                    const { data: alunosTurma, error: errTurma } = await supabaseClient
+                        .from('alunos').select('*').eq('turma', aluno.turma).eq('autorizado', true);
+                    if (errTurma || !alunosTurma || alunosTurma.length === 0) return alert("Não há alunos autorizados nesta turma.");
+                    const docBlob = await docBoletimTurma(alunosTurma);
+                    if (!docBlob) return;
+                    const url = URL.createObjectURL(docBlob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = `Boletins-${labelTurma(aluno.turma).replace(/\s+/g,'_')}.docx`;
+                    a.click(); URL.revokeObjectURL(url);
                 };
 
                 overlay.querySelector('#btnFecharOpcoes').onclick = () => overlay.remove();
                 return;
-                
             }
 
-                        // ==========================================
-            // NOVO: LÓGICA PARA O BOLSA FAMÍLIA (WORD)
-            // ==========================================
-            if (nomeDoc === 'Bolsa Família' || nomeDoc === 'Bolsa Familia') {
-                const docBlob = await docBolsaFamilia(aluno);
-                if (!docBlob) return;
-
-                const url = URL.createObjectURL(docBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `BolsaFamilia-${aluno.nome.replace(/\s+/g,'_')}.docx`;
-                a.click();
-                URL.revokeObjectURL(url);
-                return;
-            }
-
-
-            // Outros documentos (mantidos)
+            // Para TODOS os outros documentos (que agora geram Word)
             const fn = DOCUMENTOS_HTML[nomeDoc];
             if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
 
-            const html = fn(aluno);
+            // Mostra um aviso rápido
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
-            overlay.innerHTML = `
-                <div class="modal-content" style="text-align: center; max-width: 400px;">
-                    <h2 style="justify-content: center; margin-bottom: 10px;">${nomeDoc}</h2>
-                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Escolha uma ação:</p>
-                    <div style="display: flex; gap: 10px; justify-content: center;">
-                        <button id="btnImprimir" class="btn-primario" style="background: var(--destaque);">Imprimir</button>
-                        <button id="btnWord" class="btn-primario" style="background: #28a745;">Baixar Word</button>
-                    </div>
-                    <button id="btnFecharDoc" class="btn-cancelar" style="width: 100%; margin-top: 15px;">Fechar</button>
-                </div>
-            `;
+            overlay.innerHTML = `<div class="modal-content" style="text-align: center; padding: 40px;"><h2>Gerando documento...</h2><p>Aguarde um instante.</p></div>`;
             document.body.appendChild(overlay);
 
-            overlay.querySelector('#btnImprimir').onclick = () => {
-                const win = window.open('', '_blank');
-                win.document.write(html);
-                win.document.close();
-                win.onload = () => { win.print(); };
-            };
-
-            overlay.querySelector('#btnWord').onclick = () => {
-                const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${nomeDoc.replace(/\s+/g,'_')}-${aluno.nome.replace(/\s+/g,'_')}.doc`;
-                a.click();
-                URL.revokeObjectURL(url);
-            };
-
-            overlay.querySelector('#btnFecharDoc').onclick = () => overlay.remove();
+            try {
+                const docBlob = await fn(aluno);
+                if (docBlob) {
+                    const url = URL.createObjectURL(docBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${nomeDoc.replace(/\s+/g,'_')}-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } else {
+                    alert("O documento não pôde ser gerado.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao gerar o documento: " + err.message);
+            } finally {
+                overlay.remove();
+            }
         })
         .catch(e => { console.error(e); alert("Erro ao gerar documento."); });
 }

@@ -182,6 +182,7 @@ if (formulario) {
 
             responsavel: tipoResponsavel,
             responsavel_outro: responsavelOutro,
+            cpf_outro: matricula['cpf-outro'] ? matricula['cpf-outro'].replace(/\D/g, '') : null,
 
             status: 'Pendente',
             autorizado: false,
@@ -266,4 +267,15 @@ if (formulario) {
             alert("Matrícula enviada com sucesso! Aguarde a aprovação do gestor.");
         }
     });
+
+    // --- MOSTRAR/ESCONDER CAMPO OUTRO RESPONSÁVEL NA MATRÍCULA ---
+        const selectResponsavel = document.querySelector('#iresponsavel');
+        if (selectResponsavel) {
+            selectResponsavel.addEventListener('change', (e) => {
+                const campoOutro = document.querySelector('#campoOutroResponsavel');
+                if (campoOutro) {
+                    campoOutro.style.display = e.target.value === 'outro' ? 'block' : 'none';
+                }
+            });
+        }
 }

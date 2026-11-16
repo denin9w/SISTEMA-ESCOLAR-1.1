@@ -490,6 +490,28 @@ footer img.boneco, footer img.moeda {
 #editTurma, #editTurno, #addTurmaGestor, #addTurnoGestor {
     text-transform: uppercase;
 }
+
+/* ============================================================
+   CORREÇÃO DOS BOTÕES DE DOCUMENTOS (NÃO VAZAR)
+   ============================================================ */
+.cdocumentos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+/* Garante que os botões não estiquem demais e quebrem a linha */
+.btn-primario {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Ajuste específico para o container que segura os botões no topo */
+#cardDocumentos > div > div:first-child {
+    flex-wrap: wrap;
+}
+
 /* ============================================================
    RESPONSIVO (Mobile)
    ============================================================ */

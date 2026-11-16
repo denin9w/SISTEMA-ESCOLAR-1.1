@@ -206,64 +206,48 @@
     <script src="style/login/script/scriptResponsavel.js"></script>
 
     <!-- Visualização / download dos documentos -->
-    <script>
-        (function () {
-            function abrirDocHTML(nomeDoc) {
+        <script>
+    (function () {
+        document.querySelectorAll('.btn-visualizar').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const nomeDoc = btn.dataset.doc;
                 const alunoId = sessionStorage.getItem("@alunoLogadoId");
-                if (!alunoId) { alert("Sessão expirada."); return; }
-
-                if (!window.supabaseClient) {
-                    alert("Aguarde, conectando ao banco...");
-                    return;
-                }
-                window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single()
-                    .then(({ data, error }) => {
-                        if (error || !data) { alert("Erro ao carregar dados do aluno."); return; }
-                        const fn = DOCUMENTOS_HTML[nomeDoc];
-                        if (!fn) { alert("Modelo não encontrado: " + nomeDoc); return; }
-                        const html = fn(data);
-                        const win = window.open('', '_blank');
-                        win.document.write(html);
-                        win.document.close();
-                    })
-                    .catch(e => { console.error(e); alert("Erro ao abrir documento."); });
-            }
-
-            // NOVA FUNÇÃO: Baixar Boletim em Word (.docx)
-            async function baixarBoletimWord(nomeDoc) {
-                const alunoId = sessionStorage.getItem("@alunoLogadoId");
-                if (!alunoId) { alert("Sessão expirada."); return; }
                 
+                if (!alunoId) { alert("Sessão expirada."); return; }
+                if (!window.supabaseClient) { alert("Aguarde, conectando..."); return; }
+
                 const { data: aluno, error } = await window.supabaseClient.from('alunos').select('*').eq('id', alunoId).single();
-                if (error || !aluno) return alert("Erro ao carregar dados.");
+                if (error || !aluno) { alert("Erro ao carregar aluno."); return; }
 
-                // Chama a função docBoletim que agora gera o arquivo Word
-                const docBlob = await docBoletim(aluno);
-                if (!docBlob) return;
+                const fn = DOCUMENTOS_HTML[nomeDoc];
+                if (!fn) { alert("Modelo não encontrado."); return; }
 
-                const url = URL.createObjectURL(docBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Boletim-${aluno.nome.replace(/\s+/g,'_')}.docx`;
-                a.click();
-                URL.revokeObjectURL(url);
-            }
+                const btnOriginal = btn.innerHTML;
+                btn.innerHTML = "Gerando...";
+                btn.disabled = true;
 
-            document.querySelectorAll('.btn-visualizar').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const nomeDoc = btn.dataset.doc;
-                    
-                    if (nomeDoc === 'Boletim') {
-                        // Agora o botão "Baixar" do boletim chama a função do Word
-                        await baixarBoletimWord(nomeDoc);
-                    } else {
-                        abrirDocHTML(nomeDoc);
+                try {
+                    const docBlob = await fn(aluno);
+                    if (docBlob) {
+                        const url = URL.createObjectURL(docBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${nomeDoc.replace(/\s+/g,'_')}-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                        a.click();
+                        URL.revokeObjectURL(url);
                     }
-                });
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao gerar documento: " + err.message);
+                } finally {
+                    btn.innerHTML = btnOriginal;
+                    btn.disabled = false;
+                }
             });
-        })();
+        });
+    })();
     </script>
 
     <!-- Botão Sair -->

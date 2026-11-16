@@ -167,11 +167,12 @@
         grid-column: 1 / -1;
         grid-row: 3 / span 1;
         width: 100%;
-        height: 50px;
+        height: 100px;
         z-index: 9999; 
         position: relative;
         background-color: var(--fundo-card);
         flex-direction: row;
+
     }
     .text-footer {
         display: flex;

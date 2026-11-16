@@ -1,5 +1,5 @@
 // ============================================================
-// templates-docs.js — Modelos de documentos em HTML (COMPLETO)
+// templates-docs.js — Modelos de documentos em HTML e Word
 // ============================================================
 
 function labelTurma(t) {
@@ -9,6 +9,26 @@ function labelTurma(t) {
     const inf = t.match(/^infantil-([IVX]+)-([ab])$/i);
     if (inf) return `INFANTIL ${inf[1].toUpperCase()} ${inf[2].toUpperCase()}`;
     return t.toUpperCase();
+}
+// --- NOVA FUNÇÃO: IDENTIFICA O NÍVEL DE ENSINO PELA TURMA ---
+function getNivelEnsino(t) {
+    if (!t) return '—';
+    const turma = t.toLowerCase();
+    
+    if (turma.includes('infantil')) {
+        return 'EDUCAÇÃO INFANTIL';
+    }
+    
+    // Pega o primeiro número da string da turma
+    const primeiroDigito = parseInt(turma.charAt(0));
+    
+    if (primeiroDigito >= 1 && primeiroDigito <= 5) {
+        return 'ENSINO FUNDAMENTAL I';
+    } else if (primeiroDigito >= 6 && primeiroDigito <= 9) {
+        return 'ENSINO FUNDAMENTAL II';
+    }
+    
+    return '—';
 }
 
 function dataBR(iso) {
@@ -27,10 +47,8 @@ function dataHojeExtenso() {
 
 function up(s) { return (s || '').toString().toUpperCase(); }
 
-// --- NOVA FUNÇÃO PARA FORMATAR AS NOTAS NO DOCUMENTO ---
 function formatarNotaDoc(valor) {
     if (valor === null || valor === undefined || valor === '') return '-';
-    // Converte para número, fixa 1 casa decimal e troca ponto por vírgula
     return Number(valor).toFixed(1).replace('.', ',');
 }
 
@@ -40,32 +58,39 @@ function dadosPais(a) {
     return { pai, mae };
 }
 
-// --- CSS GLOBAL ---
+// --- NOVA FUNÇÃO: BUSCA O RESPONSÁVEL CORRETO ---
+function getDadosResponsavel(a) {
+    let nomeResp = '—';
+    let cpfResp = '—';
+
+    if (a.responsavel === 'pai') {
+        nomeResp = a.nome_pai || '—';
+        cpfResp = a.cpf_pai || '—';
+    } else if (a.responsavel === 'mae') {
+        nomeResp = a.nome_mae || '—';
+        cpfResp = a.cpf_mae || '—';
+    } else if (a.responsavel === 'outro') {
+        nomeResp = a.responsavel_outro || '—';
+        cpfResp = a.cpf_outro || '—';
+    } else {
+        nomeResp = a.nome_pai || a.nome_mae || '—';
+    }
+
+    return {
+        nome: up(nomeResp),
+        cpf: cpfResp
+    };
+}
+
+// --- CSS GLOBAL (Ainda usado pelo Carnê) ---
 const CSS_GLOBAL = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         @page { size: A4 portrait; margin: 2cm; }
-        body { 
-            font-family: 'Times New Roman', Times, serif; 
-            font-size: 12pt; 
-            color: #000; 
-            margin: 0; 
-            padding: 20px; 
-            background: #f0f0f0; 
-            display: flex; 
-            justify-content: center; 
-        }
-        .doc-container { 
-            width: 100%; 
-            max-width: 800px; 
-            background: #fff; 
-            padding: 40px; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-            box-sizing: border-box;
-        }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: #000; margin: 0; padding: 20px; background: #f0f0f0; display: flex; justify-content: center; }
+        .doc-container { width: 100%; max-width: 800px; background: #fff; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); box-sizing: border-box; }
         .doc-title { text-align: center; font-size: 14pt; font-weight: bold; margin: 30px 0; text-transform: uppercase; }
         p { margin: 0 0 10px 0; line-height: 1.8; text-align: justify; }
-        
         @media (max-width: 768px) {
             body { padding: 10px; background: #fff; }
             .doc-container { padding: 15px; box-shadow: none; }
@@ -76,135 +101,29 @@ const CSS_GLOBAL = `
     </style>
 `;
 
-function headerPadraoBordado() {
-    return `
-    <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; margin-bottom: 30px;">
-        <tr>
-            <td style="border-bottom: 1px solid #000; padding: 10px 5px 5px 5px;">
-                <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 70px; margin-bottom: 5px;"><br>
-                <h1 style="font-size: 16pt; margin: 0; font-weight: bold; font-family: 'Times New Roman', Times, serif;">CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; font-size: 9pt; line-height: 1.4;">
-                Rua: Clementino Ricardo de Souza, 134 — Severiano Moraes Filho<br>
-                Fone: (87) 98114-9883 — CNPJ 05.198.663/0001-86<br>
-                Portaria nº 220 D.O.E. 22/01/2004 — Portaria nº 4160 D.O.E. 06/06/2011<br>
-                CEP: 552900 — Garanhuns — Pernambuco
-            </td>
-        </tr>
-    </table>`;
-}
-
-function linhaAssinatura(nome, cargo) {
-    return `
-    <table style="width: 100%; border: none; margin-top: 60px; text-align: center;">
-        <tr><td style="border: none; border-bottom: 1px solid #000; width: 60%; max-width: 300px;">&nbsp;</td></tr>
-        <tr><td style="border: none; padding-top: 5px; font-size: 12pt;">${nome ? `<strong>${nome}</strong><br>` : ''}${cargo}</td></tr>
-    </table>`;
-}
-
-function getWordHead(title) {
-    return `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-        <meta charset="UTF-8">
-        <title>${title}</title>
-        ${CSS_GLOBAL}
-    </head>
-    <body>
-        <div class="doc-container">
-            <table style="width: 100%; border-collapse: collapse; border: none;">
-                <tr>
-                    <td style="border: none; padding: 0;">`;
-}
-
-function footerPadrao() {
-    return `
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </body>
-    </html>`;
-}
-
 // ============================================================
-// DOCUMENTOS
+// 1. BOLETIM (WORD)
 // ============================================================
-
-async function docBolsaFamilia(a) {
-    try {
-        const response = await fetch('documentos/modelos/bolsa_familia.docx');
-        if (!response.ok) throw new Error("Arquivo bolsa_familia.docx não encontrado.");
-        const arrayBuffer = await response.arrayBuffer();
-
-        const zip = new PizZip(arrayBuffer);
-        const doc = new window.docxtemplater(zip, {
-            paragraphLoop: true,
-            linebreaks: true,
-        });
-
-              const dados = {
-            NOME: up(a.nome),
-            PAI: a.nome_pai ? up(a.nome_pai) : '_________________________________',
-            MAE: a.nome_mae ? up(a.nome_mae) : '_________________________________',
-            DATA_NASC: dataBR(a.data_nascimento),
-            CIDADE_NASC: up(a.cidade_nascimento || '—'),
-            ESTADO_NASC: up(a.estado_nascimento || '—'),
-            CIDADE: up(a.cidade || '—'),
-            ESTADO: up(a.estado || '—'),
-            // A MÁGICA ESTÁ AQUI: Forçando maiúsculo e usando a labelTurma
-            TURMA: up(labelTurma(a.turma)), 
-            TURNO: up(a.turno || 'NÃO INFORMADO'),
-            DATA_HOJE: dataHojeExtenso()
-        };
-
-        doc.render(dados);
-
-        const out = doc.getZip().generate({
-            type: "blob",
-            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        });
-
-        return out;
-
-    } catch (error) {
-        console.error("Erro ao gerar Bolsa Família:", error);
-        alert("Erro ao gerar o documento: " + error.message);
-        return null;
-    }
-}
-
 async function docBoletim(a) {
     try {
         const response = await fetch('documentos/modelos/boletim.docx');
         if (!response.ok) throw new Error("Arquivo modelo não encontrado.");
         const arrayBuffer = await response.arrayBuffer();
-
         const zip = new PizZip(arrayBuffer);
-        const doc = new window.docxtemplater(zip, {
-            paragraphLoop: true,
-            linebreaks: true,
-        });
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
         const dados = {
             NOME_ALUNO: up(a.nome),
-            TURMA: up(labelTurma(a.turma)), // <-- Forçando maiúsculo
-            TURNO: up(a.turno || 'NÃO INFORMADO'), // <-- Forçando maiúsculo
+            TURMA: up(labelTurma(a.turma)),
+            TURNO: up(a.turno || 'NÃO INFORMADO'),
             ANO_ATUAL: new Date().getFullYear()
         };
 
-        // Mapeamento das siglas curtas
         const materias = [
-            { id: 'portugues', sigla: 'P' },
-            { id: 'historia', sigla: 'H' },
-            { id: 'geografia', sigla: 'G' },
-            { id: 'ciencias', sigla: 'C' },
-            { id: 'matematica', sigla: 'M' },
-            { id: 'ed_fisica', sigla: 'EF' },
-            { id: 'ingles', sigla: 'I' },
-            { id: 'arte', sigla: 'A' },
+            { id: 'portugues', sigla: 'P' }, { id: 'historia', sigla: 'H' },
+            { id: 'geografia', sigla: 'G' }, { id: 'ciencias', sigla: 'C' },
+            { id: 'matematica', sigla: 'M' }, { id: 'ed_fisica', sigla: 'EF' },
+            { id: 'ingles', sigla: 'I' }, { id: 'arte', sigla: 'A' },
             { id: 'etica', sigla: 'E' }
         ];
         
@@ -217,43 +136,33 @@ async function docBoletim(a) {
             dados[`S_${mat.sigla}`] = a[`status_${mat.id}`] || '-';
         });
 
-        doc.setData(dados);
-        doc.render();
-
-        const out = doc.getZip().generate({
-            type: "blob",
-            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        });
-
-        return out;
-
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
     } catch (error) {
         console.error("Erro ao gerar boletim Word:", error);
-        alert("Erro ao gerar o boletim. Verifique se o arquivo boletim.docx está na pasta correta e se as tags não têm erro de digitação.");
+        alert("Erro ao gerar o boletim: " + error.message);
         return null;
     }
 }
+
+// ============================================================
+// 2. BOLETIM DA TURMA (WORD)
+// ============================================================
 async function docBoletimTurma(alunos) {
     try {
         const response = await fetch('documentos/modelos/boletim_turma.docx');
         if (!response.ok) throw new Error("Arquivo boletim_turma.docx não encontrado.");
         const arrayBuffer = await response.arrayBuffer();
-
         const zip = new PizZip(arrayBuffer);
-        const doc = new window.docxtemplater(zip, {
-            paragraphLoop: true,
-            linebreaks: true,
-        });
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
-        // Monta a lista com as tags exatas
         const listaAlunos = alunos.map(aluno => {
             const item = {
                 NOME_ALUNO: up(aluno.nome),
-                TURMA: up(labelTurma(aluno.turma)), // <-- Forçando maiúsculo
-                TURNO: up(aluno.turno || 'NÃO INFORMADO'), // <-- Forçando maiúsculo
+                TURMA: up(labelTurma(aluno.turma)),
+                TURNO: up(aluno.turno || 'NÃO INFORMADO'),
                 ANO_ATUAL: new Date().getFullYear()
             };
-
             const materias = [
                 { id: 'portugues', sigla: 'P' }, { id: 'historia', sigla: 'H' },
                 { id: 'geografia', sigla: 'G' }, { id: 'ciencias', sigla: 'C' },
@@ -261,7 +170,6 @@ async function docBoletimTurma(alunos) {
                 { id: 'ingles', sigla: 'I' }, { id: 'arte', sigla: 'A' },
                 { id: 'etica', sigla: 'E' }
             ];
-            
             materias.forEach(mat => {
                 item[`B1_${mat.sigla}`] = formatarNotaDoc(aluno[`b1_${mat.id}`]);
                 item[`B2_${mat.sigla}`] = formatarNotaDoc(aluno[`b2_${mat.id}`]);
@@ -270,20 +178,10 @@ async function docBoletimTurma(alunos) {
                 item[`MDF_${mat.sigla}`] = formatarNotaDoc(aluno[`mdf_${mat.id}`]);
                 item[`S_${mat.sigla}`] = aluno[`status_${mat.id}`] || '-';
             });
-
             return item;
         });
-
-        // A sintaxe correta para a versão nova do docxtemplater é passar os dados no render()
         doc.render({ alunos: listaAlunos });
-
-        const out = doc.getZip().generate({
-            type: "blob",
-            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        });
-
-        return out;
-
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
     } catch (error) {
         console.error("Erro ao gerar boletim da turma:", error);
         alert("Erro ao gerar o boletim da turma: " + error.message);
@@ -291,329 +189,422 @@ async function docBoletimTurma(alunos) {
     }
 }
 
-function docTransferencia(a) {
-    const materias = ['Língua Portuguesa','História','Geografia','Arte','Ciências','Matemática','Educação Física','Ensino Religioso','Gramática','Leitura','Língua Estrangeira','Cidadania','Redação'];
-    
-    let cabecalhoMaterias = materias.map(m => `<th style="border: 1px solid #000; padding: 2px; font-size: 6pt; writing-mode: vertical-rl; transform: rotate(180deg); height: 80px; width: 30px;">${m.toUpperCase()}</th>`).join('');
-    
-    let linhas = '';
-    for (let ano = 0; ano < 8; ano++) {
-        let celulasNotas = materias.map(() => `<td style="border: 1px solid #000; padding: 2px;">--</td>`).join('');
-        linhas += `<tr>
-            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 8pt;">
-                ( &nbsp; ) ${ano+1}º ANO<br>Ano: ____
-            </td>
-            ${celulasNotas}
-            <td style="border: 1px solid #000; padding: 2px;">--</td>
-            <td style="border: 1px solid #000; padding: 2px;">--</td>
-            <td style="border: 1px solid #000; padding: 2px;">____</td>
-            <td style="border: 1px solid #000; padding: 2px;">____</td>
-            <td style="border: 1px solid #000; padding: 2px;">____</td>
-            <td style="border: 1px solid #000; padding: 2px;">____</td>
-        </tr>`;
+// ============================================================
+// 3. BOLSA FAMÍLIA (WORD)
+// ============================================================
+async function docBolsaFamilia(a) {
+    try {
+        const response = await fetch('documentos/modelos/bolsa_familia.docx');
+        if (!response.ok) throw new Error("Arquivo bolsa_familia.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const dados = {
+            NOME: up(a.nome),
+            PAI: a.nome_pai ? up(a.nome_pai) : '_________________________________',
+            MAE: a.nome_mae ? up(a.nome_mae) : '_________________________________',
+            DATA_NASC: dataBR(a.data_nascimento),
+            CIDADE_NASC: up(a.cidade_nascimento || '—'),
+            ESTADO_NASC: up(a.estado_nascimento || '—'),
+            CIDADE: up(a.cidade || '—'),
+            ESTADO: up(a.estado || '—'),
+            TURMA: up(labelTurma(a.turma)),
+            TURNO: up(a.turno || 'NÃO INFORMADO'),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Bolsa Família:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
     }
-
-    return `<!DOCTYPE html>
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-        <meta charset="UTF-8">
-        <title>Histórico — ${a.nome}</title>
-        ${CSS_GLOBAL}
-        <style> @page { size: A4 portrait; margin: 1cm; } </style>
-    </head>
-    <body>
-        <div class="doc-container">
-            <table style="width: 100%; border-collapse: collapse; border: none;">
-                <tr>
-                    <td style="border: none; padding: 0;">
-                        <div style="text-align: center; margin-bottom: 10px;">
-                            <img src="../../imagens/logo.png" alt="Logo CEJE" style="width: 80px;"><br>
-                            <div style="font-size: 8pt; margin-top: 5px;">UMA ESCOLA DE GERAÇÕES</div>
-                        </div>
-
-                        <table style="width: 100%; border: 2px solid #000; border-collapse: collapse; margin-bottom: 5px;">
-                            <tr>
-                                <td style="border-bottom: 1px solid #000; text-align: center; padding: 5px;">
-                                    <h1 style="font-size: 16pt; margin: 0; font-family: 'Times New Roman', Times, serif;">CENTRO EDUCACIONAL JARDIM DO ÉDEN</h1>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border-bottom: 1px solid #000; text-align: center; padding: 2px; font-size: 9pt;">
-                                    RUA: CLEMENTINO RICARDO DE SOUZA N° 132 &nbsp;&nbsp; Cidade: GARANHUNS &nbsp;&nbsp; UF: PE
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px;">
-                                    <table style="width: 100%; border: none; font-size: 9pt;">
-                                        <tr>
-                                            <td style="border: none; text-align: left;">Autorização de Funcionamento: P – Nº 220</td>
-                                            <td style="border: none; text-align: right;">D.O.E. de 22 / 01 / 2004</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: none; text-align: left;">P – Nº 4160</td>
-                                            <td style="border: none; text-align: right;">D.O.E. de 06 / 06 / 2011</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <span style="border: 1px solid #000; padding: 5px 30px; font-weight: bold; font-size: 10pt;">Cadastro Escolar: P – 459 - 058</span>
-                        </div>
-
-                        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 10px; font-family: 'Times New Roman', Times, serif;">
-                            <tr>
-                                <td style="border-bottom: 1px solid #000; text-align: center; padding: 5px; font-weight: bold; font-size: 11pt;">Histórico Escolar do Ensino Fundamental</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px; font-size: 11pt; line-height: 1.8;">
-                                    <p style="margin: 2px 0;">Certificamos que: <strong>${up(a.nome)}</strong></p>
-                                    <p style="margin: 2px 0;">Filiação: <strong>${up(a.nome_pai || '—')}</strong> e de <strong>${up(a.nome_mae || '—')}</strong></p>
-                                    <p style="margin: 2px 0;">Nascido em: <strong>${dataBR(a.data_nascimento)}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Natural de: <strong>${up(a.cidade_nascimento || '—')}</strong> &nbsp;&nbsp;&nbsp;&nbsp; UF: <strong>${up(a.estado || '—')}</strong></p>
-                                    <p style="margin: 2px 0;">Nacionalidade: <strong>BRASILEIRA</strong> &nbsp;&nbsp;&nbsp;&nbsp; RG: <strong>${a.rg || 'XXXXX'}</strong> &nbsp;&nbsp;&nbsp;&nbsp; CPF: <strong>${a.cpf || 'XXXXX'}</strong></p>
-                                    <p style="margin: 2px 0;"><strong>Concluiu o 1º ANO</strong> do Ensino Fundamental, nos termos da Lei Federal 9.394 de 20 de dezembro 1996.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border-top: 1px solid #000; text-align: center; padding: 5px; font-weight: bold; font-size: 11pt;">INFORMAÇÕES COMPLEMENTARES</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px; font-size: 10pt; line-height: 1.5;">
-                                    <p style="margin: 2px 0;">1- O mínimo exigido para promoção é 6,0(seis) e 75% de frequência do total de horas letivas</p>
-                                    <p style="margin: 2px 0;">Formas de acesso: ( &nbsp; ) Classificação &nbsp;&nbsp; ( &nbsp; ) Reclassificação &nbsp;&nbsp; Base Legal: Artigo 23 e 24 da Lei Federal Nº 9.394/96:</p>
-                                    <p style="text-align: center; margin: 2px 0;">Série ( &nbsp; ) &nbsp;&nbsp; ano ( X ) &nbsp;&nbsp; Fase ( &nbsp; ) &nbsp;&nbsp; Ciclo / Ano ( &nbsp; )</p>
-                                    <p style="margin: 2px 0;">1- Dispensa de Ensino Religioso: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;X&nbsp; ) Sim &nbsp;&nbsp; ( &nbsp; ) Não</p>
-                                    <p style="margin: 2px 0;">Base Legal:</p>
-                                    <p style="margin: 2px 0;">4- Dispensa de Educação Física: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp; ) Sim &nbsp;&nbsp; ( &nbsp;X&nbsp; ) Não</p>
-                                    <p style="margin: 2px 0;">Base Legal: ___________________________________________________________________________.</p>
-                                    <p style="margin-top: 10px;">Observação:</p>
-                                    <div style="border-bottom: 1px solid #000; width: 100%; height: 15px;"></div>
-                                    <div style="border-bottom: 1px solid #000; width: 100%; height: 15px; margin-top: 5px;"></div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <div style="text-align: center; font-size: 12pt; font-weight: bold; font-family: 'Times New Roman', Times, serif; margin: 20px 0;">CERTIFICADO E HISTÓRICO ESCOLAR DO ENSINO FUNDAMENTAL</div>
-
-                        <div class="table-responsive">
-                            <table style="width: 100%; border-collapse: collapse; text-align: center; font-family: Arial, sans-serif; font-size: 8pt;">
-                                <thead>
-                                    <tr>
-                                        <th colspan="15" style="border: 1px solid #000; padding: 2px;">BASE CURRICULAR COMUM</th>
-                                        <th colspan="4" style="border: 1px solid #000; padding: 2px;">PARTE DIVERSIFICADA</th>
-                                    </tr>
-                                    <tr>
-                                        <th style="border: 1px solid #000; padding: 2px;">SÉRIE / ANO</th>
-                                        <th style="border: 1px solid #000; padding: 2px;">COMPONENTES CURRICULARES</th>
-                                        ${cabecalhoMaterias}
-                                    </tr>
-                                </thead>
-                                <tbody>${linhas}</tbody>
-                            </table>
-                        </div>
-
-                        <div style="text-align: center; margin-top: 20px; font-size: 10pt; font-weight: bold;">Garanhuns, ${dataHojeExtenso()}.</div>
-
-                        <table style="width: 100%; border: none; margin-top: 30px; font-size: 10pt;">
-                            <tr>
-                                <td style="border: none; text-align: center; width: 50%;">
-                                    <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto;">&nbsp;</div>
-                                    Secretário(a)<br>Autorização nº<br>Carimbo
-                                </td>
-                                <td style="border: none; text-align: center; width: 50%;">
-                                    <div style="border-bottom: 1px solid #000; width: 80%; margin: 0 auto;">&nbsp;</div>
-                                    Gestor(a)<br>Autorização nº<br>Carimbo
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </body>
-    </html>`;
 }
 
-function docDeclaracaoMatricula(a) {
-    const p = dadosPais(a);
-    return `${getWordHead('Declaração de Matrícula')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO</div>
-        <p>Declaro para os devidos fins de justificativa que o aluno (a) <strong>${up(a.nome)}</strong> nascido em <strong>${dataBR(a.data_nascimento)}</strong>, filho de <strong>${p.pai}</strong> e <strong>${p.mae}</strong> o mesmo(a) está devidamente matriculada neste estabelecimento de ensino cursando o <strong>${labelTurma(a.turma)} DO EDUCAÇÃO INFANTIL I MANHÃ</strong>.</p>
-        <p>Sem mais para o momento agradeço e coloco-me ao inteiro dispor.</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
+// ============================================================
+// 4. DECLARAÇÃO DE MATRÍCULA (WORD)
+// ============================================================
+async function docDeclaracaoMatricula(a) {
+    try {
+        const response = await fetch('documentos/modelos/declaracao_matricula.docx');
+        if (!response.ok) throw new Error("Arquivo declaracao_matricula.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const dados = {
+            NOME: up(a.nome),
+            PAI: a.nome_pai ? up(a.nome_pai) : '_________________________________',
+            MAE: a.nome_mae ? up(a.nome_mae) : '_________________________________',
+            DATA_NASC: dataBR(a.data_nascimento),
+            TURMA: up(labelTurma(a.turma)),
+            TURNO: up(a.turno || 'NÃO INFORMADO'),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Declaração de Matrícula:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docProvissoria(a) {
-    const p = dadosPais(a);
-    return `${getWordHead('Provisória')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO PROVISÓRIA DE TRANSFERÊNCIA</div>
-        <p>Declaramos que o aluno (a) <strong>${up(a.nome)}</strong> filho(a) de <strong>${p.pai}</strong> e de <strong>${p.mae}</strong> nascido(a) <strong>${dataBR(a.data_nascimento)}</strong>, natural de <strong>${up(a.cidade_nascimento || '—')}</strong>, Estado de <strong>${up(a.estado || '—')}</strong>, tem direito a matricula no <strong>${labelTurma(a.turma)} do Ensino Fundamental</strong>.</p>
-        <p>Desde que obteve nos períodos anteriores os seguintes resultados:</p>
-        <p style="text-align: center;">( X ) aprovação &nbsp;&nbsp; ( &nbsp; ) reprovação &nbsp;&nbsp; ( &nbsp; ) cursando</p>
-        <p>Sem mais para o momento agradeço e coloco-me ao inteiro dispor.</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
+// ============================================================
+// 5. DECLARAÇÃO PROVISÓRIA (WORD)
+// ============================================================
+async function docProvissoria(a) {
+    try {
+        const response = await fetch('documentos/modelos/declaracao_provisoria.docx');
+        if (!response.ok) throw new Error("Arquivo declaracao_provisoria.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const dados = {
+            NOME: up(a.nome),
+            PAI: a.nome_pai ? up(a.nome_pai) : '_________________________________',
+            MAE: a.nome_mae ? up(a.nome_mae) : '_________________________________',
+            DATA_NASC: dataBR(a.data_nascimento),
+            CIDADE_NASC: up(a.cidade_nascimento || '—'),
+            ESTADO_NASC: up(a.estado_nascimento || '—'),
+            TURMA: up(labelTurma(a.turma)),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Declaração Provisória:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
+}
+// ============================================================
+// TRANSFERÊNCIA (WORD)
+// ============================================================
+async function docTransferencia(a) {
+    try {
+        const response = await fetch('documentos/modelos/transferencia.docx');
+        if (!response.ok) throw new Error("Arquivo transferencia.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const dados = {
+            NOME: up(a.nome),
+            PAI: a.nome_pai ? up(a.nome_pai) : '_________________________________',
+            MAE: a.nome_mae ? up(a.nome_mae) : '_________________________________',
+            DATA_NASC: dataBR(a.data_nascimento),
+            CIDADE_NASC: up(a.cidade_nascimento || '—'),
+            ESTADO_NASC: up(a.estado_nascimento || '—'),
+            RG: a.rg || 'XXXXX',
+            CPF: a.cpf || 'XXXXX',
+            TURMA: up(labelTurma(a.turma)),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Transferência:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docReciboPagamento(a) {
-    const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
-    return `${getWordHead('Recibo de Pagamento')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">RECIBO DE PAGAMENTO</div>
-        <p>Eu, <strong>MARCIA DE SOUZA</strong>, responsável pela Escola CENTRO EDUCACIONAL JARDIM DO ÉDEN, localizada em Garanhuns Rua Clementino Ricardo de Souza N° 134 Bairro Severiano Moraes Filho, declaro que recebemos do Sr. <strong>${up(nomeResp)}</strong> responsável financeiro pelo(a) aluno(a) <strong>${up(a.nome)}</strong> a quantia de 1.750,00 reais (mil setecentos e cinquenta reais) referente ao pagamento de mensalidades, conforme detalhado abaixo:</p>
-        <p style="margin-left: 20px;">Mensalidades do ano letivo de 2024: (250,00)</p>
-        <p style="margin-left: 20px;">Taxa de Matrícula: (250,00)</p>
-        <p><strong>Valor Total Pago em 2024: 1.750,00 (mil setecentos e cinquenta reais)</strong></p>
-        <p>Este recibo é valido como comprovante de pagamento integral das despesas educacionais durante o ano de 2024 na Escola CENTRO EDUCACIONAL JARDIM DO ÉDEN</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('Assinatura', '')}
-    ${footerPadrao()}`;
+// ============================================================
+// 6. RECIBO DE PAGAMENTO (WORD)
+// ============================================================
+async function docReciboPagamento(a) {
+    try {
+        const response = await fetch('documentos/modelos/recibo_pagamento.docx');
+        if (!response.ok) throw new Error("Arquivo recibo_pagamento.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const resp = getDadosResponsavel(a);
+        const dados = {
+            NOME: up(a.nome),
+            RESPONSAVEL: resp.nome,
+            CPF_RESPONSAVEL: resp.cpf,
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Recibo de Pagamento:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docFichaIndividual(a) {
-    const materias = ['Língua Portuguesa e Literatura','História','Geografia','Ciências','Matemática','Educação Física','Inglês','Arte','Cidadania'];
-    let linhas = '';
-    materias.forEach(m => { linhas += `<tr><td style="border: 1px solid #000; padding: 4px; text-align: left;">${m}</td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td></tr>`; });
-    
-    return `${getWordHead('Ficha Individual')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">FICHA INDIVIDUAL DO ALUNO</div>
+// ============================================================
+// 7. FICHA INDIVIDUAL (WORD) - CORRIGIDA
+// ============================================================
+async function docFichaIndividual(a) {
+    try {
+        const response = await fetch('documentos/modelos/ficha_individual.docx');
+        if (!response.ok) throw new Error("Arquivo ficha_individual.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        // Prepara os dados básicos
+        const dados = {
+            NOME: up(a.nome),
+            ANO_ATUAL: new Date().getFullYear(),
+            TURMA: up(labelTurma(a.turma)),
+            TURNO: up(a.turno || 'NÃO INFORMADO'),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+
+        // Adiciona as notas de cada matéria já formatadas
+        const materias = [
+            { id: 'portugues', sigla: 'P' }, { id: 'historia', sigla: 'H' },
+            { id: 'geografia', sigla: 'G' }, { id: 'ciencias', sigla: 'C' },
+            { id: 'matematica', sigla: 'M' }, { id: 'ed_fisica', sigla: 'EF' },
+            { id: 'ingles', sigla: 'I' }, { id: 'arte', sigla: 'A' },
+            { id: 'etica', sigla: 'E' }
+        ];
         
-        <table style="width:100%; border:none; margin-bottom: 15px; font-size: 14px;">
-            <tr><td style="border:none; padding:2px;"><strong>Aluno (a):</strong> ${up(a.nome)}</td></tr>
-            <tr><td style="border:none; padding:2px;"><strong>Ano:</strong> ${new Date().getFullYear()} &nbsp;&nbsp; <strong>Série:</strong> ${labelTurma(a.turma)} &nbsp;&nbsp; <strong>Turma:</strong> ${(a.turma || '').slice(-1).toUpperCase()}</td></tr>
-        </table>
-        
-        <div class="table-responsive">
-            <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; text-align: center; font-size: 12px;">
-                <thead>
-                    <tr>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 4px;">APROVEITAMENTO</th>
-                        <th colspan="5" style="border: 1px solid #000; padding: 4px;">I SEMESTRE</th>
-                        <th colspan="5" style="border: 1px solid #000; padding: 4px;">II SEMESTRE</th>
-                    </tr>
-                    <tr>
-                        <th style="border: 1px solid #000;">I UNIDADE</th><th style="border: 1px solid #000;">II UNIDADE</th><th style="border: 1px solid #000;">Recuperação</th><th style="border: 1px solid #000;">Média</th><th style="border: 1px solid #000;">Nota</th>
-                        <th style="border: 1px solid #000;">III UNIDADE</th><th style="border: 1px solid #000;">IV UNIDADE</th><th style="border: 1px solid #000;">Recuperação</th><th style="border: 1px solid #000;">Média</th><th style="border: 1px solid #000;">Nota</th>
-                    </tr>
-                </thead>
-                <tbody>${linhas}</tbody>
-            </table>
-        </div>
-        
-        <p style="margin-top: 20px; font-size: 12px;">APROVADO( &nbsp; ) &nbsp; REPROVADO( &nbsp; ) &nbsp; CURSANDO( X ) &nbsp; DESISTENTE( &nbsp; )</p>
-        <p style="font-size: 12px;">Percentual de Frequência de dias frequentados: ____% &nbsp;&nbsp; Carga Horária Anual: 800 dias letivos: 200</p>
-        ${linhaAssinatura('', 'Direção')}
-    ${footerPadrao()}`;
+        materias.forEach(mat => {
+            dados[`B1_${mat.sigla}`] = formatarNotaDoc(a[`b1_${mat.id}`]);
+            dados[`B2_${mat.sigla}`] = formatarNotaDoc(a[`b2_${mat.id}`]);
+            dados[`B3_${mat.sigla}`] = formatarNotaDoc(a[`b3_${mat.id}`]);
+            dados[`B4_${mat.sigla}`] = formatarNotaDoc(a[`b4_${mat.id}`]);
+            dados[`MDF_${mat.sigla}`] = formatarNotaDoc(a[`mdf_${mat.id}`]);
+        });
+
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Ficha Individual:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docRecibo(a) {
-    const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
-    return `${getWordHead('Recibo')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">RECIBO</div>
-        <p>Declaro para os devidos fins de justificativa que o senhor(a) <strong>${up(nomeResp)}</strong> efetuou o pagamento da matricula escolar do mês de janeiro do aluno(a) <strong>${up(a.nome)}</strong> no valor de R$ 300,00 reais (Trezentos reais).</p>
-        <p>Sem mais para o momento agradeço e coloco-me ao inteiro dispor para quaisquer esclarecimentos.</p>
-        <p>Atenciosamente a Direção</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('Márcia de Souza', '')}
-    ${footerPadrao()}`;
+// ============================================================
+// 8. RECIBO (WORD)
+// ============================================================
+async function docRecibo(a) {
+    try {
+        const response = await fetch('documentos/modelos/recibo.docx');
+        if (!response.ok) throw new Error("Arquivo recibo.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const resp = getDadosResponsavel(a);
+        const dados = {
+            NOME: up(a.nome),
+            RESPONSAVEL: resp.nome,
+            CPF_RESPONSAVEL: resp.cpf,
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Recibo:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docQuitacaoSimples(a) {
-    const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
-    return `${getWordHead('Quitação')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO DE QUITAÇÃO DE DÉBITO</div>
-        <p>Declaro para os devidos fins de justificativa que o senhor(a) <strong>${up(nomeResp)}</strong> efetuou o pagamento das mensalidades escolares do ano letivo de <strong>${new Date().getFullYear()}</strong> do(a) aluno(a) <strong>${up(a.nome)}</strong>.</p>
-        <p>Sem mais para o momento agradeço e coloco-me ao inteiro dispor para quaisquer esclarecimentos.</p>
-        <p>Atenciosamente a Direção</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
+// ============================================================
+// 9. QUITAÇÃO SIMPLES (WORD)
+// ============================================================
+async function docQuitacaoSimples(a) {
+    try {
+        const response = await fetch('documentos/modelos/quitacao_simples.docx');
+        if (!response.ok) throw new Error("Arquivo quitacao_simples.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const resp = getDadosResponsavel(a);
+        const dados = {
+            NOME: up(a.nome),
+            RESPONSAVEL: resp.nome,
+            CPF_RESPONSAVEL: resp.cpf,
+            ANO_ATUAL: new Date().getFullYear(),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Quitação Simples:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docQuitacaoTabela(a) {
-    const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
-    const ano = new Date().getFullYear();
-    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    let linhas = ''; let total = 0;
-    meses.forEach((m, i) => { const valor = 250; total += valor; linhas += `<tr><td style="border: 1px solid #000; padding: 4px;">${String(i+1).padStart(2,'0')}/${ano}</td><td style="border: 1px solid #000; padding: 4px;">${valor.toFixed(2).replace('.',',')} R$</td></tr>`; });
-    return `${getWordHead('Quitação Tabela')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO DE QUITAÇÃO DE DÉBITO</div>
-        <p>Declaro para os devidos fins de justificativa que o senhor(a) <strong>${up(nomeResp)}</strong> responsável pelo(a) aluno(a) <strong>${up(a.nome)}</strong> efetuou o pagamento das mensalidades escolares do ano letivo de <strong>${ano}</strong> no valor total de <strong>${total.toFixed(2).replace('.',',')} R$</strong>.</p>
-        <p>Segue o valor abaixo:</p>
-        <table style="width: 100%; max-width: 400px; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12px; margin: 0 auto;">
-            <thead><tr><th style="border: 1px solid #000; padding: 4px;">Data</th><th style="border: 1px solid #000; padding: 4px;">Valor</th></tr></thead>
-            <tbody>${linhas}<tr><th style="border: 1px solid #000; padding: 4px;">Total</th><th style="border: 1px solid #000; padding: 4px;">${total.toFixed(2).replace('.',',')} R$</th></tr></tbody>
-        </table>
-        <p style="margin-top: 20px;">Sem mais para o momento agradeço e coloco-me ao inteiro dispor para quaisquer esclarecimentos.</p>
-        <p>Atenciosamente a Direção</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
+// ============================================================
+// 10. QUITAÇÃO TABELA (WORD)
+// ============================================================
+async function docQuitacaoTabela(a) {
+    try {
+        const response = await fetch('documentos/modelos/quitacao_tabela.docx');
+        if (!response.ok) throw new Error("Arquivo quitacao_tabela.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const resp = getDadosResponsavel(a);
+        const dados = {
+            NOME: up(a.nome),
+            RESPONSAVEL: resp.nome,
+            CPF_RESPONSAVEL: resp.cpf,
+            ANO_ATUAL: new Date().getFullYear(),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Quitação Tabela:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docDeclaracaoNormal(a) {
-    return `${getWordHead('Declaração')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO</div>
-        <p>Declaro para os devidos fins que o(a) aluno(a) <strong>${up(a.nome)}</strong>, nascido(a) em <strong>${dataBR(a.data_nascimento)}</strong>, encontra-se regularmente matriculado(a) neste estabelecimento de ensino, cursando o <strong>${labelTurma(a.turma)}</strong>.</p>
-        <p>Sem mais para o momento, agradeço e coloco-me ao inteiro dispor.</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
+// ============================================================
+// 11. DECLARAÇÃO NORMAL (WORD)
+// ============================================================
+async function docDeclaracaoNormal(a) {
+    try {
+        const response = await fetch('documentos/modelos/declaracao_normal.docx');
+        if (!response.ok) throw new Error("Arquivo declaracao_normal.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const dados = {
+            NOME: up(a.nome),
+            DATA_NASC: dataBR(a.data_nascimento),
+            TURMA: up(labelTurma(a.turma)),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Declaração Normal:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docDeclaracaoNormalPaiMae(a) {
-    const p = dadosPais(a);
-    return `${getWordHead('Declaração Pai Mãe')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO</div>
-        <p>Declaro para os devidos fins que o(a) aluno(a) <strong>${up(a.nome)}</strong>, filho(a) de <strong>${p.pai}</strong> e de <strong>${p.mae}</strong>, nascido(a) em <strong>${dataBR(a.data_nascimento)}</strong>, encontra-se regularmente matriculado(a) neste estabelecimento de ensino, cursando o <strong>${labelTurma(a.turma)}</strong>.</p>
-        <p>Sem mais para o momento, agradeço e coloco-me ao inteiro dispor.</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
+// ============================================================
+// 12. DECLARAÇÃO NORMAL PAI/MÃE (WORD)
+// ============================================================
+async function docDeclaracaoNormalPaiMae(a) {
+    try {
+        const response = await fetch('documentos/modelos/declaracao_normal_pai_mae.docx');
+        if (!response.ok) throw new Error("Arquivo declaracao_normal_pai_mae.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const dados = {
+            NOME: up(a.nome),
+            PAI: a.nome_pai ? up(a.nome_pai) : '_________________________________',
+            MAE: a.nome_mae ? up(a.nome_mae) : '_________________________________',
+            DATA_NASC: dataBR(a.data_nascimento),
+            TURMA: up(labelTurma(a.turma)),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Declaração Pai/Mãe:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docProfessorSaiu(a) {
-    return `${getWordHead('Professor Saiu')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO</div>
-        <p>Declaro para os devidos fins de justificativa que <strong>${up(a.nome_pai || a.nome_mae || '—')}</strong> trabalhou em nosso estabelecimento de ensino exercendo a função de professora regente.</p>
-        <p>Sem mais para o momento agradeço e coloco-me ao inteiro dispor para qualquer dúvida ou esclarecimento.</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
+// ============================================================
+// 13. DECLARAÇÃO DE PROFESSOR QUE SAIU (WORD)
+// ============================================================
+/*async function docProfessorSaiu(a) {
+    try {
+        // 1. Busca o nome do professor (pegando o primeiro da lista)
+        const { data: prof } = await supabaseClient.from('usuarios').select('nome').eq('tipo', 'professor').limit(1);
+        const nomeProf = prof && prof.length > 0 ? prof[0].nome : 'PROFESSOR NÃO ENCONTRADO';
+
+        // 2. O resto do código que baixa o Word (NÃO MUDE ISSO)
+        const response = await fetch('documentos/modelos/declaracao_professor.docx');
+        if (!response.ok) throw new Error("Arquivo não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        // 3. Envia a tag para o Word
+        doc.render({
+            NOME_PROF: up(nomeProf),
+            DATA_HOJE: dataHojeExtenso()
+        });
+
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao gerar documento: " + error.message);
+        return null;
+    }
+}
+*/
+// ============================================================
+// 14. PAGAMENTO ESCOLAR (WORD) - CORRIGIDO AQUI
+// ============================================================
+async function docPagamentoEscolar(a) {
+    try {
+        const response = await fetch('documentos/modelos/pagamento_escolar.docx');
+        if (!response.ok) throw new Error("Arquivo pagamento_escolar.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const resp = getDadosResponsavel(a);
+        const dados = {
+            NOME: up(a.nome),
+            RESPONSAVEL: resp.nome,
+            CPF_RESPONSAVEL: resp.cpf,
+            ANO_ATUAL: new Date().getFullYear(),
+            NIVEL_ENSINO: getNivelEnsino(a.turma),
+            DATA_HOJE: dataHojeExtenso()
+        };
+        doc.render(dados);
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    } catch (error) {
+        console.error("Erro ao gerar Pagamento Escolar:", error);
+        alert("Erro ao gerar o documento: " + error.message);
+        return null;
+    }
 }
 
-function docPagamentoEscolar(a) {
-    const nomeResp = a.nome_pai || a.nome_mae || a.responsavel_outro || '—';
-    return `${getWordHead('Pagamento Escolar')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">DECLARAÇÃO DE PAGAMENTO ESCOLAR</div>
-        <p>Declaro para os devidos fins que o(a) Sr(a). <strong>${up(nomeResp)}</strong>, responsável pelo(a) aluno(a) <strong>${up(a.nome)}</strong>, efetuou o pagamento das mensalidades escolares referentes ao ano letivo de <strong>${new Date().getFullYear()}</strong>.</p>
-        <p>Sem mais para o momento agradeço e coloco-me ao inteiro dispor.</p>
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'DIRETORA')}
-    ${footerPadrao()}`;
-}
-
+// ============================================================
+// 15. CARNÊ (MANTIDO COMO HTML)
+// ============================================================
 function docCarne(a, opcoes) {
     const { valor, temIrmao, irmao1, irmao2 } = opcoes || { valor: '300,00', temIrmao: false };
     
-    const nomeResponsavel = a.nome_pai || a.nome_mae || a.responsavel_outro || 'NÃO INFORMADO';
+    const resp = getDadosResponsavel(a);
+    const nomeResponsavel = resp.nome;
+    const cpfResp = resp.cpf;
+
     const endereco = a.endereco ? `${a.endereco}, Nº ${a.numero_endereco || 'S/N'}` : 'Endereço não informado';
     const cidadeEstado = a.cidade ? `${a.cidade}/${a.estado || ''}` : '';
-    const cpfResp = a.cpf_pai || a.cpf_mae || 'NÃO INFORMADO';
     const anoAtual = new Date().getFullYear();
     
     const primeiroNome = (nome) => nome ? nome.trim().split(' ').slice(0, 2).join(' ') : '';
@@ -667,7 +658,7 @@ function docCarne(a, opcoes) {
                             <tr>
                                 <td style="border-right: 1px solid #000; width: 33%;">
                                     <div style="font-size: 6pt; color: #555; padding: 2px;">TURNO</div>
-                                    <div style="padding: 2px 4px; font-weight: bold;">DIURNO</div>
+                                    <div style="padding: 2px 4px; font-weight: bold;">${up(a.turno || 'DIURNO')}</div>
                                 </td>
                                 <td style="border-right: 1px solid #000; width: 33%;">
                                     <div style="font-size: 6pt; color: #555; padding: 2px;">PARCELA</div>
@@ -735,168 +726,6 @@ function docCarne(a, opcoes) {
     </html>`;
 }
 
-function docContabilidade(a, pagamentos) {
-    const anoAtual = new Date().getFullYear();
-    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    let linhas = '';
-    let totalPago = 0;
-    let totalPendente = 0;
-
-    meses.forEach((m, i) => {
-        const numMes = i + 1;
-        const pago = pagamentos.includes(numMes);
-        const valorMes = 300; 
-        const status = pago ? '<span style="color: green; font-weight: bold;">PAGO</span>' : '<span style="color: red; font-weight: bold;">PENDENTE</span>';
-        
-        if (pago) totalPago += valorMes;
-        else totalPendente += valorMes;
-
-        linhas += `<tr>
-            <td style="border: 1px solid #000; padding: 4px;">${m}</td>
-            <td style="border: 1px solid #000; padding: 4px;">${valorMes.toFixed(2).replace('.',',')} R$</td>
-            <td style="border: 1px solid #000; padding: 4px;">${status}</td>
-        </tr>`;
-    });
-
-    return `${getWordHead('Relatório Financeiro')}
-        ${headerPadraoBordado()}
-        <div class="doc-title">RELATÓRIO FINANCEIRO (${anoAtual})</div>
-        
-        <table style="width:100%; border:none; margin-bottom: 15px; font-size: 14px;">
-            <tr><td style="border:none; padding:2px;"><strong>Aluno (a):</strong> ${up(a.nome)}</td></tr>
-            <tr><td style="border:none; padding:2px;"><strong>Responsável:</strong> ${up(a.nome_pai || a.nome_mae || a.responsavel_outro || '—')}</td></tr>
-            <tr><td style="border:none; padding:2px;"><strong>Turma:</strong> ${labelTurma(a.turma)}</td></tr>
-        </table>
-
-        <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; text-align: center; font-size: 12px; margin-bottom: 20px;">
-            <thead>
-                <tr>
-                    <th style="border: 1px solid #000; padding: 5px; background: #f0f0f0;">Mês de Referência</th>
-                    <th style="border: 1px solid #000; padding: 5px; background: #f0f0f0;">Valor</th>
-                    <th style="border: 1px solid #000; padding: 5px; background: #f0f0f0;">Status</th>
-                </tr>
-            </thead>
-            <tbody>${linhas}</tbody>
-        </table>
-
-        <div style="background: #eef3f8; padding: 15px; border-radius: 8px; font-size: 14px;">
-            <p style="margin: 5px 0;"><strong>Total Pago:</strong> <span style="color: green;">${totalPago.toFixed(2).replace('.',',')} R$</span></p>
-            <p style="margin: 5px 0;"><strong>Total Pendente:</strong> <span style="color: red;">${totalPendente.toFixed(2).replace('.',',')} R$</span></p>
-        </div>
-
-        <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-        ${linhaAssinatura('', 'Direção')}
-    ${footerPadrao()}`;
-}
-
-function docRelatorioGlobal(alunos, tipo) {
-    const hoje = new Date();
-    const mesAtual = hoje.getMonth() + 1; 
-    const anoAtual = hoje.getFullYear();
-    const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    const nomeMesAtual = mesesNomes[mesAtual - 1];
-
-    const alunosPorTurma = {};
-    alunos.forEach(aluno => {
-        if (!alunosPorTurma[aluno.turma]) alunosPorTurma[aluno.turma] = [];
-        alunosPorTurma[aluno.turma].push(aluno);
-    });
-
-    let htmlTurmas = '';
-    let temAlguemNoRelatorio = false;
-    const turmasOrdenadas = Object.keys(alunosPorTurma).sort();
-
-    turmasOrdenadas.forEach(turma => {
-        let linhasAlunos = '';
-        let contagem = 0;
-
-        alunosPorTurma[turma].forEach(aluno => {
-            const pagamentos = aluno.pagamentos || [];
-            const isPagoAteMesAtual = pagamentos.includes(mesAtual);
-
-            if (tipo === 'pagos' && !isPagoAteMesAtual) return;
-            if (tipo === 'pendentes' && isPagoAteMesAtual) return;
-
-            contagem++;
-            temAlguemNoRelatorio = true;
-
-            let detalhes = '';
-            if (tipo === 'pendentes') {
-                const faltantes = [];
-                for (let i = 1; i <= mesAtual; i++) {
-                    if (!pagamentos.includes(i)) faltantes.push(mesesNomes[i-1]);
-                }
-                detalhes = `<span style="color: #dc3545; font-size: 10pt;">Meses em falta: ${faltantes.join(', ')}</span>`;
-            } else {
-                detalhes = `<span style="color: #28a745; font-size: 10pt;">Pago até ${nomeMesAtual}</span>`;
-            }
-
-            linhasAlunos += `
-                <tr>
-                    <td style="border: 1px solid #000; padding: 6px; text-align: left;">${up(aluno.nome)}</td>
-                    <td style="border: 1px solid #000; padding: 6px; text-align: left;">${detalhes}</td>
-                </tr>
-            `;
-        });
-
-        if (contagem > 0) {
-            htmlTurmas += `
-                <div style="margin-bottom: 20px; page-break-inside: avoid;">
-                    <h3 style="background: #eef3f8; color: #003869; padding: 5px 10px; margin: 0; font-size: 12pt; border: 1px solid #000; border-bottom: none;">
-                        Turma: ${labelTurma(turma)}
-                    </h3>
-                    <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11pt;">
-                        <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="border: 1px solid #000; padding: 5px; width: 40%;">Nome do Aluno</th>
-                                <th style="border: 1px solid #000; padding: 5px; text-align: left;">Status Financeiro</th>
-                            </tr>
-                        </thead>
-                        <tbody>${linhasAlunos}</tbody>
-                    </table>
-                </div>
-            `;
-        }
-    });
-
-    if (!temAlguemNoRelatorio) {
-        htmlTurmas = `<p style="text-align: center; font-size: 14pt; margin-top: 50px;">Nenhum aluno encontrado para este filtro (Mês de referência: ${nomeMesAtual}).</p>`;
-    }
-
-    const titulo = tipo === 'pagos' ? 'EXTRATO DE ALUNOS COM PAGAMENTO EM DIA' : 'RELATÓRIO DE PENDÊNCIAS FINANCEIRAS';
-
-    return `<!DOCTYPE html>
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-        <meta charset="UTF-8">
-        <title>Relatório Financeiro Global</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            @page { size: A4 portrait; margin: 1.5cm; }
-            body { font-family: 'Times New Roman', Times, serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; justify-content: center; }
-            .doc-container { width: 100%; max-width: 800px; background: #fff; padding: 40px; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-            @media print {
-                body { background: #fff; }
-                .doc-container { box-shadow: none; padding: 0; max-width: 100%; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="doc-container">
-            ${headerPadraoBordado()}
-            <div class="doc-title">${titulo}</div>
-            <div style="text-align: right; font-size: 10pt; margin-bottom: 15px;">
-                Referência: Até ${nomeMesAtual} de ${anoAtual}<br>
-                Emitido em: ${dataHojeExtenso()}
-            </div>
-            ${htmlTurmas}
-            <div style="text-align: center; margin-top: 50px;">Garanhuns, ${dataHojeExtenso()}</div>
-            ${linhaAssinatura('', 'Direção')}
-        </div>
-    </body>
-    </html>`;
-}
-
 // ============================================================
 // ALIAS
 // ============================================================
@@ -909,12 +738,12 @@ function docDeclaracaoQuitacaoDebitoTabela(a) { return docQuitacaoTabela(a); }
 const DOCUMENTOS_HTML = {
     'Bolsa Família':                       docBolsaFamilia,
     'Bolsa Familia':                       docBolsaFamilia,
-    'Transferência':                       docTransferencia,
-    'Transferencia':                       docTransferencia,
     'Declaração de Matrícula':             docDeclaracaoMatricula,
     'Declaracao Matricula':                docDeclaracaoMatricula,
     'Declaração Provisória':               docProvissoria,
     'Provissoria':                         docProvissoria,
+    'Transferência':                       docTransferencia,
+    'Transferencia':                       docTransferencia,
     'Recibo de Pagamento':                 docReciboPagamento,
     'Recibo Pagamento':                    docReciboPagamento,
     'Ficha Individual':                    docFichaIndividual,
@@ -928,12 +757,9 @@ const DOCUMENTOS_HTML = {
     'Declaracao Normal':                   docDeclaracaoNormal,
     'Declaração Normal Pai Mae':           docDeclaracaoNormalPaiMae,
     'Declaracao Normal Pai Mae':           docDeclaracaoNormalPaiMae,
-    'Declaração de Professor que Saiu':    docProfessorSaiu,
-    'Declaracao Professor Saiu':           docProfessorSaiu,
     'Pagamento Escolar':                   docPagamentoEscolar,
     'Boletim':                             docBoletim,
     'boletim':                             docBoletim,
     'Carnê':                               docCarne,
-    'Carne':                               docCarne,
-    'Contabilidade':                       docContabilidade
+    'Carne':                               docCarne
 };

@@ -98,7 +98,7 @@
             <div class="barra-progresso"><div id="barraProgressoFill"></div></div>
         </div>
 
-        <form id="formulario" action="/registro" method="post">
+            <form id="formulario" action="/registro" method="post">
 
             <!-- ================================================= -->
             <!-- ETAPA 1 - DADOS PESSOAIS                         -->
@@ -106,33 +106,21 @@
             <div class="etapa ativa" id="etapa-1">
                 <fieldset class="dados-aluno">
                     <legend class="titulo">Dados Pessoais</legend>
-
                     <label for="inome">Nome:</label>
                     <input class="input-aluno" id="inome" name="nome" type="text" placeholder="Digite o nome completo do aluno" autocomplete="on" required>
-
                     <label for="idata">Data de Nascimento:</label>
                     <input class="input-aluno" id="idata" name="data-nascimento" type="date" required>
-
                     <fieldset class="sexo-aluno">
                         <legend class="legend">Sexo:</legend>
                         <div class="sexo">
-                            <div class="sexo-m">
-                                <input id="isexoM" name="sexo" type="radio" value="Masculino" checked>
-                                <label class="subtitulo" for="isexoM">Masculino</label>
-                            </div>
-                            <div class="sexo-f">
-                                <input id="isexoF" name="sexo" type="radio" value="Feminino">
-                                <label class="subtitulo" for="isexoF">Feminino</label>
-                            </div>
+                            <div class="sexo-m"><input id="isexoM" name="sexo" type="radio" value="Masculino" checked><label class="subtitulo" for="isexoM">Masculino</label></div>
+                            <div class="sexo-f"><input id="isexoF" name="sexo" type="radio" value="Feminino"><label class="subtitulo" for="isexoF">Feminino</label></div>
                         </div>
                     </fieldset>
-
                     <label for="inacionalidade">Nacionalidade:</label>
                     <input class="input-aluno" id="inacionalidade" name="nacionalidade" type="text" placeholder="Digite a nacionalidade">
-
                     <label for="icidade-nascimento">Cidade de nascimento:</label>
                     <input class="input-aluno" id="icidade-nascimento" name="cidade-nascimento" type="text" placeholder="Lugar onde a criança foi registrada" required>
-                       <!-- NOVO CAMPO AQUI -->
                     <label for="iestado-nascimento">Estado de Nascimento (UF):</label>
                     <input class="input-aluno" id="iestado-nascimento" name="estado-nascimento" type="text" placeholder="PE" maxlength="2" required>
                 </fieldset>
@@ -144,22 +132,16 @@
             <div class="etapa" id="etapa-2">
                 <fieldset class="dados-aluno">
                     <legend class="titulo">Endereço</legend>
-
                     <label for="iendereco">Rua:</label>
                     <input class="input-aluno" id="iendereco" name="endereco" type="text" placeholder="Rua atual" required>
-
                     <label for="ibairro">Bairro:</label>
                     <input class="input-aluno" id="ibairro" name="bairro" type="text" placeholder="Bairro atual" required>
-
                     <label for="inumero">Nº:</label>
                     <input class="input-aluno" id="inumero" name="numero-endereco" type="number" placeholder="408" required>
-
                     <label for="icidade">Cidade:</label>
                     <input class="input-aluno" id="icidade" name="cidade" type="text" placeholder="Garanhuns..." required>
-
                     <label for="iestado">UF:</label>
                     <input class="input-aluno" id="iestado" name="estado" type="text" placeholder="PE" maxlength="2" required>
-
                     <label for="icep">CEP:</label>
                     <input class="input-aluno" id="icep" name="cep" type="text" placeholder="00000-000">
                 </fieldset>
@@ -171,16 +153,13 @@
             <div class="etapa" id="etapa-3">
                 <fieldset class="dados-aluno">
                     <legend class="titulo">Documentos e Turma</legend>
-
                     <label for="icpf">CPF:</label>
                     <input class="input-aluno" id="icpf" name="cpf" type="text" placeholder="000.000.000-00" required>
-
                     <label for="irg">RG:</label>
                     <input class="input-aluno" id="irg" name="rg" type="text" placeholder="00.000.000-0" required>
-
                     <label for="inss">NISS:</label>
                     <input class="input-aluno" id="inss" name="niss" type="text" placeholder="000.00000.00-0">
-
+                    
                     <label for="iturma">Turma:</label>
                     <select name="turma" id="iturma" class="input-aluno" required>
                         <option value="" selected disabled>Selecione uma turma</option>
@@ -211,12 +190,13 @@
                             <option value="9ano-a">9º Ano A</option>
                         </optgroup>
                     </select>
-<!-- NOVO CAMPO AQUI -->
+
                     <label for="iturno">Turno:</label>
                     <select name="turno" id="iturno" class="input-aluno" required>
                         <option value="" selected disabled>Selecione o turno</option>
                         <option value="Manhã">Manhã</option>
                         <option value="Tarde">Tarde</option>
+                    </select>
 
                     <label for="iobs">Observação:</label>
                     <textarea name="observacao" id="iobs" placeholder="Digite alguma observação sobre o aluno."></textarea>
@@ -229,22 +209,16 @@
             <div class="etapa" id="etapa-4">
                 <fieldset class="dados-aluno">
                     <legend class="titulo">Dados do Pai</legend>
-
                     <label for="inomeP">Nome do Pai:</label>
-                    <input class="input-responsavel" id="inomeP" name="nome-pai" type="text" placeholder="Digite o nome completo do pai" autocomplete="on">
-
+                    <input class="input-responsavel" id="inomeP" name="nome-pai" type="text" placeholder="Digite o nome completo do pai">
                     <label for="iprofissao-pai">Profissão do Pai:</label>
-                    <input class="input-responsavel" id="iprofissao-pai" name="profissao-pai" type="text" placeholder="Digite a profissão do pai" autocomplete="on">
-
+                    <input class="input-responsavel" id="iprofissao-pai" name="profissao-pai" type="text" placeholder="Digite a profissão do pai">
                     <label for="iidentidade-pai">Identidade do Pai:</label>
                     <input class="input-responsavel" id="iidentidade-pai" name="identidade-pai" type="text" placeholder="Digite a identidade do pai">
-
                     <label for="icpf-pai">CPF do Pai:</label>
                     <input class="input-responsavel" id="icpf-pai" name="cpf-pai" type="text" placeholder="Digite o CPF do pai">
-
                     <label for="iwhatsapp-pai">WhatsApp do Pai:</label>
                     <input class="input-responsavel" id="iwhatsapp-pai" name="whatsapp-pai" type="text" placeholder="Digite o WhatsApp do pai">
-
                     <label for="itelefone-pai">Telefone do Pai:</label>
                     <input class="input-responsavel" id="itelefone-pai" name="telefone-pai" type="text" placeholder="Digite o telefone do pai">
                 </fieldset>
@@ -256,22 +230,16 @@
             <div class="etapa" id="etapa-5">
                 <fieldset class="dados-aluno">
                     <legend class="titulo">Dados da Mãe</legend>
-
                     <label for="inome-mae">Nome da Mãe:</label>
-                    <input class="input-responsavel" id="inome-mae" name="nome-mae" type="text" placeholder="Digite o nome completo da mãe" autocomplete="on">
-
+                    <input class="input-responsavel" id="inome-mae" name="nome-mae" type="text" placeholder="Digite o nome completo da mãe">
                     <label for="iprofissao-mae">Profissão da Mãe:</label>
                     <input class="input-responsavel" id="iprofissao-mae" name="profissao-mae" type="text" placeholder="Digite a profissão da mãe">
-
                     <label for="iidentidade-mae">Identidade da Mãe:</label>
                     <input class="input-responsavel" id="iidentidade-mae" name="identidade-mae" type="text" placeholder="Digite a identidade da mãe">
-
                     <label for="icpf-mae">CPF da Mãe:</label>
                     <input class="input-responsavel" id="icpf-mae" name="cpf-mae" type="text" placeholder="Digite o CPF da mãe">
-
                     <label for="iwhatsapp-mae">WhatsApp da Mãe:</label>
                     <input class="input-responsavel" id="iwhatsapp-mae" name="whatsapp-mae" type="text" placeholder="Digite o WhatsApp da mãe">
-
                     <label for="itelefone-mae">Telefone da Mãe:</label>
                     <input class="input-responsavel" id="itelefone-mae" name="telefone-mae" type="text" placeholder="Digite o telefone da mãe">
                 </fieldset>
@@ -283,7 +251,6 @@
             <div class="etapa" id="etapa-6">
                 <fieldset class="dados-aluno">
                     <legend class="titulo">Responsável pela Matrícula</legend>
-
                     <label for="iresponsavel">Responsável:</label>
                     <select name="responsavel" id="iresponsavel">
                         <option value="pai">Pai</option>
@@ -291,8 +258,13 @@
                         <option value="outro">Outro</option>
                     </select>
 
-                    <label for="iresponsavelO">Caso seja outro:</label>
-                    <input type="text" id="iresponsavelO" name="responsavel-outro" placeholder="Avó / Avô / Tio / Tia">
+                    <div id="campoOutroResponsavel" style="display: none;">
+                        <label for="iresponsavelO">Nome do Outro Responsável:</label>
+                        <input type="text" id="iresponsavelO" name="responsavel-outro" placeholder="Avó / Avô / Tio / Tia">
+                        
+                        <label for="icpfOutro">CPF do Outro Responsável:</label>
+                        <input type="text" id="icpfOutro" name="cpf-outro" class="input-responsavel" placeholder="000.000.000-00">
+                    </div>
                 </fieldset>
             </div>
 
