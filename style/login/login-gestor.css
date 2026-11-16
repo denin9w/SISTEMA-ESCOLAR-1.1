@@ -270,31 +270,69 @@ div.text-baner h1 {
     border-color: var(--destaque);
 }
 
+/* ============================================================
+   GRID FLUIDO DE DOCUMENTOS (PADRONIZADO)
+   ============================================================ */
+/* ============================================================
+   GRID FLUIDO DE DOCUMENTOS (PADRONIZADO)
+   ============================================================ */
 .lista-documentos {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
+    /* Mágica aqui: Força 4 colunas iguais no Desktop */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 15px;
+    width: 100%;
+    margin-top: 15px;
+    align-items: stretch; 
 }
+
+/* ... (mantenha o resto do CSS de .cdocumentos a e a i igual ao anterior) ... */
 
 .cdocumentos a {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 10px;
+    justify-content: center; /* Centraliza o conteúdo verticalmente */
+    text-align: center;
+    gap: 10px;
+    padding: 25px 15px; /* Padding fixo para todos */
     background: #f8f9fa;
-    border: 1px solid #eee;
-    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
     text-decoration: none;
-    color: var(--texto);
-    font-size: 0.85rem;
-    transition: all 0.2s;
+    color: var(--titlecor);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    
+    /* A MÁGICA ACONTECE AQUI: */
+    width: 100%; /* Ocupa toda a coluna do grid */
+    height: 100%; /* Obriga a preencher a altura da linha */
+    min-height: 120px; /* Altura mínima para não ficar achatado */
+    box-sizing: border-box;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
+
+/* Ícones */
+.cdocumentos a i {
+    font-size: 28px;
+    color: var(--destaque);
+    transition: 0.3s;
+    margin-bottom: 5px;
+}
+
+/* Efeito ao passar o mouse */
 .cdocumentos a:hover {
-    background: #e6f2ff;
+    background: #e0f2fe;
     border-color: var(--destaque);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 119, 255, 0.15);
     color: var(--destaque);
 }
 
+.cdocumentos a:hover i {
+    transform: scale(1.1);
+}
 /* ============================================================
    FOOTER PADRONIZADO (AJUSTADO PARA NÃO CORTAR)
    ============================================================ */
@@ -555,6 +593,10 @@ footer img.boneco, footer img.moeda {
         display: none; 
     }
 
+    .lista-documentos {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Volta a ser flexível no celular */
+    }
+
     footer {
         flex-direction: column; /* No celular empilha logo e texto */
         max-height: none; /* No celular pode crescer para não cortar */
@@ -562,6 +604,7 @@ footer img.boneco, footer img.moeda {
         gap: 10px;
         text-align: center;
     }
+
 
     footer > img:first-child {
         width: 80px;
