@@ -223,6 +223,8 @@ main#login-main img.moeda {
     }
 
     /* HEADER (Esquerda) - Agora ele fica transparente para mostrar a imagem do body */
+   @media screen and (min-width: 764px) {
+    
     header {
         display: flex;
         flex-direction: column;
@@ -230,58 +232,65 @@ main#login-main img.moeda {
         align-items: center;
         grid-column: 1 / span 1;
         grid-row: 2 / span 1;
-        background: transparent; /* Tira a imagem daqui */
+        background: transparent; 
         position: relative;
         height: 100vh;
         box-shadow: none;
     }
 
-    /* Adiciona um leve degradê branco atrás do texto para ele ficar legível */
+    /* O Card de boas vindas na esquerda */
     .text-fixo {
         position: relative;
         z-index: 2;
         text-align: center;
         padding: 40px;
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.7);
         border-radius: 20px;
-        backdrop-filter: blur(5px); /* Efeito de vidro embaçado super moderno */
+        backdrop-filter: blur(5px);
+        
+        /* A MÁGICA ACONTECE AQUI: Dá um respiro igual dos dois lados */
+        width: 90%; 
+        max-width: 500px;
+        box-sizing: border-box;
     }
 
     .text-fixo h1 {
-        font-size: 5rem;
+        font-size:clamp(2.5rem, 3.5vw, 6rem); /* Diminuí levemente para não estourar */
         color: var(--titlecor) !important;
+        line-height: 1.1;
+        margin-bottom: 15px;
     }
 
-    /* MAIN (Direita) - Fica transparente para mostrar a imagem do body */
-   main#login-main {
+    /* MAIN (Direita) */
+    main#login-main {
         grid-column: 2 / -1;
         grid-row: 2 / span 1;
         width: auto;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 80px 40px 60px 40px; 
         
-        /* A CORREÇÃO ESTÁ AQUI: Fundo totalmente transparente */
+        /* Ajustado para o mesmo respiro (80px no topo, 40px nas laterais) */
+        padding: 80px 40px; 
+        
         background: transparent !important; 
     }
 
-    /* Garante que o "falso" fundo branco do mobile não apareça */
     main#login-main::before {
         display: none !important;
     }
 
-    /* O Card continua branco e flutuando sobre a imagem */
     #login-card {
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15); /* Sombra mais forte para destacar */
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15); 
         padding: 50px 40px;
         border-radius: 16px;
         width: 100%;
         max-width: 450px;
         margin: 0 auto;
-        background: var(--fundo-card); /* Fundo branco no card */
+        background: var(--fundo-card); 
         border: none;
     }
+}
 
     /* ... (resto do código das abas, inputs e footer continua igual) ... */
 }

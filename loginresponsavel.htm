@@ -229,15 +229,20 @@
                 btn.disabled = true;
 
                 try {
-                    const docBlob = await fn(aluno);
-                    if (docBlob) {
-                        const url = URL.createObjectURL(docBlob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `${nomeDoc.replace(/\s+/g,'_')}-${aluno.nome.replace(/\s+/g,'_')}.docx`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-                    }
+                const docBlob = await fn(aluno);
+                if (docBlob) {
+                    const url = URL.createObjectURL(docBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download =`${nomeDoc.replace(/\s+/g,'_')}-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+
+                    // A MÁGICA PARA O CHROME NÃO BLOQUEAR:
+                    document.body.appendChild(a); // Adiciona o link invisível na página
+                    a.click();                   // Clica nele
+                    document.body.removeChild(a); // Remove o link da página
+
+                    URL.revokeObjectURL(url);
+                }
                 } catch (err) {
                     console.error(err);
                     alert("Erro ao gerar documento: " + err.message);
