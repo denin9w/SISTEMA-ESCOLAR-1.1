@@ -233,6 +233,29 @@ if (formulario) {
             }
         }
 
+                // 3. Cria a conta para o Outro Responsável (se preenchido)
+        const cpfOutroLimpo = (matricula['cpf-outro'] || '').replace(/\D/g, '');
+        
+        if (cpfOutroLimpo) {
+            const emailOutro = `${cpfOutroLimpo}@ceje.local`;
+            const senhaOutro = cpfOutroLimpo;
+            
+            const { data: authOutro, error: errOutro } = await supabaseClient.auth.signUp({
+                email: emailOutro,
+                password: senhaOutro,
+            });
+            
+            if (authOutro && authOutro.user) {
+                novoAluno.auth_id_outro = authOutro.user.id; 
+            } else if (errOutro && (errOutro.message.includes("already registered") || errOutro.message.includes("User already exists"))) {
+                const { data: loginOutro } = await supabaseClient.auth.signInWithPassword({
+                    email: emailOutro,
+                    password: senhaOutro,
+                });
+                if (loginOutro && loginOutro.user) novoAluno.auth_id_outro = loginOutro.user.id;
+            }
+        }
+
         // --- SALVA O ALUNO (BANCO GERA MATRÍCULA) ---
         const { data: alunoInserido, error } = await supabaseClient
             .from('alunos')

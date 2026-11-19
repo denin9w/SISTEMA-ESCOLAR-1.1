@@ -59,7 +59,7 @@ async function entrar(){
     input_b.disabled = true;
     input_b.textContent = "Verificando...";
 
-    try {
+       try {
         const emailAuth = `${cpfDigitado.replace(/\D/g, '')}@ceje.local`;
         const senhaAuth = cpfDigitado.replace(/\D/g, '');
 
@@ -74,12 +74,13 @@ async function entrar(){
             return;
         }
 
-        // 2) Lógica para Responsável
-            if (tipoSelecionado === "responsavel") {
+        // 2) Lógica para Responsável (Pai, Mãe ou Outro)
+        if (tipoSelecionado === "responsavel") {
+            // A MÁGICA: Busca o aluno verificando os 3 IDs (Pai, Mãe e Outro)
             const { data: alunos, error: alunoError } = await supabaseClient
                 .from('alunos')
                 .select('id, nome')
-                .eq('auth_id', authData.user.id)
+                .or(`auth_id.eq.${authData.user.id},auth_id_mae.eq.${authData.user.id},auth_id_outro.eq.${authData.user.id}`)
                 .limit(1);
 
             if (alunoError) throw alunoError;
@@ -87,15 +88,13 @@ async function entrar(){
             if (alunos && alunos.length > 0) {
                 const aluno = alunos[0];
                 
-                // NÃO BLOQUEIA MAIS AQUI. O bloqueio é feito na tela do responsável.
                 sessionStorage.setItem("@alunoLogadoId", aluno.id);
                 sessionStorage.setItem("@alunoLogadoNome", aluno.nome);
                 window.location.href = PAGINAS[tipoSelecionado];
             } else {
-                alert("Nenhum aluno encontrado.");
+                alert("Nenhum aluno encontrado para este CPF.");
                 await supabaseClient.auth.signOut();
             }
-        
         
         // 3) Lógica para Professor/Gestor
         } else {
