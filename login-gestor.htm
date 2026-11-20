@@ -59,6 +59,9 @@
                     <button id="btnAddAlunoGestor" class="btn-primario">
                         <i class="fa-solid fa-plus"></i> Adicionar Aluno
                     </button>
+                    <button id="btnViradaAno" class="btn-primario" style="background: #dc3545;">
+                        <i class="fa-solid fa-calendar-check"></i> Fechar Ano e Promover Alunos
+                    </button>
                     <div id="barraBusca">
                         <input type="text" id="buscaAluno" placeholder="Pesquisar aluno pelo nome..." />
                         <button id="btnPesquisarAluno" class="btn-primario">
@@ -85,6 +88,25 @@
                 <div class="card-gestor" id="cardDocumentos" style="display: none;">
                     <h3><i class="fa-solid fa-folder-open"></i> Documentos</h3>
                     <div id="idocumentos" class="lista-documentos"></div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- NOVO CARD: HISTÓRICO DE ALUNOS             -->
+                <!-- ========================================== -->
+                <div class="card-gestor" id="cardHistorico" style="display: none; margin-top: 20px;">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> Histórico de Anos Anteriores</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Consulte os alunos arquivados de anos letivos passados.</p>
+                    
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label>Selecione o Ano Letivo:</label>
+                        <select id="selectAnoHistorico" class="input-aluno">
+                            <option value="">Carregando...</option>
+                        </select>
+                    </div>
+                    
+                    <div id="listaHistoricoAlunos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                        <!-- Os alunos do histórico aparecerão aqui -->
+                    </div>
                 </div>
 
                 <div class="card-gestor" id="cardFinanceiroGlobal" style="display: none; margin-top: 20px;">

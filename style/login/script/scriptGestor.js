@@ -65,6 +65,8 @@ async function iniciarGestor() {
     gestorLogado = JSON.parse(gString);
     if (gestorNomeEl) gestorNomeEl.textContent = `Gestor: ${gestorLogado.nome}`;
 
+    if (cardHistorico) cardHistorico.style.display = 'block';
+
     preencherSelects();
     carregarAvisos();
     carregarProfessoresPendentes();
@@ -915,6 +917,227 @@ async function carregarMatriculasPendentes() {
         });
     });
 }
+
+// ============================================================
+// HISTÓRICO DE ANOS ANTERIORES
+// ============================================================
+const selectAnoHistorico = document.querySelector('#selectAnoHistorico');
+const listaHistoricoAlunos = document.querySelector('#listaHistoricoAlunos');
+const cardHistorico = document.querySelector('#cardHistorico');
+
+async function carregarAnosHistorico() {
+    if (!selectAnoHistorico) return;
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('alunos_historico')
+            .select('ano_letivo');
+        
+        if (error) {
+            console.error('Erro ao buscar histórico:', error);
+            selectAnoHistorico.innerHTML = '<option value="">Erro ao carregar (veja o console F12)</option>';
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            selectAnoHistorico.innerHTML = '<option value="">Nenhum histórico encontrado</option>';
+            return;
+        }
+
+        const anosUnicos = [...new Set(data.map(d => d.ano_letivo))].sort((a, b) => b - a);
+        
+        selectAnoHistorico.innerHTML = '<option value="">Selecione um ano...</option>';
+        anosUnicos.forEach(ano => {
+            const opt = document.createElement('option');
+            opt.value = ano;
+            opt.textContent = `Ano Letivo ${ano}`;
+            selectAnoHistorico.appendChild(opt);
+        });
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        selectAnoHistorico.innerHTML = '<option value="">Erro inesperado</option>';
+    }
+}
+
+if (selectAnoHistorico) {
+    selectAnoHistorico.addEventListener('change', async () => {
+        const ano = selectAnoHistorico.value;
+        if (!ano) { listaHistoricoAlunos.innerHTML = ''; return; }
+
+        listaHistoricoAlunos.innerHTML = '<p>Carregando alunos de ' + ano + '...</p>';
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('alunos_historico')
+                .select('dados_aluno')
+                .eq('ano_letivo', ano);
+                
+            if (error) { listaHistoricoAlunos.innerHTML = '<p>Erro ao carregar.</p>'; return; }
+
+            listaHistoricoAlunos.innerHTML = '';
+            if (!data || data.length === 0) { listaHistoricoAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>'; return; }
+
+            data.forEach(item => {
+                const a = item.dados_aluno;
+                const div = document.createElement('div');
+                div.className = 'aluno-item';
+                div.innerHTML = `<strong>${a.nome}</strong> - ${labelTurma(a.turma)}`;
+                listaHistoricoAlunos.appendChild(div);
+            });
+        } catch (err) {
+            console.error(err);
+            listaHistoricoAlunos.innerHTML = '<p>Erro ao carregar histórico.</p>';
+        }
+    });
+}
+// ============================================================
+// VIRADA DE ANO LETIVO (BACKUP, PROMOÇÃO E LIMPEZA)
+// ============================================================
+const btnViradaAno = document.querySelector('#btnViradaAno');
+
+// Função para calcular a próxima turma
+function getProximaTurma(turmaAtual) {
+    if (!turmaAtual) return turmaAtual;
+    const t = turmaAtual.toLowerCase();
+
+    // Progressão do Infantil
+    if (t === 'infantil-i-a') return 'infantil-II-a';
+    if (t === 'infantil-i-b') return 'infantil-II-b';
+    if (t === 'infantil-II-a') return 'infantil-III-a';
+    if (t === 'infantil-II-b') return 'infantil-III-b';
+    if (t === 'infantil-III-a') return '1ano-a';
+    if (t === 'infantil-III-b') return '1ano-b';
+
+    // Progressão do Fundamental I
+    if (t === '1ano-a') return '2ano-a';
+    if (t === '1ano-b') return '2ano-b';
+    if (t === '2ano-a') return '3ano-a';
+    if (t === '2ano-b') return '3ano-b';
+    if (t === '3ano-a') return '4ano-a';
+    if (t === '3ano-b') return '4ano-b';
+    if (t === '4ano-a') return '5ano-a';
+    if (t === '4ano-b') return '5ano-b';
+    if (t === '5ano-a') return '6ano-a';
+    if (t === '5ano-b') return '6ano-a'; // Junta as turmas no 6º ano
+
+    // Progressão do Fundamental II
+    if (t === '6ano-a') return '7ano-a';
+    if (t === '7ano-a') return '8ano-a';
+    if (t === '8ano-a') return '9ano-a';
+    if (t === '9ano-a') return 'CONCLUIDO'; // Alunos do 9º ano saem da escola
+
+    return turmaAtual; // Se não bater, mantém
+}
+
+if (btnViradaAno) {
+    btnViradaAno.addEventListener('click', async () => {
+        const anoAtual = new Date().getFullYear();
+        
+        if (!confirm(`⚠️ ATENÇÃO: Virada de Ano Letivo!\n\nIsso irá:\n1. Salvar todos os alunos de ${anoAtual} no histórico (com notas).\n2. PROMOVER os alunos para a próxima série.\n3. LIMPAR as notas bimestrais para o novo ano.\n4. ATUALIZAR as turmas dos professores.\n\nDeseja continuar?`)) return;
+        
+        btnViradaAno.disabled = true;
+        btnViradaAno.innerHTML = "Processando...";
+
+        try {
+            // 1. Busca todos os alunos
+            const { data: alunos, error: errBusca } = await supabaseClient.from('alunos').select('*');
+            if (errBusca) throw errBusca;
+            if (!alunos || alunos.length === 0) {
+                alert("Não há alunos para arquivar.");
+                return;
+            }
+
+            // 2. Salva no Histórico (Backup completo)
+            const historico = alunos.map(a => ({
+                aluno_id_original: a.id,
+                ano_letivo: anoAtual,
+                dados_aluno: a 
+            }));
+            const { error: errInsert } = await supabaseClient.from('alunos_historico').insert(historico);
+            if (errInsert) throw errInsert;
+
+            // 3. Prepara a lista de alunos promovidos para o próximo ano
+            const alunosPromovidos = alunos
+                .filter(a => a.status === 'Ativa') // Só promove quem está ativo
+                .map(a => {
+                    const novaTurma = getProximaTurma(a.turma);
+                    if (novaTurma === 'CONCLUIDO') return null; // Remove quem concluiu o 9º
+
+                    // Copia todos os dados do aluno
+                    const novoAluno = { ...a };
+                    
+                    // A MÁGICA: Remove o ID e a matrícula antiga para o banco gerar novos
+                    delete novoAluno.id;
+                    delete novoAluno.numero_matricula;
+
+                    // Atualiza a turma e limpa o JSON de notas
+                    novoAluno.turma = novaTurma;
+                    novoAluno.notas = {};
+
+                    // Limpa as colunas de notas individuais (b1_, b2_, mdf_, etc)
+                    Object.keys(novoAluno).forEach(key => {
+                        if (key.startsWith('b1_') || key.startsWith('b2_') || 
+                            key.startsWith('b3_') || key.startsWith('b4_') || 
+                            key.startsWith('mdf_') || key.startsWith('status_')) {
+                            novoAluno[key] = null;
+                        }
+                    });
+
+                    return novoAluno;
+                })
+                .filter(a => a !== null);
+
+            // 4. Deleta todos os alunos antigos
+            const { error: errDelete } = await supabaseClient.from('alunos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            if (errDelete) throw errDelete;
+
+            // 5. Insere os alunos promovidos
+            if (alunosPromovidos.length > 0) {
+                const { error: errPromove } = await supabaseClient.from('alunos').insert(alunosPromovidos);
+                if (errPromove) throw errPromove;
+            }
+
+            // 6. Atualiza as turmas dos professores
+            const { data: professores } = await supabaseClient.from('usuarios').select('id, turmas').eq('tipo', 'professor');
+            const turmasValidas = ['infantil-I-a','infantil-I-b', 'infantil-II-a','infantil-II-b', 'infantil-III-a','infantil-III-b', '1ano-a','1ano-b', '2ano-a','2ano-b', '3ano-a','3ano-b', '4ano-a','4ano-b', '5ano-a','5ano-b', '6ano-a', '7ano-a', '8ano-a', '9ano-a'];
+
+            if (professores) {
+                for (const prof of professores) {
+                    let turmasProf = prof.turmas || [];
+                    if (typeof turmasProf === 'string') {
+                        try { turmasProf = JSON.parse(turmasProf); } catch(e) { turmasProf = []; }
+                    }
+                    
+                    const novasTurmas = turmasProf.filter(t => turmasValidas.includes(t));
+                    
+                    if (novasTurmas.length !== turmasProf.length) {
+                        await supabaseClient.from('usuarios').update({ turmas: novasTurmas }).eq('id', prof.id);
+                    }
+                }
+            }
+
+            alert(`✅ Ano ${anoAtual} fechado!\n\nAlunos promovidos com sucesso. As notas foram zeradas para o novo ano letivo.`);
+            
+            // Limpa o filtro de turma e limpa a lista na tela
+            selectTurma.value = "";
+            listaDeAlunos.innerHTML = '<p>Lista limpa para o novo ano. Selecione uma turma para ver os alunos promovidos.</p>';
+            cardAlunos.style.display = 'block';
+            
+            // Atualiza o histórico
+            carregarAnosHistorico(); 
+
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao fechar o ano: " + err.message);
+        } finally {
+            btnViradaAno.disabled = false;
+            btnViradaAno.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Fechar Ano e Promover Alunos';
+        }
+    });
+}
+
+
+
 // ============================================================
 // LÓGICA DA ÁREA FINANCEIRA GLOBAL
 // ============================================================
