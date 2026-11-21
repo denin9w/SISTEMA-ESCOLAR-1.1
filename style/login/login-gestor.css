@@ -597,6 +597,69 @@ footer img.boneco, footer img.moeda {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Volta a ser flexível no celular */
     }
 
+/* ============================================================
+   ADAPTAÇÃO MOBILE: HISTÓRICO E MODAL DE TURMAS
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Ajuste do Grid de Turmas na tela do celular */
+    #listaHistoricoAlunos {
+        grid-template-columns: 1fr !important; /* Ocupa a tela toda em vez de colunas */
+    }
+
+    /* Ajuste dos Cards das Turmas */
+    #listaHistoricoAlunos .aluno-item {
+        padding: 12px !important;
+    }
+
+    /* Ajuste do Modal de Alunos no Celular */
+    #modalHistoricoTurma .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        max-height: 90vh !important;
+        padding: 15px !important;
+    }
+
+    /* Ajuste do título do Modal */
+    #modalHistoricoTurma h2 {
+        font-size: 1.1rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    /* Ajuste da linha do Aluno (Empilha o nome e os botões) */
+    #listaAlunosHistoricoModal > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 10px 5px !important;
+    }
+
+    #listaAlunosHistoricoModal > div > span {
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+
+    /* Ajuste dos botões dentro do Modal do celular */
+    #listaAlunosHistoricoModal > div > div {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 5px !important;
+    }
+
+    #listaAlunosHistoricoModal > div button {
+        flex: 1; /* Faz os botões dividirem o espaço igualmente */
+        font-size: 0.75rem !important; /* Fonte menor para caber */
+        padding: 8px 0 !important; /* Ajusta o preenchimento */
+        justify-content: center;
+    }
+    
+    /* Remove o ícone para não quebrar a linha em celulares muito pequenos (opcional) */
+    #listaAlunosHistoricoModal > div button i {
+        margin-right: 3px;
+    }
+}
+
+
     footer {
         flex-direction: column; /* No celular empilha logo e texto */
         max-height: none; /* No celular pode crescer para não cortar */

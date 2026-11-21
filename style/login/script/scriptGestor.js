@@ -864,12 +864,13 @@ async function carregarProfessoresPendentes() {
 }
 
 // --- MATRÍCULAS PENDENTES ---
+// --- MATRÍCULAS PENDENTES (COM GESTÃO DE VISITA) ---
 async function carregarMatriculasPendentes() {
     if (!listaMatriculasPend) return;
     
     const { data, error } = await supabaseClient
         .from('alunos')
-        .select('id, nome, turma, nome_pai, solicitou_visita') // Puxa o campo de visita
+        .select('id, nome, turma, nome_pai, data_visita_solicitada, data_visita_confirmada, opcoes_visita_gestor')
         .eq('autorizado', false)
         .eq('status', 'Pendente');
 
@@ -884,23 +885,102 @@ async function carregarMatriculasPendentes() {
     data.forEach(a => {
         const div = document.createElement('div');
         div.className = 'aviso-item';
+        div.style.borderLeft = '4px solid #007bff';
+        div.style.padding = '15px';
+        div.style.marginBottom = '15px';
+        div.style.backgroundColor = '#fff';
         
-        // Se o pai pediu visita, mostra um aviso em vermelho
-        const avisoVisita = a.solicitou_visita 
-            ? `<div style="color: #dc3545; font-weight: bold; margin: 5px 0; font-size: 0.85rem;"><i class="fa-solid fa-bell"></i> Solicitou Visita à Escola!</div>` 
-            : '';
+        let blocoVisita = '';
+        let botoesAcao = '';
+
+        // Lógica: Se o pai solicitou uma data e o gestor ainda não fez nada
+        if (a.data_visita_solicitada && !a.data_visita_confirmada && !a.opcoes_visita_gestor) {
+            const dataFormatada = new Date(a.data_visita_solicitada + 'T00:00:00').toLocaleDateString('pt-BR');
+            blocoVisita = `
+                <div style="background: #e6f2ff; padding: 10px; border-radius: 8px; margin: 10px 0; border: 1px solid #cce5ff;">
+                    <strong><i class="fa-solid fa-calendar-check"></i> Visita Solicitada para:</strong> 
+                    <span style="color: #007bff; font-weight: bold; font-size: 1.1rem;">${dataFormatada}</span>
+                </div>
+            `;
+            botoesAcao = `
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    <button class="btn-primario btn-confirmar-visita" data-id="${a.id}" data-data="${dataFormatada}" style="background: #28a745;"><i class="fa-solid fa-check"></i> Confirmar Data</button>
+                    <button class="btn-primario btn-sugerir-data" data-id="${a.id}" style="background: #f59e0b;"><i class="fa-solid fa-pen"></i> Sugerir outra Data</button>
+                    <button class="btn-primario btn-autorizar-matricula" data-id="${a.id}" style="background: #007bff;"><i class="fa-solid fa-user-check"></i> Autorizar Direto</button>
+                </div>
+            `;
+        } 
+        // Se o gestor já confirmou a data ou mandou opções
+        else if (a.data_visita_confirmada || a.opcoes_visita_gestor) {
+            let msgStatus = '';
+            if (a.data_visita_confirmada) {
+                msgStatus = `<span style="color: #28a745; font-weight: bold;">✅ Visita Confirmada para: ${new Date(a.data_visita_confirmada).toLocaleDateString('pt-BR')}</span>`;
+            } else if (a.opcoes_visita_gestor) {
+                msgStatus = `<span style="color: #f59e0b; font-weight: bold;">⏳ Aguardando pai aceitar as datas sugeridas.</span>`;
+            }
+
+            blocoVisita = `
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin: 10px 0; border: 1px solid #ddd;">
+                    ${msgStatus}
+                </div>
+            `;
+            botoesAcao = `
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    <button class="btn-primario btn-autorizar-matricula" data-id="${a.id}" style="background: #007bff;"><i class="fa-solid fa-user-check"></i> Autorizar Matrícula</button>
+                </div>
+            `;
+        } 
+        // Se não solicitou visita
+        else {
+            blocoVisita = `<p style="color: #666; font-size: 0.9rem;">Não solicitou visita à escola.</p>`;
+            botoesAcao = `
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    <button class="btn-primario btn-autorizar-matricula" data-id="${a.id}" style="background: #007bff;"><i class="fa-solid fa-user-check"></i> Autorizar Direto</button>
+                </div>
+            `;
+        }
 
         div.innerHTML = `
-            <strong>${a.nome}</strong> (${labelTurma(a.turma)})<br>
-            Pai/Mãe: ${a.nome_pai || 'Não informado'}<br>
-            ${avisoVisita}
-            <button class="btn-mini btn-autorizar-matricula" data-id="${a.id}" style="margin-top: 8px;">Aprovar Matrícula</button>
+            <strong style="font-size: 1.1rem;">${a.nome}</strong> (${labelTurma(a.turma)})<br>
+            <span style="font-size: 0.9rem; color: #555;">Pai/Mãe: ${a.nome_pai || 'Não informado'}</span>
+            ${blocoVisita}
+            ${botoesAcao}
         `;
         listaMatriculasPend.appendChild(div);
     });
 
+    // --- AÇÕES DOS BOTÕES ---
+
+    // 1. Confirmar a data exata que o pai pediu
+       // 1. Confirmar a data exata que o pai pediu
+    listaMatriculasPend.querySelectorAll('.btn-confirmar-visita').forEach(btn => {
+        btn.onclick = async () => {
+            if (!confirm("Confirmar a visita para a data solicitada pelo pai?")) return;
+            
+            // Pega a data do botão (ex: 27/11/2026) e converte para o formato do banco (2026-11-27)
+            let dataParaSalvar = btn.dataset.data;
+            if (dataParaSalvar.includes('/')) {
+                const partes = dataParaSalvar.split('/');
+                dataParaSalvar = `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+
+            const { error } = await supabaseClient
+                .from('alunos')
+                .update({ data_visita_confirmada: dataParaSalvar })
+                .eq('id', btn.dataset.id);
+                
+            if (error) {
+                alert("Erro ao confirmar: " + error.message);
+            } else {
+                alert("Visita confirmada!");
+                carregarMatriculasPendentes();
+            }
+        };
+    });
+
+    // 3. Autorizar Matrícula (Direto ou após a visita)
     listaMatriculasPend.querySelectorAll('.btn-autorizar-matricula').forEach(btn => {
-        btn.addEventListener('click', async () => {
+        btn.onclick = async () => {
             if (!confirm("Aprovar esta matrícula? O número será gerado automaticamente.")) return;
             
             const { error } = await supabaseClient
@@ -914,9 +994,78 @@ async function carregarMatriculasPendentes() {
                 alert("Matrícula aprovada! O responsável já pode acessar os documentos.");
                 carregarMatriculasPendentes();
             }
-        });
+        };
     });
 }
+// Função para abrir a janela de sugerir nova data
+function abrirModalSugerirData(alunoId) {
+    // Cria o modal se não existir
+    let modalSugerir = document.getElementById('modalSugerirData');
+    if (!modalSugerir) {
+        modalSugerir = document.createElement('div');
+        modalSugerir.id = 'modalSugerirData';
+        modalSugerir.className = 'modal-overlay';
+        modalSugerir.style.display = 'none';
+        modalSugerir.innerHTML = `
+            <div class="modal-content" style="max-width: 400px;">
+                <h2><i class="fa-solid fa-calendar-plus" style="color: #f59e0b;"></i> Sugerir Nova Data</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Escolha a nova data para a visita do responsável.</p>
+                
+                <div class="input-group">
+                    <label>Nova Data da Visita:</label>
+                    <input type="date" id="inputNovaDataGestor" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 15px;">
+                </div>
+
+                <div class="modal-botoes">
+                    <button type="button" class="btn-cancelar" id="btnFecharSugerirData">Cancelar</button>
+                    <button type="button" class="btn-salvar" id="btnSalvarSugerirData" style="background: #f59e0b;">Enviar Sugestão</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalSugerir);
+        
+        // Fecha ao clicar em cancelar
+        document.getElementById('btnFecharSugerirData').onclick = () => modalSugerir.style.display = 'none';
+    }
+
+    // Define a data mínima como hoje
+    const inputData = document.getElementById('inputNovaDataGestor');
+    inputData.min = new Date().toISOString().split('T')[0];
+    inputData.value = ''; // Limpa o campo
+
+    // Ação do botão salvar
+    document.getElementById('btnSalvarSugerirData').onclick = async () => {
+        const novaData = inputData.value;
+        if (!novaData) return alert("Escolha uma data primeiro.");
+
+        const btnSalvar = document.getElementById('btnSalvarSugerirData');
+        btnSalvar.disabled = true;
+        btnSalvar.textContent = "Enviando...";
+
+        // Formata a data para o padrão brasileiro (DD/MM/AAAA) para enviar para o pai
+        const dataFormatada = new Date(novaData + 'T00:00:00').toLocaleDateString('pt-BR');
+
+        // Atualiza o banco de dados
+        const { error } = await supabaseClient.from('alunos').update({ 
+            opcoes_visita_gestor: dataFormatada, 
+            data_visita_solicitada: null 
+        }).eq('id', alunoId);
+
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = "Enviar Sugestão";
+
+        if (error) {
+            alert("Erro ao enviar: " + error.message);
+        } else {
+            alert("Sugestão de data enviada para o responsável!");
+            modalSugerir.style.display = 'none';
+            carregarMatriculasPendentes(); // Recarrega o painel
+        }
+    };
+
+    modalSugerir.style.display = 'flex';
+}
+
 
 // ============================================================
 // HISTÓRICO DE ANOS ANTERIORES
@@ -964,7 +1113,7 @@ if (selectAnoHistorico) {
         const ano = selectAnoHistorico.value;
         if (!ano) { listaHistoricoAlunos.innerHTML = ''; return; }
 
-        listaHistoricoAlunos.innerHTML = '<p>Carregando alunos de ' + ano + '...</p>';
+        listaHistoricoAlunos.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Analisando turmas de ' + ano + '...</p>';
         
         try {
             const { data, error } = await supabaseClient
@@ -972,23 +1121,169 @@ if (selectAnoHistorico) {
                 .select('dados_aluno')
                 .eq('ano_letivo', ano);
                 
-            if (error) { listaHistoricoAlunos.innerHTML = '<p>Erro ao carregar.</p>'; return; }
+            if (error) { listaHistoricoAlunos.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Erro ao carregar.</p>'; return; }
 
             listaHistoricoAlunos.innerHTML = '';
-            if (!data || data.length === 0) { listaHistoricoAlunos.innerHTML = '<p>Nenhum aluno encontrado.</p>'; return; }
+            if (!data || data.length === 0) { listaHistoricoAlunos.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum aluno encontrado.</p>'; return; }
 
+            // Agrupa os alunos por turma
+            const turmasContagem = {};
+            const alunosPorTurma = {};
+            
             data.forEach(item => {
                 const a = item.dados_aluno;
+                const turmaOriginal = a.turma || 'Sem Turma';
+                
+                if (!turmasContagem[turmaOriginal]) {
+                    turmasContagem[turmaOriginal] = 0;
+                    alunosPorTurma[turmaOriginal] = [];
+                }
+                turmasContagem[turmaOriginal]++;
+                alunosPorTurma[turmaOriginal].push(a);
+            });
+
+            const turmasOrdenadas = Object.keys(turmasContagem).sort();
+
+            // Cria os cards de resumo (Apenas com os dados da turma)
+            turmasOrdenadas.forEach(turma => {
+                const quantidade = turmasContagem[turma];
+                const proximaTurma = getProximaTurma(turma);
+                const textoProxima = proximaTurma === 'CONCLUIDO' ? 'Concluído' : proximaTurma;
+
                 const div = document.createElement('div');
                 div.className = 'aluno-item';
-                div.innerHTML = `<strong>${a.nome}</strong> - ${labelTurma(a.turma)}`;
+                // Estilo do card da turma
+                div.style.padding = '15px';
+                div.style.background = '#fff';
+                div.style.border = '1px solid #eee';
+                div.style.borderRadius = '8px';
+                div.style.borderLeft = '4px solid #007bff';
+                div.style.cursor = 'pointer';
+                div.style.transition = 'transform 0.2s';
+                div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                
+                // Efeito ao passar o mouse
+                div.onmouseover = () => div.style.transform = 'scale(1.02)';
+                div.onmouseout = () => div.style.transform = 'scale(1)';
+
+                div.innerHTML = `
+                    <strong style="font-size: 1.1rem; color: #333; display: block; margin-bottom: 10px;">${labelTurma(turma)}</strong>
+                    <div style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">
+                        <i class="fa-solid fa-users" style="color: #007bff;"></i> ${quantidade} aluno(s)
+                    </div>
+                    <div style="font-size: 0.85rem; color: #888;">
+                        <i class="fa-solid fa-arrow-right"></i> Próximo: <strong>${textoProxima}</strong>
+                    </div>
+                `;
+
+                // Ao clicar no card, abre o Modal com a lista de alunos
+                div.addEventListener('click', () => {
+                    abrirModalHistoricoTurma(labelTurma(turma), alunosPorTurma[turma]);
+                });
+
                 listaHistoricoAlunos.appendChild(div);
             });
+
         } catch (err) {
             console.error(err);
-            listaHistoricoAlunos.innerHTML = '<p>Erro ao carregar histórico.</p>';
+            listaHistoricoAlunos.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: red;">Erro ao carregar histórico.</p>';
         }
     });
+}
+
+// NOVA FUNÇÃO: Abre o Modal com os alunos da turma
+function abrirModalHistoricoTurma(nomeTurma, alunos) {
+    let modalHist = document.getElementById('modalHistoricoTurma');
+    if (!modalHist) {
+        modalHist = document.createElement('div');
+        modalHist.id = 'modalHistoricoTurma';
+        modalHist.className = 'modal-overlay';
+        modalHist.style.display = 'none';
+        modalHist.innerHTML = `
+            <div class="modal-content" style="max-width: 700px; width: 90%;">
+                <h2><i class="fa-solid fa-users"></i> Alunos da Turma: <span id="tituloTurmaHistorico" style="color: #007bff;"></span></h2>
+                <div id="listaAlunosHistoricoModal" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+                    <!-- Lista de alunos injetada aqui -->
+                </div>
+                <div class="modal-botoes">
+                    <button type="button" class="btn-cancelar" onclick="document.getElementById('modalHistoricoTurma').style.display='none'" style="width: 100%;">Fechar Janela</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalHist);
+    }
+
+    document.getElementById('tituloTurmaHistorico').textContent = nomeTurma;
+    const container = document.getElementById('listaAlunosHistoricoModal');
+    container.innerHTML = '';
+
+    alunos.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(aluno => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '12px 10px';
+        row.style.borderBottom = '1px solid #eee';
+        
+        // Destaca levemente as linhas ímpares
+        row.style.backgroundColor = container.children.length % 2 === 0 ? '#f9f9f9' : '#fff';
+
+        row.innerHTML = `
+            <span style="font-weight: 600; color: #333;">${aluno.nome}</span>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-primario btn-ficha" style="padding: 6px 12px; font-size: 0.8rem;" title="Baixar Ficha">
+                    <i class="fa-solid fa-clipboard-list"></i> Ficha
+                </button>
+                <button class="btn-primario btn-boletim" style="padding: 6px 12px; font-size: 0.8rem; background: #28a745;" title="Baixar Boletim">
+                    <i class="fa-solid fa-file-pdf"></i> Boletim
+                </button>
+                <button class="btn-primario btn-transferencia" style="padding: 6px 12px; font-size: 0.8rem; background: #dc3545;" title="Baixar Transferência">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i> Transf.
+                </button>
+            </div>
+        `;
+
+        // Ações dos botões
+        row.querySelector('.btn-ficha').onclick = async () => {
+            const fn = DOCUMENTOS_HTML['Ficha Individual'];
+            if (!fn) return alert("Modelo não encontrado.");
+            const docBlob = await fn(aluno);
+            if (docBlob) {
+                const url = URL.createObjectURL(docBlob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `Ficha-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                a.click(); URL.revokeObjectURL(url);
+            }
+        };
+
+        row.querySelector('.btn-boletim').onclick = async () => {
+            const fn = DOCUMENTOS_HTML['Boletim'];
+            if (!fn) return alert("Modelo não encontrado.");
+            const docBlob = await fn(aluno);
+            if (docBlob) {
+                const url = URL.createObjectURL(docBlob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `Boletim-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                a.click(); URL.revokeObjectURL(url);
+            }
+        };
+
+        row.querySelector('.btn-transferencia').onclick = async () => {
+            const fn = DOCUMENTOS_HTML['Transferência'];
+            if (!fn) return alert("Modelo não encontrado.");
+            const docBlob = await fn(aluno);
+            if (docBlob) {
+                const url = URL.createObjectURL(docBlob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `Transferencia-${aluno.nome.replace(/\s+/g,'_')}.docx`;
+                a.click(); URL.revokeObjectURL(url);
+            }
+        };
+
+        container.appendChild(row);
+    });
+
+    modalHist.style.display = 'flex';
 }
 // ============================================================
 // VIRADA DE ANO LETIVO (BACKUP, PROMOÇÃO E LIMPEZA)
@@ -1139,6 +1434,100 @@ if (btnViradaAno) {
 
 
 // ============================================================
+// PROMOVER ALUNOS A PARTIR DO HISTÓRICO (COM PROTEÇÃO CONTRA DUPLICIDADE)
+// ============================================================
+const btnPromoverHistorico = document.querySelector('#btnPromoverHistorico');
+
+if (btnPromoverHistorico) {
+    btnPromoverHistorico.addEventListener('click', async () => {
+        const anoSelecionado = selectAnoHistorico.value;
+        if (!anoSelecionado) {
+            return alert("Selecione um ano no histórico primeiro!");
+        }
+
+        if (!confirm(`⚠️ ATENÇÃO!\n\nIsso vai pegar os alunos de ${anoSelecionado} do histórico, PROMOVER para a próxima turma e inserir na lista principal.\n\nAlunos que já estiverem na lista principal (mesmo CPF) não serão duplicados.\n\nDeseja continuar?`)) return;
+
+        btnPromoverHistorico.disabled = true;
+        btnPromoverHistorico.innerHTML = "Processando...";
+
+        try {
+            // 1. Busca os dados do histórico do ano selecionado
+            const { data: historico, error: errBusca } = await supabaseClient
+                .from('alunos_historico')
+                .select('dados_aluno')
+                .eq('ano_letivo', anoSelecionado);
+                
+            if (errBusca) throw errBusca;
+            if (!historico || historico.length === 0) throw new Error("Nenhum aluno no histórico deste ano.");
+
+            // 2. Busca os CPFs dos alunos que já estão na tabela principal para não duplicar
+            const { data: alunosAtuais, error: errAtuais } = await supabaseClient
+                .from('alunos')
+                .select('cpf');
+                
+            if (errAtuais) throw errAtuais;
+            
+            // Cria uma lista de CPFs que já existem no sistema
+            const cpfsExistentes = new Set((alunosAtuais || []).map(a => a.cpf).filter(Boolean));
+
+            // 3. Prepara os alunos promovidos
+            const alunosPromovidos = historico.map(item => {
+                const a = item.dados_aluno;
+                
+                // Se o CPF do aluno já existe no banco, ignora ele
+                if (a.cpf && cpfsExistentes.has(a.cpf)) {
+                    return null;
+                }
+
+                const novaTurma = getProximaTurma(a.turma);
+                if (novaTurma === 'CONCLUIDO') return null; // Ignora quem concluiu o 9º ano
+
+                const novoAluno = { ...a };
+                
+                delete novoAluno.id;
+                delete novoAluno.numero_matricula;
+
+                novoAluno.turma = novaTurma;
+                novoAluno.notas = {};
+                novoAluno.status = 'Ativa';
+                
+                Object.keys(novoAluno).forEach(key => {
+                    if (key.startsWith('b1_') || key.startsWith('b2_') || 
+                        key.startsWith('b3_') || key.startsWith('b4_') || 
+                        key.startsWith('mdf_') || key.startsWith('status_')) {
+                        novoAluno[key] = null;
+                    }
+                });
+
+                return novoAluno;
+            }).filter(a => a !== null);
+
+            if (alunosPromovidos.length === 0) {
+                return alert("Nenhum aluno novo para inserir. Eles já foram promovidos ou todos se formaram.");
+            }
+
+            // 4. Insere na tabela principal
+            const { error: errInsert } = await supabaseClient.from('alunos').insert(alunosPromovidos);
+            if (errInsert) throw errInsert;
+
+            alert(`✅ Sucesso!\n\n${alunosPromovidos.length} alunos foram promovidos do histórico de ${anoSelecionado}.`);
+            
+            // Recarrega a lista na tela (se você tiver a função)
+            if (typeof carregarAlunosPorTurma === 'function' && typeof selectTurma !== 'undefined' && selectTurma.value) {
+                carregarAlunosPorTurma(selectTurma.value);
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao promover alunos: " + err.message);
+        } finally {
+            btnPromoverHistorico.disabled = false;
+            btnPromoverHistorico.innerHTML = '<i class="fa-solid fa-arrow-up-right-dots"></i> Promover Alunos do Histórico';
+        }
+    });
+}
+
+// ============================================================
 // LÓGICA DA ÁREA FINANCEIRA GLOBAL
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1207,4 +1596,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnPagos) btnPagos.onclick = () => gerarRelatorioGlobal('pagos');
     if (btnPendentes) btnPendentes.onclick = () => gerarRelatorioGlobal('pendentes');
+});
+document.addEventListener('DOMContentLoaded', () => {
+    // Verifica se a função existe e a chama
+    if (typeof carregarAnosHistorico === 'function') {
+        console.log("Ligando o carregamento do histórico...");
+    } else {
+        console.error("ERRO: A função carregarAnosHistorico não foi encontrada!");
+    }
 });

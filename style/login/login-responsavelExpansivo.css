@@ -86,6 +86,25 @@
     display: none;
   }
 
+/* Ajuste fino para celulares */
+@media (max-width: 768px) {
+    #agendamentoVisita {
+        padding: 15px; /* Diminui o espaço interno da caixa */
+        margin-top: 15px;
+    }
+    
+    #agendamentoVisita .texto-calendario {
+        font-size: 0.95rem; /* Texto levemente menor */
+    }
+
+    #agendamentoVisita .input-data-custom,
+    #agendamentoVisita .btn-visita-custom {
+        padding: 12px; /* Botões e inputs um pouco mais compactos */
+        font-size: 0.95rem;
+    }
+}
+
+
   /* 5. Footer no final */
   footer {
     grid-column: 1 / -1;
