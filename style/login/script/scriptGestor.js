@@ -35,8 +35,8 @@ const listaMatriculasPend = document.querySelector('#listaMatriculasPendentes');
 let gestorLogado = null;
 
 const TURMAS = [
-    'infantil-I-a','infantil-I-b', 'infantil-II-a','infantil-II-b', 'infantil-III-a','infantil-III-b',
-    '1ano-a','1ano-b', '2ano-a','2ano-b', '3ano-a','3ano-b', '4ano-a','4ano-b', '5ano-a','5ano-b',
+    'infantil-i-a', 'infantil-i-b', 'infantil-ii-a', 'infantil-ii-b', 'infantil-iii-a', 'infantil-iii-b',
+    '1ano-a', '1ano-b', '2ano-a', '2ano-b', '3ano-a', '3ano-b', '4ano-a', '4ano-b', '5ano-a', '5ano-b',
     '6ano-a', '7ano-a', '8ano-a', '9ano-a'
 ];
 
@@ -62,15 +62,32 @@ async function iniciarGestor() {
         window.location.href = "login.htm";
         return;
     }
+    
     gestorLogado = JSON.parse(gString);
     if (gestorNomeEl) gestorNomeEl.textContent = `Gestor: ${gestorLogado.nome}`;
 
     if (cardHistorico) cardHistorico.style.display = 'block';
 
+    // Busca o ano letivo atual (Correção do Cache)
+    const { data: config, error: erroConfig } = await supabaseClient
+        .from('configuracoes_escola')
+        .select('ano_letivo_atual')
+        .limit(1);
+
+    const elAno = document.getElementById('displayAnoLetivo');
+    if (elAno) {
+        if (config && config.length > 0) {
+            elAno.textContent = `📅 Ano Letivo Atual: ${config[0].ano_letivo_atual}`;
+        } else {
+            elAno.textContent = `📅 Ano Letivo Atual: 2026`;
+        }
+    }
+
     preencherSelects();
     carregarAvisos();
     carregarProfessoresPendentes();
     carregarMatriculasPendentes();
+    carregarAnosHistorico(); // Chamando o histórico aqui também
 }
 
 if (selectTurma) {
@@ -464,6 +481,7 @@ if (formEditarAluno) {
 // ... (Funções de Modal Carnê, Financeiro, Documentos, Avisos e Professores Pendentes permanecem iguais) ...
 // Se precisar do restante do código a partir daqui, me avise!
 // --- MODAL EMITIR CARNÊ ---
+// --- MODAL EMITIR CARNÊ ---
 function abrirModalCarne(aluno) {
     let modalCarne = document.getElementById('modalCarne');
     if (!modalCarne) {
@@ -539,7 +557,8 @@ function abrirModalCarne(aluno) {
     modalCarne.style.display = 'flex';
     document.getElementById('valorCarne').focus();
 
-    document.getElementById('formCarne').onsubmit = (e) => {
+    // AQUI É A AÇÃO DO BOTÃO GERAR CARNÊ
+    document.getElementById('formCarne').onsubmit = async (e) => {
         e.preventDefault();
         const valor = document.getElementById('valorCarne').value;
         const temIrmao = document.getElementById('temIrmaoCarne').checked;
@@ -551,44 +570,47 @@ function abrirModalCarne(aluno) {
             irmao2: temIrmao ? { nome: document.getElementById('nomeIrmao2').value, turma: document.getElementById('turmaIrmao2').value } : null
         };
 
+        // Mostra um aviso de carregamento rápido
+        const btnSalvar = document.querySelector('#formCarne .btn-salvar');
+        const textoOriginal = btnSalvar.innerHTML;
+        btnSalvar.innerHTML = "Gerando...";
+        btnSalvar.disabled = true;
+
+        // Busca os dados do aluno e gera o Word
         supabaseClient.from('alunos').select('*').eq('id', aluno.id).single()
-            .then(({ data: alunoCompleto, error }) => {
-                if (error || !alunoCompleto) return alert("Erro ao buscar dados.");
+            .then(async ({ data: alunoCompleto, error }) => {
+                if (error || !alunoCompleto) {
+                    alert("Erro ao buscar dados.");
+                    btnSalvar.innerHTML = textoOriginal;
+                    btnSalvar.disabled = false;
+                    return;
+                }
                 
-                const html = docCarne(alunoCompleto, opcoes);
+                // CHAMA A FUNÇÃO DO WORD (que está no templates-docs.js)
+                const docBlob = await docCarneWord(alunoCompleto, opcoes);
                 
-                const overlay = document.createElement('div');
-                overlay.className = 'modal-overlay';
-                overlay.innerHTML = `
-                    <div class="modal-content" style="text-align: center; max-width: 400px;">
-                        <h2 style="justify-content: center; margin-bottom: 10px;">Carnê Pronto</h2>
-                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                            <button id="btnImprimir" class="btn-primario" style="background: var(--destaque);">Imprimir</button>
-                            <button id="btnWord" class="btn-primario" style="background: #28a745;">Baixar Word</button>
-                        </div>
-                        <button id="btnFecharDoc" class="btn-cancelar" style="width: 100%; margin-top: 15px;">Fechar</button>
-                    </div>
-                `;
-                document.body.appendChild(overlay);
+                btnSalvar.innerHTML = textoOriginal;
+                btnSalvar.disabled = false;
 
-                overlay.querySelector('#btnImprimir').onclick = () => {
-                    const win = window.open('', '_blank');
-                    win.document.write(html);
-                    win.document.close();
-                    win.onload = () => { win.print(); };
-                };
-
-                overlay.querySelector('#btnWord').onclick = () => {
-                    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-                    const url = URL.createObjectURL(blob);
+                if (docBlob) {
+                    modalCarne.style.display = 'none'; // Fecha a janela
+                    
+                    // Faz o download do arquivo .docx
+                    const url = URL.createObjectURL(docBlob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `Carne-${aluno.nome.replace(/\s+/g,'_')}.doc`;
+                    a.download = `Carne-${alunoCompleto.nome.replace(/\s+/g,'_')}.docx`;
                     a.click();
                     URL.revokeObjectURL(url);
-                };
-
-                overlay.querySelector('#btnFecharDoc').onclick = () => { overlay.remove(); modalCarne.style.display = 'none'; };
+                } else {
+                    alert("Erro ao gerar o arquivo Word.");
+                }
+            })
+            .catch(e => { 
+                console.error(e); 
+                alert("Erro ao gerar documento."); 
+                btnSalvar.innerHTML = textoOriginal;
+                btnSalvar.disabled = false;
             });
     };
 }
@@ -1084,7 +1106,7 @@ async function carregarAnosHistorico() {
         
         if (error) {
             console.error('Erro ao buscar histórico:', error);
-            selectAnoHistorico.innerHTML = '<option value="">Erro ao carregar (veja o console F12)</option>';
+            selectAnoHistorico.innerHTML = '<option value="">Erro ao carregar</option>';
             return;
         }
 
@@ -1285,23 +1307,23 @@ function abrirModalHistoricoTurma(nomeTurma, alunos) {
 
     modalHist.style.display = 'flex';
 }
-// ============================================================
-// VIRADA DE ANO LETIVO (BACKUP, PROMOÇÃO E LIMPEZA)
-// ============================================================
-const btnViradaAno = document.querySelector('#btnViradaAno');
 
-// Função para calcular a próxima turma
+
+// ============================================================
+// FUNÇÃO PARA CALCULAR A PRÓXIMA TURMA
+// ============================================================
 function getProximaTurma(turmaAtual) {
     if (!turmaAtual) return turmaAtual;
     const t = turmaAtual.toLowerCase();
 
     // Progressão do Infantil
-    if (t === 'infantil-i-a') return 'infantil-II-a';
-    if (t === 'infantil-i-b') return 'infantil-II-b';
-    if (t === 'infantil-II-a') return 'infantil-III-a';
-    if (t === 'infantil-II-b') return 'infantil-III-b';
-    if (t === 'infantil-III-a') return '1ano-a';
-    if (t === 'infantil-III-b') return '1ano-b';
+    if (t === 'infantil-i-a') return 'infantil-ii-a';
+    if (t === 'infantil-i-b') return 'infantil-ii-b';
+    if (t === 'infantil-ii-a') return 'infantil-iii-a';
+    if (t === 'infantil-ii-b') return 'infantil-iii-b';
+    if (t === 'infantil-iii-a') return '1ano-a';
+    if (t === 'infantil-iii-b') return '1ano-b';
+
 
     // Progressão do Fundamental I
     if (t === '1ano-a') return '2ano-a';
@@ -1319,213 +1341,100 @@ function getProximaTurma(turmaAtual) {
     if (t === '6ano-a') return '7ano-a';
     if (t === '7ano-a') return '8ano-a';
     if (t === '8ano-a') return '9ano-a';
-    if (t === '9ano-a') return 'CONCLUIDO'; // Alunos do 9º ano saem da escola
+    if (t === '9ano-a') return 'CONCLUIDO';
 
-    return turmaAtual; // Se não bater, mantém
+    return turmaAtual;
 }
+
+// ============================================================
+// VIRADA DE ANO LETIVO (BACKUP, PROMOÇÃO E LIMPEZA BLINDADA)
+// ============================================================
+const btnViradaAno = document.querySelector('#btnViradaAno');
 
 if (btnViradaAno) {
     btnViradaAno.addEventListener('click', async () => {
-        const anoAtual = new Date().getFullYear();
+        // ... código para buscar o ano atual (igual ao que já fizemos) ...
+        const { data: config } = await supabaseClient.from('configuracoes_escola').select('ano_letivo_atual').limit(1);
+        const anoAtual = (config && config.length > 0) ? config[0].ano_letivo_atual : new Date().getFullYear();
         
-        if (!confirm(`⚠️ ATENÇÃO: Virada de Ano Letivo!\n\nIsso irá:\n1. Salvar todos os alunos de ${anoAtual} no histórico (com notas).\n2. PROMOVER os alunos para a próxima série.\n3. LIMPAR as notas bimestrais para o novo ano.\n4. ATUALIZAR as turmas dos professores.\n\nDeseja continuar?`)) return;
-        
+        if (!confirm(`⚠️ ATENÇÃO: Fechamento do Ano Letivo de ${anoAtual}!\n\nIsso irá:\n1. Salvar todos os alunos de ${anoAtual} no histórico.\n2. PROMOVER os alunos para a próxima série.\n3. LIMPAR as notas bimestrais.\n4. Avançar o sistema para o ano ${anoAtual + 1}.\n\nDeseja continuar?`)) {
+            return;
+        }
+
+        // AQUI ATIVAMOS A TELA DE BLOQUEIO
+        const overlay = document.getElementById('overlayProcessamento');
+        if (overlay) overlay.style.display = 'flex';
+
         btnViradaAno.disabled = true;
         btnViradaAno.innerHTML = "Processando...";
 
-        try {
-            // 1. Busca todos os alunos
+            try {
+            // 1. Verifica se o backup já foi feito
+            const { count } = await supabaseClient.from('alunos_historico').select('*', { count: 'exact', head: true }).eq('ano_letivo', anoAtual);
+            if (count > 0) throw new Error(`O histórico do ano ${anoAtual} já foi gerado! O sistema já está operando em ${anoAtual + 1}.`);
+
+            // 2. Busca alunos
             const { data: alunos, error: errBusca } = await supabaseClient.from('alunos').select('*');
             if (errBusca) throw errBusca;
-            if (!alunos || alunos.length === 0) {
-                alert("Não há alunos para arquivar.");
-                return;
-            }
+            if (!alunos || alunos.length === 0) throw new Error("Não há alunos para arquivar.");
 
-            // 2. Salva no Histórico (Backup completo)
-            const historico = alunos.map(a => ({
-                aluno_id_original: a.id,
-                ano_letivo: anoAtual,
-                dados_aluno: a 
-            }));
+            // 3. Salva no histórico
+            const historico = alunos.map(a => ({ aluno_id_original: a.id, ano_letivo: anoAtual, dados_aluno: a }));
             const { error: errInsert } = await supabaseClient.from('alunos_historico').insert(historico);
             if (errInsert) throw errInsert;
 
-            // 3. Prepara a lista de alunos promovidos para o próximo ano
-            const alunosPromovidos = alunos
-                .filter(a => a.status === 'Ativa') // Só promove quem está ativo
-                .map(a => {
-                    const novaTurma = getProximaTurma(a.turma);
-                    if (novaTurma === 'CONCLUIDO') return null; // Remove quem concluiu o 9º
-
-                    // Copia todos os dados do aluno
-                    const novoAluno = { ...a };
-                    
-                    // A MÁGICA: Remove o ID e a matrícula antiga para o banco gerar novos
-                    delete novoAluno.id;
-                    delete novoAluno.numero_matricula;
-
-                    // Atualiza a turma e limpa o JSON de notas
-                    novoAluno.turma = novaTurma;
-                    novoAluno.notas = {};
-
-                    // Limpa as colunas de notas individuais (b1_, b2_, mdf_, etc)
-                    Object.keys(novoAluno).forEach(key => {
-                        if (key.startsWith('b1_') || key.startsWith('b2_') || 
-                            key.startsWith('b3_') || key.startsWith('b4_') || 
-                            key.startsWith('mdf_') || key.startsWith('status_')) {
-                            novoAluno[key] = null;
-                        }
-                    });
-
-                    return novoAluno;
-                })
-                .filter(a => a !== null);
-
-            // 4. Deleta todos os alunos antigos
-            const { error: errDelete } = await supabaseClient.from('alunos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-            if (errDelete) throw errDelete;
-
-            // 5. Insere os alunos promovidos
-            if (alunosPromovidos.length > 0) {
-                const { error: errPromove } = await supabaseClient.from('alunos').insert(alunosPromovidos);
-                if (errPromove) throw errPromove;
-            }
-
-            // 6. Atualiza as turmas dos professores
-            const { data: professores } = await supabaseClient.from('usuarios').select('id, turmas').eq('tipo', 'professor');
-            const turmasValidas = ['infantil-I-a','infantil-I-b', 'infantil-II-a','infantil-II-b', 'infantil-III-a','infantil-III-b', '1ano-a','1ano-b', '2ano-a','2ano-b', '3ano-a','3ano-b', '4ano-a','4ano-b', '5ano-a','5ano-b', '6ano-a', '7ano-a', '8ano-a', '9ano-a'];
-
-            if (professores) {
-                for (const prof of professores) {
-                    let turmasProf = prof.turmas || [];
-                    if (typeof turmasProf === 'string') {
-                        try { turmasProf = JSON.parse(turmasProf); } catch(e) { turmasProf = []; }
-                    }
-                    
-                    const novasTurmas = turmasProf.filter(t => turmasValidas.includes(t));
-                    
-                    if (novasTurmas.length !== turmasProf.length) {
-                        await supabaseClient.from('usuarios').update({ turmas: novasTurmas }).eq('id', prof.id);
-                    }
+            // 4. Promove alunos
+            const alunosConcluidos = [];
+            for (const a of alunos) {
+                if (a.status !== 'Ativa') continue;
+                const novaTurma = getProximaTurma(a.turma);
+                
+                if (novaTurma === 'CONCLUIDO') {
+                    alunosConcluidos.push(a.id);
+                    continue;
                 }
+
+                await supabaseClient.from('alunos').update({ 
+                    turma: novaTurma, notas: {},
+                    b1_portugues: null, b2_portugues: null, b3_portugues: null, b4_portugues: null, mdf_portugues: null,
+                    b1_matematica: null, b2_matematica: null, b3_matematica: null, b4_matematica: null, mdf_matematica: null,
+                    b1_ciencias: null, b2_ciencias: null, b3_ciencias: null, b4_ciencias: null, mdf_ciencias: null,
+                    b1_historia: null, b2_historia: null, b3_historia: null, b4_historia: null, mdf_historia: null,
+                    b1_geografia: null, b2_geografia: null, b3_geografia: null, b4_geografia: null, mdf_geografia: null
+                }).eq('id', a.id);
             }
 
-            alert(`✅ Ano ${anoAtual} fechado!\n\nAlunos promovidos com sucesso. As notas foram zeradas para o novo ano letivo.`);
-            
-            // Limpa o filtro de turma e limpa a lista na tela
-            selectTurma.value = "";
-            listaDeAlunos.innerHTML = '<p>Lista limpa para o novo ano. Selecione uma turma para ver os alunos promovidos.</p>';
-            cardAlunos.style.display = 'block';
-            
-            // Atualiza o histórico
-            carregarAnosHistorico(); 
+            // 5. Deleta concluídos
+            if (alunosConcluidos.length > 0) {
+                await supabaseClient.from('alunos').delete().in('id', alunosConcluidos);
+            }
+
+            // 6. Avança o ano (Usando update em todos os registros para garantir)
+            const { error: errAno } = await supabaseClient
+                .from('configuracoes_escola')
+                .update({ ano_letivo_atual: anoAtual + 1 })
+                .neq('id', 0); // Atualiza todos os registros da tabela
+
+            if (errAno) {
+                console.error("Erro ao atualizar ano:", errAno);
+                alert("Atenção: Os alunos foram promovidos, mas o ano no painel não atualizou.");
+            }
+
+            alert(`✅ Ano ${anoAtual} fechado com sucesso!\n\nO sistema agora está operando no ano letivo de ${anoAtual + 1}.`);
+            window.location.reload(); // Recarrega a tela para atualizar tudo
 
         } catch (err) {
             console.error(err);
             alert("Erro ao fechar o ano: " + err.message);
         } finally {
+            // ESCONDE A TELA DE BLOQUEIO E VOLTA O BOTÃO AO NORMAL
+            if (overlay) overlay.style.display = 'none';
             btnViradaAno.disabled = false;
             btnViradaAno.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Fechar Ano e Promover Alunos';
         }
     });
 }
 
-
-
-// ============================================================
-// PROMOVER ALUNOS A PARTIR DO HISTÓRICO (COM PROTEÇÃO CONTRA DUPLICIDADE)
-// ============================================================
-const btnPromoverHistorico = document.querySelector('#btnPromoverHistorico');
-
-if (btnPromoverHistorico) {
-    btnPromoverHistorico.addEventListener('click', async () => {
-        const anoSelecionado = selectAnoHistorico.value;
-        if (!anoSelecionado) {
-            return alert("Selecione um ano no histórico primeiro!");
-        }
-
-        if (!confirm(`⚠️ ATENÇÃO!\n\nIsso vai pegar os alunos de ${anoSelecionado} do histórico, PROMOVER para a próxima turma e inserir na lista principal.\n\nAlunos que já estiverem na lista principal (mesmo CPF) não serão duplicados.\n\nDeseja continuar?`)) return;
-
-        btnPromoverHistorico.disabled = true;
-        btnPromoverHistorico.innerHTML = "Processando...";
-
-        try {
-            // 1. Busca os dados do histórico do ano selecionado
-            const { data: historico, error: errBusca } = await supabaseClient
-                .from('alunos_historico')
-                .select('dados_aluno')
-                .eq('ano_letivo', anoSelecionado);
-                
-            if (errBusca) throw errBusca;
-            if (!historico || historico.length === 0) throw new Error("Nenhum aluno no histórico deste ano.");
-
-            // 2. Busca os CPFs dos alunos que já estão na tabela principal para não duplicar
-            const { data: alunosAtuais, error: errAtuais } = await supabaseClient
-                .from('alunos')
-                .select('cpf');
-                
-            if (errAtuais) throw errAtuais;
-            
-            // Cria uma lista de CPFs que já existem no sistema
-            const cpfsExistentes = new Set((alunosAtuais || []).map(a => a.cpf).filter(Boolean));
-
-            // 3. Prepara os alunos promovidos
-            const alunosPromovidos = historico.map(item => {
-                const a = item.dados_aluno;
-                
-                // Se o CPF do aluno já existe no banco, ignora ele
-                if (a.cpf && cpfsExistentes.has(a.cpf)) {
-                    return null;
-                }
-
-                const novaTurma = getProximaTurma(a.turma);
-                if (novaTurma === 'CONCLUIDO') return null; // Ignora quem concluiu o 9º ano
-
-                const novoAluno = { ...a };
-                
-                delete novoAluno.id;
-                delete novoAluno.numero_matricula;
-
-                novoAluno.turma = novaTurma;
-                novoAluno.notas = {};
-                novoAluno.status = 'Ativa';
-                
-                Object.keys(novoAluno).forEach(key => {
-                    if (key.startsWith('b1_') || key.startsWith('b2_') || 
-                        key.startsWith('b3_') || key.startsWith('b4_') || 
-                        key.startsWith('mdf_') || key.startsWith('status_')) {
-                        novoAluno[key] = null;
-                    }
-                });
-
-                return novoAluno;
-            }).filter(a => a !== null);
-
-            if (alunosPromovidos.length === 0) {
-                return alert("Nenhum aluno novo para inserir. Eles já foram promovidos ou todos se formaram.");
-            }
-
-            // 4. Insere na tabela principal
-            const { error: errInsert } = await supabaseClient.from('alunos').insert(alunosPromovidos);
-            if (errInsert) throw errInsert;
-
-            alert(`✅ Sucesso!\n\n${alunosPromovidos.length} alunos foram promovidos do histórico de ${anoSelecionado}.`);
-            
-            // Recarrega a lista na tela (se você tiver a função)
-            if (typeof carregarAlunosPorTurma === 'function' && typeof selectTurma !== 'undefined' && selectTurma.value) {
-                carregarAlunosPorTurma(selectTurma.value);
-            }
-
-        } catch (err) {
-            console.error(err);
-            alert("Erro ao promover alunos: " + err.message);
-        } finally {
-            btnPromoverHistorico.disabled = false;
-            btnPromoverHistorico.innerHTML = '<i class="fa-solid fa-arrow-up-right-dots"></i> Promover Alunos do Histórico';
-        }
-    });
-}
 
 // ============================================================
 // LÓGICA DA ÁREA FINANCEIRA GLOBAL

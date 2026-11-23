@@ -727,6 +727,75 @@ function docCarne(a, opcoes) {
 }
 
 // ============================================================
+// 15. CARNÊ EM WORD
+// ============================================================
+async function docCarneWord(a, opcoes) {
+    try {
+        const response = await fetch('documentos/modelos/carne_novo.docx');
+        if (!response.ok) throw new Error("Arquivo carne_novo.docx não encontrado.");
+        const arrayBuffer = await response.arrayBuffer();
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+        const resp = getDadosResponsavel(a); 
+        const valor = opcoes?.valor || '300,00';
+        const anoAtual = new Date().getFullYear();
+        
+        const letraTurma = (a.turma || '').slice(-1).toUpperCase();
+        const serieFormatada = up(labelTurma(a.turma).split('-')[0].trim()); 
+
+        // Monta a lista de 12 parcelas
+        const parcelas = [];
+        for (let i = 1; i <= 12; i++) {
+            const ultimoDia = new Date(anoAtual, i, 0).getDate();
+            const mesFormatado = String(i).padStart(2, '0');
+            const dataFormatada = `${String(ultimoDia).padStart(2, '0')}/${mesFormatado}/${anoAtual}`;
+            
+            const ruaCompleta = up(a.endereco || '') + (a.numero_endereco ? `, Nº ${a.numero_endereco}` : '');
+            const cidadeEstado = up(a.cidade || '') + '/' + up(a.estado || '');
+
+            parcelas.push({
+                // --- DADOS DA ESQUERDA ---
+                NOME_ESQ: up(a.nome),
+                TURMA_ESQ: letraTurma,
+                SERIE_ESQ: serieFormatada,
+                TURNO_ESQ: up(a.turno || 'DIURNO'),
+                PARCELA_ESQ: `${i}/12`,
+                DATA_ESQ: dataFormatada,
+                NOME_RESP_ESQ: up(resp.nome),
+                RUA_ESQ: ruaCompleta,
+                BAIRRO_ESQ: up(a.bairro || ''),
+                CIDADE_ESQ: cidadeEstado,
+                CPF_ESQ: resp.cpf,
+                VALOR_ESQ: `R$ ${valor}`,
+
+                // --- DADOS DA DIREITA (MESMOS VALORES) ---
+                NOME_DIR: up(a.nome),
+                TURMA_DIR: letraTurma,
+                SERIE_DIR: serieFormatada,
+                TURNO_DIR: up(a.turno || 'DIURNO'),
+                PARCELA_DIR: `${i}/12`,
+                DATA_DIR: dataFormatada,
+                NOME_RESP_DIR: up(resp.nome),
+                RUA_DIR: ruaCompleta,
+                BAIRRO_DIR: up(a.bairro || ''),
+                CIDADE_DIR: cidadeEstado,
+                CPF_DIR: resp.cpf,
+                VALOR_DIR: `R$ ${valor}`
+            });
+        }
+
+        // O SEGREDO ESTÁ AQUI: O docxtemplater precisa da chave "parcelas" para o loop.
+        doc.render({ parcelas: parcelas });
+        return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+
+    } catch (error) {
+        console.error("Erro ao gerar Carnê Word:", error);
+        alert("Erro ao gerar o carnê: " + error.message);
+        return null;
+    }
+}
+// ============================================================
 // ALIAS
 // ============================================================
 function docDeclaracaoQuitacaoDebito(a) { return docQuitacaoSimples(a); }

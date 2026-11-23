@@ -55,6 +55,9 @@
             </div>
 
             <div id="toolbar-gestor">
+                <div id="displayAnoLetivo" style="font-weight: bold; color: #007bff; font-size: 1.2rem; margin-bottom: 15px;">
+                    Carregando ano letivo...
+                </div>
                 <div class="toolbar-row">
                     <button id="btnAddAlunoGestor" class="btn-primario">
                         <i class="fa-solid fa-plus"></i> Adicionar Aluno
@@ -63,9 +66,7 @@
                         <i class="fa-solid fa-calendar-check"></i> Fechar Ano
                     </button>
 
-                    <button id="btnPromoverHistorico" class="btn-primario" style="margin-top: 10px; background: #007bff;">
-                        <i class="fa-solid fa-arrow-up-right-dots"></i> Promover Alunos do Histórico
-                    </button>
+                    
                     <div id="barraBusca">
                         <input type="text" id="buscaAluno" placeholder="Pesquisar aluno pelo nome..." />
                         <button id="btnPesquisarAluno" class="btn-primario">
@@ -324,6 +325,7 @@
             </form>
         </div>
     </div>
+     
 
     <!-- SCRIPTS -->
 
@@ -355,6 +357,16 @@
         }
     })();
     </script>
+       <div id="overlayProcessamento" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 255, 255, 0.85); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(4px);">
+        <div style="background: white; padding: 40px 60px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 50px; color: rgba(20, 20, 211, 0.904); margin-bottom: 20px;"></i>
+            <h2 style="color: #333; margin-bottom: 10px; font-size: 1.5rem;">Fechando o Ano Letivo...</h2>
+            <p style="color: #666;">Aguarde, estamos fazendo o backup e promovendo os alunos.<br>Não feche esta página.</p>
+        </div>
+    </div>
+
+
+
 
     <!-- FOOTER PADRONIZADO (AQUI, DEPOIS DOS SCRIPTS) -->
       <footer>
@@ -375,6 +387,8 @@
         <img class="boneco" src="imagens/boneco1.png" alt="Boneco Azul">
         <img class="moeda" src="imagens/moeda.png" alt="Moeda">
     </footer>
+    <!-- TELA DE BLOQUEIO (LOADING) -->
+
 
 
 </body>
