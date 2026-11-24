@@ -741,24 +741,44 @@ async function docCarneWord(a, opcoes) {
         const valor = opcoes?.valor || '300,00';
         const anoAtual = new Date().getFullYear();
         
-        const letraTurma = (a.turma || '').slice(-1).toUpperCase();
-        const serieFormatada = up(labelTurma(a.turma).split('-')[0].trim()); 
+        // 1. Prepara a lista de nomes e séries
+        let nomesExibir = [up(a.nome)];
+        let seriesExibir = [up(labelTurma(a.turma).split('-')[0].trim())]; // Ex: "1º ANO"
+        
+        // Adiciona o 2º irmão se existir
+        if (opcoes.temIrmao && opcoes.irmao1?.nome && opcoes.irmao1.nome.trim() !== '') {
+            nomesExibir.push(up(opcoes.irmao1.nome));
+            seriesExibir.push(up(labelTurma(opcoes.irmao1.turma).split('-')[0].trim()));
+        }
+        
+        // Adiciona o 3º irmão se existir
+        if (opcoes.temIrmao && opcoes.irmao2?.nome && opcoes.irmao2.nome.trim() !== '') {
+            nomesExibir.push(up(opcoes.irmao2.nome));
+            seriesExibir.push(up(labelTurma(opcoes.irmao2.turma).split('-')[0].trim()));
+        }
 
-        // Monta a lista de 12 parcelas
+        // Junta tudo com " e "
+        const nomeFinal = nomesExibir.join(' / ');
+        const serieFinal = seriesExibir.join(' / ');
+        
+        // 2. Pega a letra da turma do aluno principal (ou avisa que é misto)
+        const letraTurma = (a.turma || '').slice(-1).toUpperCase();
+        
+        // 3. Endereço (do aluno principal, pois é o mesmo para todos)
+        const ruaCompleta = up(a.endereco || '') + (a.numero_endereco ? `, Nº ${a.numero_endereco}` : '');
+        const cidadeEstado = up(a.cidade || '') + '/' + up(a.estado || '');
+
         const parcelas = [];
         for (let i = 1; i <= 12; i++) {
             const ultimoDia = new Date(anoAtual, i, 0).getDate();
             const mesFormatado = String(i).padStart(2, '0');
             const dataFormatada = `${String(ultimoDia).padStart(2, '0')}/${mesFormatado}/${anoAtual}`;
-            
-            const ruaCompleta = up(a.endereco || '') + (a.numero_endereco ? `, Nº ${a.numero_endereco}` : '');
-            const cidadeEstado = up(a.cidade || '') + '/' + up(a.estado || '');
 
             parcelas.push({
-                // --- DADOS DA ESQUERDA ---
-                NOME_ESQ: up(a.nome),
+                // --- ESQUERDA ---
+                NOME_ESQ: nomeFinal,
                 TURMA_ESQ: letraTurma,
-                SERIE_ESQ: serieFormatada,
+                SERIE_ESQ: serieFinal,
                 TURNO_ESQ: up(a.turno || 'DIURNO'),
                 PARCELA_ESQ: `${i}/12`,
                 DATA_ESQ: dataFormatada,
@@ -769,10 +789,10 @@ async function docCarneWord(a, opcoes) {
                 CPF_ESQ: resp.cpf,
                 VALOR_ESQ: `R$ ${valor}`,
 
-                // --- DADOS DA DIREITA (MESMOS VALORES) ---
-                NOME_DIR: up(a.nome),
+                // --- DIREITA ---
+                NOME_DIR: nomeFinal,
                 TURMA_DIR: letraTurma,
-                SERIE_DIR: serieFormatada,
+                SERIE_DIR: serieFinal,
                 TURNO_DIR: up(a.turno || 'DIURNO'),
                 PARCELA_DIR: `${i}/12`,
                 DATA_DIR: dataFormatada,
@@ -785,7 +805,6 @@ async function docCarneWord(a, opcoes) {
             });
         }
 
-        // O SEGREDO ESTÁ AQUI: O docxtemplater precisa da chave "parcelas" para o loop.
         doc.render({ parcelas: parcelas });
         return doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
 
@@ -795,6 +814,10 @@ async function docCarneWord(a, opcoes) {
         return null;
     }
 }
+
+
+
+
 // ============================================================
 // ALIAS
 // ============================================================
@@ -832,3 +855,109 @@ const DOCUMENTOS_HTML = {
     'Carnê':                               docCarne,
     'Carne':                               docCarne
 };
+
+
+// ============================================================
+// 16. CONTABILIDADE INDIVIDUAL (HTML PARA IMPRESSÃO)
+// ============================================================
+
+
+function docContabilidade(a, pagamentos) {
+    const resp = getDadosResponsavel(a);
+    const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    
+    let linhasTabela = '';
+    mesesNomes.forEach((mes, index) => {
+        const numMes = index + 1;
+        const isPago = pagamentos.includes(numMes);
+        linhasTabela += `
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 8px;">${mes}</td>
+                <td style="border: 1px solid #ccc; padding: 8px; text-align: center; color: ${isPago ? 'green' : 'red'}; font-weight: bold;">
+                    ${isPago ? 'PAGO' : 'PENDENTE'}
+                </td>
+            </tr>
+        `;
+    });
+
+    return `<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório Financeiro - ${a.nome}</title>
+        ${CSS_GLOBAL}
+    </head>
+    <body>
+        <div class="doc-container">
+            <h1 class="doc-title">Relatório Financeiro Individual</h1>
+            <p><strong>Aluno:</strong> ${up(a.nome)}</p>
+            <p><strong>Turma:</strong> ${up(labelTurma(a.turma))}</p>
+            <p><strong>Responsável:</strong> ${resp.nome} (CPF: ${resp.cpf})</p>
+            <p><strong>Data de Emissão:</strong> ${dataHojeExtenso()}</p>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                    <tr style="background: #f0f0f0;">
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Mês</th>
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${linhasTabela}
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>`;
+}
+
+// ============================================================
+// 17. RELATÓRIO FINANCEIRO GLOBAL (HTML PARA IMPRESSÃO)
+// ============================================================
+function docRelatorioGlobal(alunos, tipo) {
+    const dataAtual = new Date();
+    const mesAtual = dataAtual.getMonth() + 1; // 1 a 12
+    
+    let linhas = '';
+    alunos.forEach(a => {
+        const pagamentos = a.pagamentos || [];
+        const isPago = pagamentos.includes(mesAtual);
+        
+        if (tipo === 'pagos' && isPago) {
+            linhas += `<tr><td style="border: 1px solid #ccc; padding: 8px;">${a.nome}</td><td style="border: 1px solid #ccc; padding: 8px;">${labelTurma(a.turma)}</td><td style="border: 1px solid #ccc; padding: 8px; color: green;">PAGO</td></tr>`;
+        } else if (tipo === 'pendentes' && !isPago) {
+            linhas += `<tr><td style="border: 1px solid #ccc; padding: 8px;">${a.nome}</td><td style="border: 1px solid #ccc; padding: 8px;">${labelTurma(a.turma)}</td><td style="border: 1px solid #ccc; padding: 8px; color: red;">PENDENTE</td></tr>`;
+        }
+    });
+
+    if (linhas === '') {
+        linhas = '<tr><td colspan="3" style="text-align: center; padding: 20px;">Nenhum aluno encontrado.</td></tr>';
+    }
+
+    return `<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório Global - ${tipo}</title>
+        ${CSS_GLOBAL}
+    </head>
+    <body>
+        <div class="doc-container">
+            <h1 class="doc-title">Relatório Global de ${tipo === 'pagos' ? 'Pagamentos' : 'Pendências'}</h1>
+            <p><strong>Mês Referência:</strong> ${new Date().toLocaleString('pt-BR', { month: 'long' }).toUpperCase()}</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                    <tr style="background: #f0f0f0;">
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Aluno</th>
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Turma</th>
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${linhas}
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>`;
+}

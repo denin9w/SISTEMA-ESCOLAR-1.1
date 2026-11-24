@@ -616,6 +616,7 @@ function abrirModalCarne(aluno) {
 }
 
 // --- MODAL FINANCEIRO (CONTABILIDADE INDIVIDUAL) ---
+// --- MODAL FINANCEIRO (CONTABILIDADE INDIVIDUAL) ---
 function abrirModalFinanceiro(aluno) {
     let modalFin = document.getElementById('modalFinanceiro');
     if (!modalFin) {
@@ -626,14 +627,15 @@ function abrirModalFinanceiro(aluno) {
         modalFin.innerHTML = `
             <div class="modal-content" style="max-width: 600px;">
                 <h2><i class="fa-solid fa-chart-line" style="color: #28a745;"></i> Contabilidade Financeira</h2>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Selecione os meses pagos pelo aluno. O relatório será gerado automaticamente.</p>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Selecione os meses pagos pelo aluno. Você pode apenas salvar ou salvar e gerar o relatório.</p>
                 <form id="formFinanceiro">
                     <div id="listaMesesFin" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
                         <!-- Preenchido via JS -->
                     </div>
-                    <div class="modal-botoes">
-                        <button type="button" class="btn-cancelar" id="btnFecharFin">Cancelar</button>
-                        <button type="submit" class="btn-salvar" style="background: #28a745;">Salvar e Gerar Relatório</button>
+                    <div class="modal-botoes" style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                        <button type="button" class="btn-cancelar" id="btnFecharFin" style="flex: 1;">Cancelar</button>
+                        <button type="button" class="btn-salvar" id="btnSalvarApenasFin" style="background: #007bff; flex: 1;">Salvar</button>
+                        <button type="submit" class="btn-salvar" style="background: #28a745; flex: 1;">Salvar e Gerar Relatório</button>
                     </div>
                 </form>
             </div>
@@ -646,6 +648,7 @@ function abrirModalFinanceiro(aluno) {
     const pagamentos = aluno.pagamentos || [];
     const containerMeses = document.getElementById('listaMesesFin');
     
+    // Renderiza os checkboxes e marca os que já estão salvos
     containerMeses.innerHTML = mesesNomes.map((m, i) => {
         const numMes = i + 1;
         const isPago = pagamentos.includes(numMes);
@@ -659,28 +662,75 @@ function abrirModalFinanceiro(aluno) {
 
     modalFin.style.display = 'flex';
 
+    // Função interna para pegar os meses marcados
+    const getMesesMarcados = () => {
+        const marcados = [];
+        document.querySelectorAll('.check-mes:checked').forEach(cb => {
+            marcados.push(parseInt(cb.value));
+        });
+        return marcados;
+    };
+
+    // Botão Apenas Salvar
+    document.getElementById('btnSalvarApenasFin').onclick = async () => {
+        const btn = document.getElementById('btnSalvarApenasFin');
+        btn.disabled = true;
+        btn.textContent = "Salvando...";
+
+        const novosPagamentos = getMesesMarcados();
+        const { error } = await supabaseClient.from('alunos').update({ pagamentos: novosPagamentos }).eq('id', aluno.id);
+
+        btn.disabled = false;
+        btn.textContent = "Salvar";
+
+        if (error) {
+            alert("Erro ao salvar: " + error.message);
+        } else {
+            alert("Financeiro salvo com sucesso!");
+            modalFin.style.display = 'none';
+            
+            // Atualiza o objeto local para manter os dados se abrir de novo
+            aluno.pagamentos = novosPagamentos; 
+        }
+    };
+
+    // Botão Salvar e Gerar Relatório (Submit do Form)
     document.getElementById('formFinanceiro').onsubmit = async (e) => {
         e.preventDefault();
-        const novosPagamentos = [];
-        document.querySelectorAll('.check-mes:checked').forEach(cb => {
-            novosPagamentos.push(parseInt(cb.value));
-        });
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Gerando...";
 
-        // SALVA AUTOMATICAMENTE NO SUPABASE
+        const novosPagamentos = getMesesMarcados();
+        
+        // 1. Salva no banco de dados
         const { error } = await supabaseClient.from('alunos').update({ pagamentos: novosPagamentos }).eq('id', aluno.id);
-        if (error) return alert("Erro ao salvar financeiro.");
+        
+        if (error) {
+            alert("Erro ao salvar: " + error.message);
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Salvar e Gerar Relatório";
+            return;
+        }
 
-        // Gera o relatório
+        // 2. Busca os dados completos e gera o relatório (Word)
         supabaseClient.from('alunos').select('*').eq('id', aluno.id).single()
             .then(({ data: alunoCompleto }) => {
-                const html = docContabilidade(alunoCompleto, novosPagamentos);
+                // A MÁGICA: Chama a função docContabilidade que está no templates-docs.js
+                const html = docContabilidade(alunoCompleto, novosPagamentos); 
                 
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Gerar Relatório";
+                modalFin.style.display = 'none';
+
+                // Abre a janela de impressão/download
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
                 overlay.innerHTML = `
                     <div class="modal-content" style="text-align: center; max-width: 400px;">
                         <h2 style="justify-content: center; margin-bottom: 10px;">Dados Salvos!</h2>
-                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">O relatório já está pronto para ser impresso ou baixado.</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">O relatório já está pronto.</p>
                         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
                             <button id="btnImprimirFin" class="btn-primario" style="background: var(--destaque);">Imprimir</button>
                             <button id="btnWordFin" class="btn-primario" style="background: #28a745;">Baixar Word</button>
@@ -707,7 +757,13 @@ function abrirModalFinanceiro(aluno) {
                     URL.revokeObjectURL(url);
                 };
 
-                overlay.querySelector('#btnFecharFinDoc').onclick = () => { overlay.remove(); modalFin.style.display = 'none'; };
+                overlay.querySelector('#btnFecharFinDoc').onclick = () => overlay.remove();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Erro ao gerar documento.");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Salvar e Gerar Relatório";
             });
     };
 }
